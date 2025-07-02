@@ -18,9 +18,9 @@ export default function Home() {
   if (!user) return <div>Loading...</div>;
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {/* <WyraTimeLine /> */}
+      <WyraTimeLine />
 
-      <CircleList currentUser={user} />
+      {/* <CircleList currentUser={user} /> */}
     </main>
   );
 }
