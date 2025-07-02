@@ -7,6 +7,7 @@ import Link from "next/link";
 import LikeButton from "./LikeBtn";
 import { User } from "@supabase/supabase-js";
 import DislikeButton from "./DislikeBtn";
+import CommentButton from "./CommentBtn";
 
 interface WyraMedia {
   id: string;
@@ -111,6 +112,11 @@ export default function MyWyraTimeline() {
               <LikeButton wyraId={wyra.id} userId={user?.id} />
 
               <DislikeButton wyraId={wyra.id} userId={user?.id} />
+
+              <CommentButton
+                wyraId={wyra.id}
+                userId={user?.id}
+              />
             </div>
           </div>
         ))}
