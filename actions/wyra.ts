@@ -1,12 +1,9 @@
-
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { headers } from "next/headers";
 import { error } from "console";
 import { WyraInsertInput } from "./types";
-
-
 
 export async function insertWyra(data: WyraInsertInput) {
   const supabase = await createClient();
@@ -55,4 +52,36 @@ export async function insertWyra(data: WyraInsertInput) {
     }
   }
   return wyra;
+}
+
+export async function getMyWyras(userId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("wyra")
+    .select(
+      `
+      id,
+      title,
+      created_at,
+      wyra_option (
+        id,
+        option_text,
+        position,
+        wyra_media (
+          id,
+          media_url,
+          media_type
+        )
+      )
+    `
+    )
+    .eq("created_by", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
 }
