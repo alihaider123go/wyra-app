@@ -267,3 +267,11 @@ body {
     content: "...";
   }
 }
+
+
+.react-select__control {
+  @apply border-gray-300 rounded shadow-sm;
+}
+.react-select__menu {
+  @apply z-50;
+}
