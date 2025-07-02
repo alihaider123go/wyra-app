@@ -8,6 +8,7 @@ import LikeButton from "./LikeBtn";
 import { User } from "@supabase/supabase-js";
 import DislikeButton from "./DislikeBtn";
 import CommentButton from "./CommentBtn";
+import FollowButton from "./FollowUnFollowBtn";
 
 interface WyraMedia {
   id: string;
@@ -26,7 +27,7 @@ interface Wyra {
   id: string;
   title?: string;
   created_at: string;
-  created_by?: string;
+  created_by: string;
   wyra_option: WyraOption[];
 }
 export default function MyWyraTimeline() {
@@ -77,9 +78,17 @@ export default function MyWyraTimeline() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {wyraList.map((wyra) => (
           <div key={wyra.id} className="bg-white border rounded-xl shadow p-5">
-            <h2 className="text-lg font-semibold text-black mb-2">
-              Would you rather...
-            </h2>
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-lg font-semibold text-black">
+                Would you rather...
+              </h2>
+              {user?.id && wyra?.created_by && (
+                <FollowButton
+                  currentUserId={user?.id}
+                  profileUserId={wyra.created_by}
+                />
+              )} 
+            </div>
             {wyra.wyra_option
               .sort((a, b) => a.position - b.position)
               .map((opt: any, index: number) => (
@@ -113,10 +122,7 @@ export default function MyWyraTimeline() {
 
               <DislikeButton wyraId={wyra.id} userId={user?.id} />
 
-              <CommentButton
-                wyraId={wyra.id}
-                userId={user?.id}
-              />
+              <CommentButton wyraId={wyra.id} userId={user?.id} />
             </div>
           </div>
         ))}

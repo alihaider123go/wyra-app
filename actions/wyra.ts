@@ -64,6 +64,7 @@ export async function getMyWyras(userId: string) {
       id,
       title,
       created_at,
+      created_by,
       wyra_option (
         id,
         option_text,
