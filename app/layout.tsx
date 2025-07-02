@@ -30,7 +30,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="mx-auto max-w-screen-lg h-screen flex flex-col">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex flex-col relative overflow-hidden">
+        {/* <div className="mx-auto max-w-screen-lg h-screen flex flex-col"> */}
           <Navbar />
               <div className="flex-grow">{children}</div>
         </div>
