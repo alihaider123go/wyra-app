@@ -1,3 +1,5 @@
+"use client";
+
 import CreateForm from "@/components/wyra/CreateForm";
 
 export default function WyraCreatePage() {

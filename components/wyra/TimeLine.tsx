@@ -30,7 +30,7 @@ interface Wyra {
   created_by: string;
   wyra_option: WyraOption[];
 }
-export default function MyWyraTimeline() {
+export default function WyraTimeline() {
   const [wyraList, setWyraList] = useState<Wyra[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);

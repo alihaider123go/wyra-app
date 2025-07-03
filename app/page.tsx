@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Header from "@/components/header"
 import BottomNavigation from "@/components/bottom-navigation"
 import Loader from "@/components/common/loader";
+import Profile from "@/components/profile";
 
 export default function Home() {
   const supabase = createClient();
@@ -115,6 +116,7 @@ export default function Home() {
               { renderCurrentPage() }
             </CardContent>
           </Card>
+      {/* <Profile userId={user?.id} /> */}
 
         </div>
       </main>
