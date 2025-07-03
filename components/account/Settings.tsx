@@ -11,14 +11,13 @@ interface SettingsProps {
 export default function Settings({ user }: SettingsProps) {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-10">
-      <h1 className="text-3xl font-bold mb-6">Account Settings</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-         
+      <h3 className="text-2xl text-center font-bold text-gray-800">Personal Information</h3>
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-8">          */}
         <ProfileUpdateCard userId={user?.id} />
         {/*
         <ResetPasswordCard />
         <DeleteAccountCard userId={userId} onLogout={onLogout} /> */}
-      </div>
+      {/* </div> */}
     </div>
   );
 }

@@ -74,7 +74,7 @@ const LoginForm = () => {
             </div>
 
             <div className="space-y-4 pt-2">
-              <AuthButton type="Sing In" loading={loading} />
+              <AuthButton type="Sign In" loading={loading} />
             </div>
           </form>
        

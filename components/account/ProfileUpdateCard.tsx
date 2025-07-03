@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { uploadFiles } from "@/actions/common";
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
+import { Eye, EyeOff, Heart, Sparkles, Zap, Users } from "lucide-react"
 
 interface ProfileInformationProps {
   userId: string;
@@ -28,6 +34,7 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
     bio: "",
     avatar: "",
   });
+  const fileInputRef = useRef(null);
 
   const [originalUsername, setOriginalUsername] = useState(""); // Track original username
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -165,20 +172,149 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
     }
   }
 
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
   if (loading) return <div>Loading profile...</div>;
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4 space-y-5">
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-5">
       {errorMsg && (
-        <div className="text-red-600 bg-red-100 p-2 rounded">{errorMsg}</div>
+        <Alert className="border-red-200 bg-red-50/80 backdrop-blur-sm">
+          <AlertDescription className="text-red-700">{errorMsg}</AlertDescription>
+        </Alert>
       )}
+
       {successMsg && (
-        <div className="text-green-600 bg-green-100 p-2 rounded">
-          {successMsg}
-        </div>
+        <Alert className="border-green-200 bg-green-50/80 backdrop-blur-sm">
+          <AlertDescription className="text-green-700">{successMsg}</AlertDescription>
+        </Alert>
       )}
 
       <div>
+        <label className="block font-semibold mb-1">Avatar</label>
+        {profile.avatar && (
+          <img
+            src={profile.avatar}
+            alt="avatar preview"
+            className="w-24 h-24 rounded-full mb-2 object-cover"
+          />
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+        />
+        <button
+        type="button"
+        onClick={handleButtonClick}
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+      >
+        Choose Avatar
+      </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        
+        <div className="space-y-2">
+          <Label htmlFor="firstname" className="text-sm font-semibold text-gray-700"> First Name </Label>
+          <Input
+            type="text"
+            placeholder="First Name"
+            id="firstname"
+            value={profile.firstname}
+            onChange={(e) =>
+              setProfile((p) => ({ ...p, firstname: e.target.value }))
+            }
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="lastname" className="text-sm font-semibold text-gray-700"> Last Name </Label>
+          <Input
+            type="text"
+            placeholder="Last Name"
+            id="lastname"
+            value={profile.lastname}
+            onChange={(e) =>
+              setProfile((p) => ({ ...p, lastname: e.target.value }))
+            }
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            required
+          />
+        </div>
+
+      </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="username" className="text-sm font-semibold text-gray-700"> Username </Label>
+          <Input
+            type="text"
+            placeholder="Username"
+            id="username"
+            value={profile.username}
+            onChange={(e) =>
+              setProfile((p) => ({ ...p, username: e.target.value }))
+            }
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            minLength={3}
+            required
+          />
+          <div className="text-sm mt-1">
+            {profile.username !== originalUsername && (
+              <>
+                {checkingUsername && (
+                  <span className="text-gray-500">Checking availability...</span>
+                )}
+                {!checkingUsername && usernameAvailable === true && (
+                  <span className="text-green-600">Username is available ✓</span>
+                )}
+                {!checkingUsername && usernameAvailable === false && (
+                  <span className="text-red-600">Username is taken ✗</span>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="dob" className="text-sm font-semibold text-gray-700"> Date of Birth </Label>
+          <Input
+            type="date"
+            placeholder="Date of Birth"
+            id="dob"
+            value={profile.dob}
+            onChange={(e) =>
+              setProfile((p) => ({ ...p, dob: e.target.value }))
+            }
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="bio" className="text-sm font-semibold text-gray-700"> Bio </Label>
+          <Textarea
+            placeholder="Write something about yourself"
+            id="bio"
+            rows={4}
+            maxLength={200}
+            value={profile.bio}
+            onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
+            className="text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            required
+          />
+          <div className="text-right text-sm text-gray-500 mt-1">
+            {profile.bio.length}/200 characters
+          </div>
+        </div>
+
+      {/* <div>
         <label className="block font-semibold mb-1">First Name</label>
         <input
           type="text"
@@ -273,15 +409,29 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
           accept="image/*"
           onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
         />
-      </div>
+      </div> */}
 
-      <button
+    <Button
+      type="submit"
+      disabled={updating}
+      className="w-full h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+    >
+      {updating ? (
+        <>
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+          Updating ...
+        </>
+      ) : (
+        "Update Profile"
+      )}
+    </Button>
+      {/* <button
         type="submit"
         disabled={updating}
         className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
       >
         {updating ? "Saving..." : "Update Profile"}
-      </button>
+      </button> */}
     </form>
   );
 }
