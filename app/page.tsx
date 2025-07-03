@@ -6,6 +6,7 @@ import WyraTimeLine from "@/components/wyra/TimeLine";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import Settings from "@/components/account/Settings";
+import Profile from "@/components/profile";
 
 export default function Home() {
   const supabase = createClient();
@@ -19,10 +20,11 @@ export default function Home() {
   if (!user) return <div>Loading...</div>;
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Settings user={user} />
+      {/* <Settings user={user} /> */}
       {/* <WyraTimeLine /> */}
 
       {/* <CircleList currentUser={user} /> */}
+      <Profile userId={user?.id} />
     </main>
   );
 }
