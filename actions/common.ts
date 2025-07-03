@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 export async function uploadFiles(
   files: FileList | File[],
   userId: string,
-  bucket: string = 'avatars' // change as needed
+  bucket: string = 'profile-avatars' // change as needed
 ) {
   const supabase = createClient();
   const uploadedFiles: { name: string; publicUrl: string }[] = [];
