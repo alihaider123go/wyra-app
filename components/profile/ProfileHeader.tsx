@@ -46,9 +46,7 @@ export default function UserProfileHeader({
         <div className="flex-1">
           <h2 className="text-lg font-bold text-black">{user.fullName}</h2>
           <p className="text-gray-600 text-sm">@{user.username}</p>
-          {user.bio && (
-            <p className="text-gray-800 text-sm mt-1">{user.bio}</p>
-          )}
+          {user.bio && <p className="text-gray-800 text-sm mt-1">{user.bio}</p>}
         </div>
       </div>
 

@@ -20,6 +20,12 @@ export function formatDate(dateString: string): string {
   return moment(dateString).format("MMM D, YYYY");
 }
 
+export function formatDateTime(dateString: string): string {
+  return moment(dateString).format("MMM D, YYYY h:mm A");
+}
+
+
+
 // Compact relative time: 3d ago, 5h ago, 10m ago, just now
 export function relativeTime(dateString: string): string {
   const now = moment();
