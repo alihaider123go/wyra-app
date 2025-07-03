@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import UserProfileHeader from "./ProfileHeader";
 import CircleList from "../circle/CircleList";
+import MyWyras from "../wyra/MyWyras";
 
 interface ProfileProps {
   userId: string;
@@ -113,6 +114,7 @@ export default function Profile({ userId }: ProfileProps) {
       />
 
       <CircleList userId={userId} />
+      <MyWyras userId={userId} />
     </div>
   );
 }
