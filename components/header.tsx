@@ -24,7 +24,6 @@ import {
   AlertTriangle,
   Mail,
   LogOut,
-  ArrowLeft,
   MessageCircle,
   Home,
 } from "lucide-react";
@@ -39,7 +38,6 @@ interface HeaderProps {
 
 export default function Header({ activeTab, onTabChange, user }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [notificationCount, setNotificationCount] = useState(12);
@@ -70,18 +68,6 @@ export default function Header({ activeTab, onTabChange, user }: HeaderProps) {
     }
   }, [user]);
 
-  const handleMenuClick = (page: string) => {
-    setCurrentPage(page);
-  };
-
-  const handleBack = () => {
-    setCurrentPage(null);
-  };
-
-  const handleDrawerClose = () => {
-    setIsDrawerOpen(false);
-    setCurrentPage(null);
-  };
 
   const onHandlePageClick = (name: string) => {
     onTabChange(name);
@@ -143,234 +129,6 @@ export default function Header({ activeTab, onTabChange, user }: HeaderProps) {
     { icon: Mail, label: "Contact Us", slug: "contact", isActive: false },
   ];
 
-  // Render page content within drawer
-  const renderPageContent = () => {
-    const pageProps = {
-      user,
-      onBack: handleBack,
-    };
-
-    switch (currentPage) {
-      case "account-settings":
-        return "AccountSettings";
-      // return <AccountSettings {...pageProps} />
-      case "notification-settings":
-        return "NotificationSettings";
-      // return <NotificationSettings {...pageProps} />
-      case "invite":
-        return "InvitePage";
-      // return <InvitePage {...pageProps} />
-      case "block-unblock":
-        return "BlockUnblock";
-      // return <BlockUnblock {...pageProps} />
-      case "help-faqs":
-        return "HelpFAQs";
-      // return <HelpFAQs {...pageProps} />
-      case "about-us":
-        return "AboutUs";
-      // return <AboutUs {...pageProps} />
-      case "terms":
-        return (
-          <div className="p-4">
-            <div className="flex items-center mb-6">
-              <Button variant="ghost" onClick={handleBack} className="mr-4">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Terms & Conditions
-              </h1>
-            </div>
-            <div className="prose max-w-none text-sm">
-              <p className="mb-4">
-                <strong>Last updated:</strong> January 2024
-              </p>
-              <h3 className="text-lg font-semibold mb-3">
-                1. Acceptance of Terms
-              </h3>
-              <p className="mb-4">
-                By accessing and using Wyra, you accept and agree to be bound by
-                the terms and provision of this agreement.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">2. Use License</h3>
-              <p className="mb-4">
-                Permission is granted to temporarily download one copy of Wyra
-                for personal, non-commercial transitory viewing only.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">3. User Conduct</h3>
-              <p className="mb-4">
-                Users must not post content that is harmful, offensive, or
-                violates community guidelines.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">4. Privacy</h3>
-              <p className="mb-4">
-                Your privacy is important to us. Please review our Privacy
-                Policy for information on how we collect and use data.
-              </p>
-            </div>
-          </div>
-        );
-      case "privacy":
-        return (
-          <div className="p-4">
-            <div className="flex items-center mb-6">
-              <Button variant="ghost" onClick={handleBack} className="mr-4">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Privacy Policy
-              </h1>
-            </div>
-            <div className="prose max-w-none text-sm">
-              <p className="mb-4">
-                <strong>Last updated:</strong> January 2024
-              </p>
-              <h3 className="text-lg font-semibold mb-3">
-                Information We Collect
-              </h3>
-              <p className="mb-4">
-                We collect information you provide directly to us, such as when
-                you create an account, post content, or contact us.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">
-                How We Use Your Information
-              </h3>
-              <p className="mb-4">
-                We use the information we collect to provide, maintain, and
-                improve our services.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">
-                Information Sharing
-              </h3>
-              <p className="mb-4">
-                We do not sell, trade, or otherwise transfer your personal
-                information to third parties without your consent.
-              </p>
-            </div>
-          </div>
-        );
-      case "cookies":
-        return (
-          <div className="p-4">
-            <div className="flex items-center mb-6">
-              <Button variant="ghost" onClick={handleBack} className="mr-4">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Cookies Policy
-              </h1>
-            </div>
-            <div className="prose max-w-none text-sm">
-              <p className="mb-4">
-                This policy explains how we use cookies and similar
-                technologies.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">What are Cookies?</h3>
-              <p className="mb-4">
-                Cookies are small text files stored on your device when you
-                visit our website or use our app.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">How We Use Cookies</h3>
-              <p className="mb-4">
-                We use cookies to improve your experience, remember your
-                preferences, and analyze usage patterns.
-              </p>
-            </div>
-          </div>
-        );
-      case "community":
-        return (
-          <div className="p-4">
-            <div className="flex items-center mb-6">
-              <Button variant="ghost" onClick={handleBack} className="mr-4">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Community Guidelines
-              </h1>
-            </div>
-            <div className="prose max-w-none text-sm">
-              <h3 className="text-lg font-semibold mb-3">Be Respectful</h3>
-              <p className="mb-4">
-                Treat all community members with respect and kindness. No
-                harassment, bullying, or hate speech.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">
-                Keep it Appropriate
-              </h3>
-              <p className="mb-4">
-                Share content that's suitable for all ages. No explicit,
-                violent, or inappropriate material.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">No Spam</h3>
-              <p className="mb-4">
-                Don't post repetitive content or spam. Quality over quantity.
-              </p>
-            </div>
-          </div>
-        );
-      case "csae":
-        return (
-          <div className="p-4">
-            <div className="flex items-center mb-6">
-              <Button variant="ghost" onClick={handleBack} className="mr-4">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Child Safety Policy
-              </h1>
-            </div>
-            <div className="prose max-w-none text-sm">
-              <p className="mb-4">
-                We are committed to protecting children and maintaining a safe
-                environment for all users.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">Age Requirements</h3>
-              <p className="mb-4">
-                Users must be at least 13 years old to use Wyra. We verify age
-                during registration.
-              </p>
-              <h3 className="text-lg font-semibold mb-3">Reporting</h3>
-              <p className="mb-4">
-                If you encounter inappropriate content involving minors, please
-                report it immediately.
-              </p>
-            </div>
-          </div>
-        );
-      case "contact":
-        return (
-          <div className="p-4">
-            <div className="flex items-center mb-6">
-              <Button variant="ghost" onClick={handleBack} className="mr-4">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <h1 className="text-2xl font-bold text-gray-900">Contact Us</h1>
-            </div>
-            <div className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">General Support</h3>
-                <p className="text-sm text-gray-600">support@wyra.app</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">Business Inquiries</h3>
-                <p className="text-sm text-gray-600">business@wyra.app</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">Press & Media</h3>
-                <p className="text-sm text-gray-600">press@wyra.app</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">Report Issues</h3>
-                <p className="text-sm text-gray-600">report@wyra.app</p>
-              </div>
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -385,110 +143,105 @@ export default function Header({ activeTab, onTabChange, user }: HeaderProps) {
             </SheetTrigger>
             <SheetContent side="left" className="w-full p-0 bg-white">
               <ScrollArea className="h-full bg-green">
-                {currentPage ? (
-                  // Render the selected page
-                  <div className="h-full">{renderPageContent()}</div>
-                ) : (
-                  // Render the main menu
-                  <div className="flex flex-col h-full">
-                    {/* Header */}
-                    <div className="flex items-center p-6 border-b border-gray-200">
-                      <Link href="/" onClick={() => onHandlePageClick("null")}>
-                        <div className="max-w-md mx-auto flex items-center justify-center">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="14"
-                              height="14"
-                              viewBox="-5 -5 34 34"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="lucide lucide-heart w-8 h-8 text-white"
-                            >
-                              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
-                            </svg>
-                          </div>
-                          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-montserrat">
-                            Wyra
-                          </h2>
+                <div className="flex flex-col h-full">
+                  {/* Header */}
+                  <div className="flex items-center p-6 border-b border-gray-200">
+                    <Link href="/" onClick={() => onHandlePageClick("null")}>
+                      <div className="max-w-md mx-auto flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="-5 -5 34 34"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-heart w-8 h-8 text-white"
+                          >
+                            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                          </svg>
                         </div>
-                      </Link>
-                    </div>
+                        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-montserrat">
+                          Wyra
+                        </h2>
+                      </div>
+                    </Link>
+                  </div>
 
-                    {/* User Info */}
-                    <div className="p-6 border-b border-gray-200">
-                      <div className="flex items-center">
-                        {userProfile?.avatar ? (
-                          <img
-                            src={userProfile.avatar}
-                            alt="Avatar"
-                            className="w-12 h-12 rounded-full object-cover mr-3"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                            <span className="text-lg font-semibold text-gray-600">
-                              {userProfile?.firstname?.[0]?.toUpperCase() ||
-                                userProfile?.email?.[0]?.toUpperCase()}
-                            </span>
-                          </div>
-                        )}
+                  {/* User Info */}
+                  <div
+                    className="p-6 border-b border-gray-200 w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                    onClick={() => onHandlePageClick("profile")}
+                  >
+                    <div className="flex items-center">
+                      {userProfile?.avatar ? (
+                        <img
+                          src={userProfile.avatar}
+                          alt="Avatar"
+                          className="w-12 h-12 rounded-full object-cover mr-3"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-lg font-semibold text-gray-600">
+                            {userProfile?.firstname?.[0]?.toUpperCase() ||
+                              userProfile?.email?.[0]?.toUpperCase()}
+                          </span>
+                        </div>
+                      )}
 
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {userProfile?.firstname} {userProfile?.lastname}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            @{userProfile?.username}
-                          </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">
+                          {userProfile?.firstname} {userProfile?.lastname}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          @{userProfile?.username}
                         </div>
                       </div>
                     </div>
-
-                    {/* Menu Items */}
-                    <nav className="flex-1 p-4">
-                      <ul className="space-y-1">
-                        {menuItems.map((item, index) => {
-                          const isActive = activeTab === item?.slug;
-                          return (
-                            <li key={index}>
-                              <button
-                                onClick={() => onHandlePageClick(item?.slug)}
-                                className={`w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors ${
-                                  isActive
-                                    ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-110"
-                                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
-                                }`}
-                              >
-                                <item.icon
-                                  className={`w-5 h-5 mr-3 ${
-                                    isActive ? "text-white" : "text-gray-500"
-                                  }`}
-                                />
-                                <span className="font-medium">
-                                  {item.label}
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </nav>
-
-                    {/* Logout */}
-                    <div className="border-t border-gray-200 p-4">
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center px-4 py-3 text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <LogOut className="w-5 h-5 mr-3" />
-                        <span className="font-medium">Log Out</span>
-                      </button>
-                    </div>
                   </div>
-                )}
+
+                  {/* Menu Items */}
+                  <nav className="flex-1 p-4">
+                    <ul className="space-y-1">
+                      {menuItems.map((item, index) => {
+                        const isActive = activeTab === item?.slug;
+                        return (
+                          <li key={index}>
+                            <button
+                              onClick={() => onHandlePageClick(item?.slug)}
+                              className={`w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors ${
+                                isActive
+                                  ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-110"
+                                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
+                              }`}
+                            >
+                              <item.icon
+                                className={`w-5 h-5 mr-3 ${
+                                  isActive ? "text-white" : "text-gray-500"
+                                }`}
+                              />
+                              <span className="font-medium">{item.label}</span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </nav>
+
+                  {/* Logout */}
+                  <div className="border-t border-gray-200 p-4">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center px-4 py-3 text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <LogOut className="w-5 h-5 mr-3" />
+                      <span className="font-medium">Log Out</span>
+                    </button>
+                  </div>
+                </div>
               </ScrollArea>
             </SheetContent>
           </Sheet>
