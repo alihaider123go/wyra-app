@@ -6,7 +6,6 @@ import WyraTimeLine from "@/components/wyra/TimeLine";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import Settings from "@/components/account/Settings";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Header from "@/components/header"
 import BottomNavigation from "@/components/bottom-navigation"
 import Loader from "@/components/common/loader";
@@ -106,16 +105,7 @@ export default function Home() {
 
       <main className="pb-20 md:pb-4">
         <div className="max-w-2xl mx-auto p-4">
-
-          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
-            {/* <CardHeader className="text-center pb-6"> */}
-              {/* <CardTitle className="text-2xl font-bold text-gray-800">Welcome Back</CardTitle> */}
-              {/* <CardDescription className="text-gray-600 text-lg">Sign in to start making choices</CardDescription> */}
-            {/* </CardHeader> */}
-            <CardContent>
               { renderCurrentPage() }
-            </CardContent>
-          </Card>
       {/* <Profile userId={user?.id} /> */}
 
         </div>

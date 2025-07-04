@@ -192,26 +192,28 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
         </Alert>
       )}
 
-      <div>
-        <label className="block font-semibold mb-1">Avatar</label>
-        {profile.avatar && (
-          <img
-            src={profile.avatar}
-            alt="avatar preview"
-            className="w-24 h-24 rounded-full mb-2 object-cover"
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block font-semibold mb-1">Choose Avatar</label>
+          {profile.avatar && (
+            <img
+              src={profile.avatar}
+              alt="avatar preview"
+              className="shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 w-24 h-24 rounded-full mb-2 object-cover"
+            />
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
           />
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          className="hidden"
-          onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-        />
+        </div>
         <button
         type="button"
         onClick={handleButtonClick}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        className="h-12 w-full mx-[-50px] my-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
       >
         Choose Avatar
       </button>
@@ -250,6 +252,8 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
         </div>
 
       </div>
+
+      <div className="grid grid-cols-2 gap-3">
 
         <div className="space-y-2">
           <Label htmlFor="username" className="text-sm font-semibold text-gray-700"> Username </Label>
@@ -296,6 +300,8 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
             required
           />
         </div>
+
+    </div>
 
         <div className="space-y-2">
           <Label htmlFor="bio" className="text-sm font-semibold text-gray-700"> Bio </Label>
