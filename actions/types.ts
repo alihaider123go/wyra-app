@@ -38,3 +38,10 @@ export interface UserProfile {
   username: string;
   avatar?: string;
 }
+
+export interface Circle {
+  id: string;
+  name: string;
+  created_by: string;
+  created_at: string;
+}

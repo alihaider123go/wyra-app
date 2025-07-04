@@ -86,3 +86,98 @@ export async function getMyWyras(userId: string) {
 
   return data;
 }
+
+export const getUnifiedHomeWyras = async (userId: string) => {
+  const supabase = createClient();
+
+  // 1. Get following IDs
+  const { data: followingData, error: followError } = await supabase
+    .from("user_followers")
+    .select("following_id")
+    .eq("follower_id", userId);
+
+  if (followError) {
+    console.error("Error fetching following:", followError);
+    return [];
+  }
+
+  const followingIds = followingData?.map((f) => f.following_id) ?? [];
+
+  // 2. Get circles where user is a member
+  const { data: memberCircles, error: memberError } = await supabase
+    .from("circle_members")
+    .select("circle_id")
+    .eq("user_id", userId);
+
+  if (memberError) {
+    console.error("Error fetching circle memberships:", memberError);
+    return [];
+  }
+
+  const memberCircleIds = memberCircles?.map((r) => r.circle_id) ?? [];
+
+  // 3. Get Wyra IDs from those circles
+  let wyraFromCircles: string[] = [];
+  if (memberCircleIds.length > 0) {
+    const { data: wyraCircleLinks, error: linkError } = await supabase
+      .from("wyra_circles")
+      .select("wyra_id")
+      .in("circle_id", memberCircleIds);
+
+    if (linkError) {
+      console.error("Error fetching wyra_circles:", linkError);
+      return [];
+    }
+
+    wyraFromCircles = wyraCircleLinks?.map((w) => w.wyra_id) ?? [];
+  }
+
+  // 4. Build OR condition string
+  const allAuthorIds = [userId, ...followingIds];
+  const orFilters: string[] = [];
+
+  if (allAuthorIds.length > 0) {
+    const authorFilter = allAuthorIds.map(id => `created_by.eq.${id}`).join(',');
+    orFilters.push(authorFilter);
+  }
+
+  if (wyraFromCircles.length > 0) {
+    const wyraFilter = wyraFromCircles.map(id => `id.eq.${id}`).join(',');
+    orFilters.push(wyraFilter);
+  }
+
+  // 5. Final query
+  let query = supabase
+    .from("wyra")
+    .select(
+      `
+      id,
+      title,
+      created_at,
+      created_by,
+      wyra_option (
+        id,
+        option_text,
+        position,
+        wyra_media (
+          id,
+          media_url,
+          media_type
+        )
+      )
+      `
+    )
+    .order("created_at", { ascending: false });
+
+  if (orFilters.length > 0) {
+    query = query.or(orFilters.join(','));
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Unified Wyras fetch error:", error);
+    return [];
+  }
+  return data ?? [];
+};

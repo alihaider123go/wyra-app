@@ -2,78 +2,52 @@
 
 import React, { useState } from "react";
 import { FaRegImage, FaSmile } from "react-icons/fa";
-import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import { uploadFiles } from "@/actions/common";
-import { insertWyra } from "@/actions/wyra";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
 import { createClient } from "@/utils/supabase/client";
-import { WyraInsertInput } from "@/actions/types";
-import dynamic from "next/dynamic";
-import Button from "../ui/Button";
+import { uploadFiles } from "@/actions/common";
+import { insertWyra } from "@/actions/wyra";
+import { WyraInsertInput, Circle } from "@/actions/types";
+import Button from "@/components/ui/btn";
+import CircleMultiSelectModal from "@/components/wyra/CircleMultiSelectModal";
+
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
 export default function CreateWyra() {
   const [optionOne, setOptionOne] = useState("");
   const [optionTwo, setOptionTwo] = useState("");
   const [filesOne, setFilesOne] = useState<File[]>([]);
   const [filesTwo, setFilesTwo] = useState<File[]>([]);
-  const [showEmojiPickerOne, setShowEmojiPickerOne] = useState(false);
-  const [showEmojiPickerTwo, setShowEmojiPickerTwo] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-
-  const EmojiPicker = dynamic(() => import("emoji-picker-react"), {
-    ssr: false,
-  });
+  const [showCircleModal, setShowCircleModal] = useState(false);
+  const [availableCircles, setAvailableCircles] = useState<Circle[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [createdWyraId, setCreatedWyraId] = useState<string | null>(null);
 
   const supabase = createClient();
-
-  //  const handleEmojiSelect = (
-  //   emojiData: EmojiClickData,
-  //   event: MouseEvent,
-  //   option: 1 | 2
-  // ) => {
-  //   const emoji = emojiData.emoji;
-  //   if (option === 1 && optionOne.length < 150) {
-  //     setOptionOne((prev) => prev + emoji);
-  //     setShowEmojiPickerOne(false);
-  //   } else if (option === 2 && optionTwo.length < 150) {
-  //     setOptionTwo((prev) => prev + emoji);
-  //     setShowEmojiPickerTwo(false);
-  //   }
-  // };
+  const router = useRouter();
 
   const handleFileChange = (
     option: 1 | 2,
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const selectedFiles = e.target.files;
-    if (!selectedFiles) return;
-
-    const filesArray = Array.from(selectedFiles);
-
-    if (option === 1) {
-      setFilesOne((prev) => [...prev, ...filesArray]);
-    } else {
-      setFilesTwo((prev) => [...prev, ...filesArray]);
-    }
+    const files = e.target.files;
+    if (!files) return;
+    const array = Array.from(files);
+    if (option === 1) setFilesOne((prev) => [...prev, ...array]);
+    else setFilesTwo((prev) => [...prev, ...array]);
   };
 
-  const renderPreviews = (files: File[]) => {
-    return files.map((file, idx) => {
+  const renderPreviews = (files: File[]) =>
+    files.map((file, idx) => {
       const url = URL.createObjectURL(file);
       const isImage = file.type.startsWith("image");
       const isVideo = file.type.startsWith("video");
-
       return (
         <div key={idx} className="mt-3">
           {isImage && (
-            <img
-              src={url}
-              alt={`preview-${idx}`}
-              className="max-h-40 rounded-md"
-            />
+            <img src={url} alt="preview" className="max-h-40 rounded-md" />
           )}
           {isVideo && (
             <video src={url} controls className="max-h-40 rounded-md" />
@@ -81,71 +55,101 @@ export default function CreateWyra() {
         </div>
       );
     });
-  };
 
-  const handleSubmit = async () => {
+  const prepareToSubmit = async () => {
     if (!optionOne.trim() || !optionTwo.trim()) {
       alert("Both options must be filled.");
-      setError("Both options must be filled.");
       return;
     }
-    setLoading(true);
-    setError(null);
-    // Get user ID from Supabase auth session
+
     const {
       data: { user },
-      error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) {
-      alert("You must be logged in to submit a Wyra.");
+    if (!user) {
+      alert("You must be logged in.");
       return;
     }
 
-    try {
-      console.log(filesOne)
-      // Upload files for option 1 if any
-      const optionOneUploadResults =
-        filesOne.length > 0 ? await uploadFiles(filesOne,user?.id, "wyra-media") : [];
+    setUserId(user.id);
 
-      // Upload files for option 2 if any
-      const optionTwoUploadResults =
-        filesTwo.length > 0 ? await uploadFiles(filesTwo,user?.id, "wyra-media",) : [];
+    const { data: myCircles, error } = await supabase
+      .from("circles")
+      .select(
+        "*, circle_members(user_id, user_profiles(id,firstname,lastname,email, username, avatar))"
+      )
+      .eq("created_by", user.id);
 
+    // ✅ Only keep circles with at least one member
+    const circlesWithMembers = (myCircles ?? []).filter(
+      (circle) => circle.circle_members && circle.circle_members.length > 0
+    );
 
-      const optionOneUrls = optionOneUploadResults.map(f => f.publicUrl);
-      const optionTwoUrls = optionTwoUploadResults.map(f => f.publicUrl);
-
-      const insertData: WyraInsertInput = {
-        created_by: user?.id,
-        options: [
-          {
-            option_text: optionOne,
-            media_files: optionOneUrls.map((url) => ({
-              url,
-              media_type: url.match(/\.(mp4|webm|ogg)$/i) ? "video" : "image",
-            })),
-          },
-          {
-            option_text: optionTwo,
-            media_files: optionTwoUrls.map((url) => ({
-              url,
-              media_type: url.match(/\.(mp4|webm|ogg)$/i) ? "video" : "image",
-            })),
-          },
-        ],
-      };
-      console.log("Insert Data:", insertData);
-      const wyra = await insertWyra(insertData);
-      if (wyra) {
-        router.push("/");
-      }
-      
-
-      setLoading(false);
-    } catch (error: any) {
-      console.log("Failed to submit Wyra: " + error.message);
+    console.log("Circles with members:", circlesWithMembers);
+    if (error) {
+      console.error("Failed to fetch user circles:", error.message);
+      alert("Failed to load your circles.");
+      return;
     }
+
+    if (circlesWithMembers.length > 0) {
+      setAvailableCircles(circlesWithMembers);
+      setShowCircleModal(true);
+    } else {
+      handleSubmit([]); 
+    }
+  };
+
+  const handleSubmit = async (circleIds: string[]) => {
+    setLoading(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const uploadedOne =
+      filesOne.length > 0
+        ? await uploadFiles(filesOne, user.id, "wyra-media")
+        : [];
+    const uploadedTwo =
+      filesTwo.length > 0
+        ? await uploadFiles(filesTwo, user.id, "wyra-media")
+        : [];
+
+    const optionOneUrls = uploadedOne.map((f) => f.publicUrl);
+    const optionTwoUrls = uploadedTwo.map((f) => f.publicUrl);
+
+    const insertData: WyraInsertInput = {
+      created_by: user.id,
+      options: [
+        {
+          option_text: optionOne,
+          media_files: optionOneUrls.map((url) => ({
+            url,
+            media_type: url.match(/\.(mp4|webm|ogg)$/i) ? "video" : "image",
+          })),
+        },
+        {
+          option_text: optionTwo,
+          media_files: optionTwoUrls.map((url) => ({
+            url,
+            media_type: url.match(/\.(mp4|webm|ogg)$/i) ? "video" : "image",
+          })),
+        },
+      ],
+    };
+
+    const wyra = await insertWyra(insertData);
+    if (wyra?.id && circleIds.length > 0) {
+      await supabase
+        .from("wyra_circles")
+        .insert(circleIds.map((cid) => ({ wyra_id: wyra.id, circle_id: cid })));
+    }
+
+    setLoading(false);
+    router.push("/");
   };
 
   return (
@@ -154,20 +158,19 @@ export default function CreateWyra() {
         Would you rather...
       </h1>
 
-      {/* Option One Card */}
+      {/* Option One */}
       <div className="bg-white border rounded-2xl shadow p-5 mb-8 relative">
         <textarea
           maxLength={150}
           rows={4}
           placeholder="Type option one..."
-          className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
           value={optionOne}
           onChange={(e) => setOptionOne(e.target.value)}
         />
         <div className="text-xs text-gray-400 absolute bottom-3 right-6">
           {150 - optionOne.length} Max
         </div>
-
         <div className="flex items-center mt-4 gap-4 relative">
           <label className="cursor-pointer">
             <FaRegImage
@@ -182,44 +185,28 @@ export default function CreateWyra() {
               onChange={(e) => handleFileChange(1, e)}
             />
           </label>
-          <button
-            type="button"
-            onClick={() => setShowEmojiPickerOne((prev) => !prev)}
-          >
-            <FaSmile size={22} className="text-gray-600 hover:text-gray-800" />
-          </button>
-
-          {/* {showEmojiPickerOne && ( */}
-          {/* <div className="absolute top-12 left-0 z-30">
-              <EmojiPicker
-                onEmojiClick={(emojiData, event) => handleEmojiSelect(emojiData, event, 2)}
-              />
-            </div> */}
-          {/* )} */}
+          <FaSmile size={22} className="text-gray-600" />
         </div>
-
         {renderPreviews(filesOne)}
       </div>
 
-      {/* Or Separator */}
       <div className="text-center font-semibold text-xl text-gray-700 mb-8">
         OR
       </div>
 
-      {/* Option Two Card */}
+      {/* Option Two */}
       <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
         <textarea
           maxLength={150}
           rows={4}
           placeholder="Type option two..."
-          className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
           value={optionTwo}
           onChange={(e) => setOptionTwo(e.target.value)}
         />
         <div className="text-xs text-gray-400 absolute bottom-3 right-6">
           {150 - optionTwo.length} Max
         </div>
-
         <div className="flex items-center mt-4 gap-4 relative">
           <label className="cursor-pointer">
             <FaRegImage
@@ -234,41 +221,33 @@ export default function CreateWyra() {
               onChange={(e) => handleFileChange(2, e)}
             />
           </label>
-          <button
-            type="button"
-            onClick={() => setShowEmojiPickerTwo((prev) => !prev)}
-          >
-            <FaSmile size={22} className="text-gray-600 hover:text-gray-800" />
-          </button>
-
-          {/* {showEmojiPickerTwo && ( */}
-          {/* <div className="absolute top-12 left-0 z-30">
-              <EmojiPicker
-                onEmojiClick={(emojiData, event) => handleEmojiSelect(emojiData, event, 2)}
-              />
-            </div> */}
-          {/* )} */}
+          <FaSmile size={22} className="text-gray-600" />
         </div>
-
         {renderPreviews(filesTwo)}
       </div>
 
-      {/* Submit Button */}
       <div className="text-center mt-10">
-        {/* <button
-          onClick={handleSubmit}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium shadow transition"
-        >
-          Submit Wyra
-        </button> */}
         <Button
           btnText="Create Wyra"
           loading={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium shadow transition"
+          className="bg-blue-600 text-white"
           loadingText="Creating..."
-          onClick={handleSubmit}
+          onClick={prepareToSubmit}
         />
       </div>
+
+      {/* Modal */}
+      {showCircleModal && userId && (
+        <CircleMultiSelectModal
+          userId={userId}
+          circles={availableCircles}
+          onCancel={() => setShowCircleModal(false)}
+          onSelect={(selectedCircleIds) => {
+            setShowCircleModal(false);
+            handleSubmit(selectedCircleIds);
+          }}
+        />
+      )}
     </div>
   );
 }

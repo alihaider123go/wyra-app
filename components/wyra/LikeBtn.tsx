@@ -22,8 +22,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
         .eq("wyra_id", wyraId)
         .eq("user_id", userId)
         .eq("type", "like")
-        .single();
-
+        .maybeSingle();
       setLiked(data?.type === "like");
     };
 

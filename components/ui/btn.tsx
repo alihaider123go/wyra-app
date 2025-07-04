@@ -1,6 +1,6 @@
 import React from "react";
 
-const Button = ({
+const btn = ({
   btnText,
   loading,
   loadingText = "Loading...",
@@ -8,7 +8,7 @@ const Button = ({
   className
 }: {
   btnText: string;
-  loading: boolean;
+  loading?: boolean;
   loadingText?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
@@ -26,4 +26,4 @@ const Button = ({
   );
 };
 
-export default Button;
+export default btn;

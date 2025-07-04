@@ -22,7 +22,7 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId }) => {
         .eq("wyra_id", wyraId)
         .eq("user_id", userId)
         .eq("type", "dislike")
-        .single();
+        .maybeSingle();
 
       setDisliked(data?.type === "dislike");
     };

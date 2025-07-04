@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getMyWyras } from "@/actions/wyra"; // path to your function
+import { getUnifiedHomeWyras } from "@/actions/wyra"; // path to your function
 import { createClient } from "@/utils/supabase/client"; // your supabase client
 import Link from "next/link";
 import LikeButton from "./LikeBtn";
@@ -52,7 +52,7 @@ export default function WyraTimeline() {
       }
 
       try {
-        const result = await getMyWyras(user.id); // call query function
+        const result = await getUnifiedHomeWyras(user.id); // call query function
         setWyraList(result || []);
       } catch (err) {
         console.error("Failed to fetch wyras", err);
