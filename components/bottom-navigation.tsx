@@ -1,14 +1,39 @@
 "use client"
 
 import { Home, Heart, Plus, MessageCircle, User } from "lucide-react"
+import { UserProfile } from "@/actions/types";
+import { createClient } from "@/utils/supabase/client";
+import { useEffect, useState } from "react";
+import { User as UserType } from "@supabase/supabase-js";
 
 interface BottomNavigationProps {
   activeTab: string
   onTabChange: (tab: string) => void
-  userProfilePicture?: string
+  user: UserType;
 }
 
-export default function BottomNavigation({ activeTab, onTabChange, userProfilePicture }: BottomNavigationProps) {
+export default function BottomNavigation({ activeTab, onTabChange, user }: BottomNavigationProps) {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const supabase = createClient();
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const { data: profile, error: profileError } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) {
+        console.error("Profile fetch error:", profileError);
+        return;
+      }
+
+      setUserProfile(profile);
+    };
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
   const tabs = [
     { id: "home", icon: Home, label: "Home" },
     { id: "favorites", icon: Heart, label: "Favorites" },
@@ -34,10 +59,10 @@ export default function BottomNavigation({ activeTab, onTabChange, userProfilePi
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
               }`}
             >
-              {tab.id === "profile" && userProfilePicture ? (
+              {tab.id === "profile" && userProfile?.avatar ? (
                 <div className={`w-6 h-6 rounded-full overflow-hidden ${isActive ? "ring-2 ring-white" : ""}`}>
                   <img
-                    src={userProfilePicture || "/placeholder.svg"}
+                    src={userProfile?.avatar || "/placeholder.svg"}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />

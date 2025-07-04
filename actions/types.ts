@@ -37,6 +37,8 @@ export interface UserProfile {
   lastname: string;
   username: string;
   avatar?: string;
+  email?: string;
+  bio?: string;
 }
 
 export interface Circle {

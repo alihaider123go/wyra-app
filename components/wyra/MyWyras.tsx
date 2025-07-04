@@ -28,7 +28,7 @@ interface Wyra {
 }
 
 interface MyWyrasProps {
-  userId: string | null;
+  userId: string | undefined;
 }
 
 export default function MyWyras({ userId }: MyWyrasProps) {

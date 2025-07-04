@@ -7,7 +7,7 @@ import CircleList from "../circle/CircleList";
 import MyWyras from "../wyra/MyWyras";
 
 interface ProfileProps {
-  userId: string;
+  userId: string|undefined;
 }
 
 interface UserProfile {
