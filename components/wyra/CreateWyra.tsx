@@ -96,7 +96,7 @@ export default function CreateWyra() {
       setAvailableCircles(circlesWithMembers);
       setShowCircleModal(true);
     } else {
-      handleSubmit([]); 
+      handleSubmit([]);
     }
   };
 
@@ -153,101 +153,108 @@ export default function CreateWyra() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-center text-3xl font-bold mb-10 text-black">
-        Would you rather...
-      </h1>
+    <div className="w-full flex mt-20 justify-center">
+      <section className="flex flex-col w-[400px]   bg-gray-50 rounded-lg shadow-md p-6">
+        <h1 className="text-3xl w-full text-center font-bold mb-6 font-semibold text-xl text-gray-700 mb-8">
+          Create Wyra
+        </h1>
+        <div className="max-w-2xl mx-auto p-6">
+          <h1 className="text-center text-3xl font-bold mb-10 text-black">
+            Would you rather...
+          </h1>
 
-      {/* Option One */}
-      <div className="bg-white border rounded-2xl shadow p-5 mb-8 relative">
-        <textarea
-          maxLength={150}
-          rows={4}
-          placeholder="Type option one..."
-          className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
-          value={optionOne}
-          onChange={(e) => setOptionOne(e.target.value)}
-        />
-        <div className="text-xs text-gray-400 absolute bottom-3 right-6">
-          {150 - optionOne.length} Max
-        </div>
-        <div className="flex items-center mt-4 gap-4 relative">
-          <label className="cursor-pointer">
-            <FaRegImage
-              size={22}
-              className="text-gray-600 hover:text-gray-800"
+          {/* Option One */}
+          <div className="bg-white border rounded-2xl shadow p-5 mb-8 relative">
+            <textarea
+              maxLength={150}
+              rows={4}
+              placeholder="Type option one..."
+              className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+              value={optionOne}
+              onChange={(e) => setOptionOne(e.target.value)}
             />
-            <input
-              type="file"
-              accept="image/*,video/*"
-              multiple
-              hidden
-              onChange={(e) => handleFileChange(1, e)}
+            <div className="text-xs text-gray-400 absolute bottom-3 right-6">
+              {150 - optionOne.length} Max
+            </div>
+            <div className="flex items-center mt-4 gap-4 relative">
+              <label className="cursor-pointer">
+                <FaRegImage
+                  size={22}
+                  className="text-gray-600 hover:text-gray-800"
+                />
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  hidden
+                  onChange={(e) => handleFileChange(1, e)}
+                />
+              </label>
+              <FaSmile size={22} className="text-gray-600" />
+            </div>
+            {renderPreviews(filesOne)}
+          </div>
+
+          <div className="text-center font-semibold text-xl text-gray-700 mb-8">
+            OR
+          </div>
+
+          {/* Option Two */}
+          <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
+            <textarea
+              maxLength={150}
+              rows={4}
+              placeholder="Type option two..."
+              className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+              value={optionTwo}
+              onChange={(e) => setOptionTwo(e.target.value)}
             />
-          </label>
-          <FaSmile size={22} className="text-gray-600" />
-        </div>
-        {renderPreviews(filesOne)}
-      </div>
+            <div className="text-xs text-gray-400 absolute bottom-3 right-6">
+              {150 - optionTwo.length} Max
+            </div>
+            <div className="flex items-center mt-4 gap-4 relative">
+              <label className="cursor-pointer">
+                <FaRegImage
+                  size={22}
+                  className="text-gray-600 hover:text-gray-800"
+                />
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  hidden
+                  onChange={(e) => handleFileChange(2, e)}
+                />
+              </label>
+              <FaSmile size={22} className="text-gray-600" />
+            </div>
+            {renderPreviews(filesTwo)}
+          </div>
 
-      <div className="text-center font-semibold text-xl text-gray-700 mb-8">
-        OR
-      </div>
-
-      {/* Option Two */}
-      <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
-        <textarea
-          maxLength={150}
-          rows={4}
-          placeholder="Type option two..."
-          className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
-          value={optionTwo}
-          onChange={(e) => setOptionTwo(e.target.value)}
-        />
-        <div className="text-xs text-gray-400 absolute bottom-3 right-6">
-          {150 - optionTwo.length} Max
-        </div>
-        <div className="flex items-center mt-4 gap-4 relative">
-          <label className="cursor-pointer">
-            <FaRegImage
-              size={22}
-              className="text-gray-600 hover:text-gray-800"
+          <div className="text-center mt-10">
+            <Button
+              btnText="Create Wyra"
+              loading={loading}
+              className="bg-blue-600 text-white"
+              loadingText="Creating..."
+              onClick={prepareToSubmit}
             />
-            <input
-              type="file"
-              accept="image/*,video/*"
-              multiple
-              hidden
-              onChange={(e) => handleFileChange(2, e)}
+          </div>
+
+          {/* Modal */}
+          {showCircleModal && userId && (
+            <CircleMultiSelectModal
+              userId={userId}
+              circles={availableCircles}
+              onCancel={() => setShowCircleModal(false)}
+              onSelect={(selectedCircleIds) => {
+                setShowCircleModal(false);
+                handleSubmit(selectedCircleIds);
+              }}
             />
-          </label>
-          <FaSmile size={22} className="text-gray-600" />
+          )}
         </div>
-        {renderPreviews(filesTwo)}
-      </div>
-
-      <div className="text-center mt-10">
-        <Button
-          btnText="Create Wyra"
-          loading={loading}
-          className="bg-blue-600 text-white"
-          loadingText="Creating..."
-          onClick={prepareToSubmit}
-        />
-      </div>
-
-      {/* Modal */}
-      {showCircleModal && userId && (
-        <CircleMultiSelectModal
-          userId={userId}
-          circles={availableCircles}
-          onCancel={() => setShowCircleModal(false)}
-          onSelect={(selectedCircleIds) => {
-            setShowCircleModal(false);
-            handleSubmit(selectedCircleIds);
-          }}
-        />
-      )}
+      </section>
     </div>
   );
 }

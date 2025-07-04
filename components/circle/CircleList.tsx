@@ -5,7 +5,7 @@ import CircleDetailModal from "./CircleDetailModal";
 import { uploadFiles } from "@/actions/common";
 
 interface CircleListProps {
-  userId: string | null;
+  userId: string | undefined;
 }
 
 export default function CircleList({ userId }: CircleListProps) {
