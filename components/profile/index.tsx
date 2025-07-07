@@ -5,6 +5,11 @@ import { createClient } from "@/utils/supabase/client";
 import UserProfileHeader from "./ProfileHeader";
 import CircleList from "../circle/CircleList";
 import MyWyras from "../wyra/MyWyras";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Loader from "@/components/common/loader";
+import Link from "next/link";
+import { Button } from "@/components/ui/button"
+import { Plus, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
 
 interface ProfileProps {
   userId: string|undefined;
@@ -82,39 +87,75 @@ export default function Profile({ userId }: ProfileProps) {
     if (userId) fetchAllProfileData();
   }, [userId]);
 
-  if (loading) return <div className="p-6">Loading profile...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader width={10} height={10} color="border-gray-700" /></div>;
   if (error) return <div className="p-6 text-red-600">{error}</div>;
   if (!profile) return <div className="p-6">No profile found.</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-10">
-      <h1 className="text-3xl font-bold">Profile</h1>
+    <>
+     {/* Personal Information Card */}
+        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-2xl font-bold text-gray-800">Profile</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <UserProfileHeader
+              user={{
+                avatar: profile.avatar || "",
+                fullName: `${profile.firstname ?? ""} ${
+                  profile.lastname ?? ""
+                }`.trim(),
+                username: profile.username,
+                bio: profile.bio ?? "",
+                stats: {
+                  wyras: wyrasCount,
+                  followers: followersCount,
+                  following: followingCount,
+                },
+              }}
+              onEditProfile={() => {
+                window.location.href = "/settings/profile";
+              }}
+              onShareProfile={() => {
+                navigator.clipboard.writeText(window.location.href);
+                alert("Profile link copied!");
+              }}
+            />
+          </CardContent>
+        </Card>
 
-      <UserProfileHeader
-        user={{
-          avatar: profile.avatar || "",
-          fullName: `${profile.firstname ?? ""} ${
-            profile.lastname ?? ""
-          }`.trim(),
-          username: profile.username,
-          bio: profile.bio ?? "",
-          stats: {
-            wyras: wyrasCount,
-            followers: followersCount,
-            following: followingCount,
-          },
-        }}
-        onEditProfile={() => {
-          window.location.href = "/settings/profile";
-        }}
-        onShareProfile={() => {
-          navigator.clipboard.writeText(window.location.href);
-          alert("Profile link copied!");
-        }}
-      />
 
-      <CircleList userId={userId} />
-      <MyWyras userId={userId} />
-    </div>
+       {/* Circles Card */}
+        <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-2xl font-bold text-gray-800">Circles</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CircleList userId={userId} />
+          </CardContent>
+        </Card>
+
+       {/* My Wyras Card */}
+        <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-2xl font-bold text-gray-800 flex justify-between">
+              <span>
+                My Wyras
+              </span>
+              <Link href="/create-wyra" passHref>
+                <Button className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium rounded-lg transition">
+                  <Plus size={18} /> Create Wyra
+                </Button>
+              </Link>
+
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MyWyras userId={userId} />
+          </CardContent>
+        </Card>
+
+
+    </>
   );
 }

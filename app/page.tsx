@@ -8,7 +8,7 @@ import Settings from "@/components/account/Settings";
 import Header from "@/components/header"
 import BottomNavigation from "@/components/bottom-navigation"
 import Chat from "@/components/chat";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Loader from "@/components/common/loader";
 import Profile from "@/components/profile";
 import CreateWyra from "@/components/wyra/CreateWyra";
@@ -52,25 +52,25 @@ export default function Home() {
       case "account-settings":
         return <Settings user={user} />;
       case "notification-settings":
-        return "notification-settings";
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Notification Settings</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
       case "invite":
-        return "invite";
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">invite</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
       case "block-unblock":
-        return "block-unblock";
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">block unblock</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
       case "help-faqs":
-        return "help-faqs";
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Faqs</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
       case "about-us":
-        return "about-us";
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">About Us</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
       case "terms":
-        return "terms";
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Terms</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
       case "privacy":
-        return "privacy";
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Privacy</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
       case "cookies":
-        return "cookies";
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Cookies</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
       case "community":
-        return "community";
-      case "csae":
-        return "csae";
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Community</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+      case "case":
+        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Case</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
       default:
         return null;
     }
@@ -88,9 +88,11 @@ export default function Home() {
 
       <main className="pb-20 md:pb-4">
         <div className="max-w-2xl mx-auto p-4">
-          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
-            <CardContent>{renderCurrentTab()}</CardContent>
-          </Card>
+          {/* <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> */}
+            {/* <CardContent> */}
+              {renderCurrentTab()}
+              {/* </CardContent> */}
+          {/* </Card> */}
         </div>
       </main>
 

@@ -11,6 +11,9 @@ import { insertWyra } from "@/actions/wyra";
 import { WyraInsertInput, Circle } from "@/actions/types";
 import Button from "@/components/ui/btn";
 import CircleMultiSelectModal from "@/components/wyra/CircleMultiSelectModal";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Loader from "@/components/common/loader";
+import Link from "next/link";
 
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
@@ -153,8 +156,15 @@ export default function CreateWyra() {
   };
 
   return (
-    <div className="w-full flex mt-20 justify-center">
-      <section className="flex flex-col w-[400px]   bg-gray-50 rounded-lg shadow-md p-6">
+      <div className="w-full flex mt-20 mb-20 justify-center">
+        <section className="flex flex-col max-w-md">
+          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+            {/* <CardHeader className="text-center pb-6">
+              <CardTitle className="text-2xl font-bold text-gray-800">Welcome Back</CardTitle>
+              <CardDescription className="text-gray-600 text-lg">Sign in to start making choices</CardDescription>
+            </CardHeader> */}
+            <CardContent>
+
         <h1 className="text-3xl w-full text-center font-bold mb-6 font-semibold text-xl text-gray-700 mb-8">
           Create Wyra
         </h1>
@@ -254,6 +264,8 @@ export default function CreateWyra() {
             />
           )}
         </div>
+        </CardContent>
+        </Card>
       </section>
     </div>
   );

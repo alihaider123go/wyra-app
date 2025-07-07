@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Plus, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { formatDate, relativeTime } from "@/utils/helper";
+import { Button } from "@/components/ui/button"
 
 interface WyraMedia {
   id: string;
@@ -87,16 +88,7 @@ export default function MyWyras({ userId }: MyWyrasProps) {
     return <div className="text-center py-10">No Wyras yet.</div>;
 
   return (
-    <div className="bg-white border rounded-xl p-6 flex flex-col gap-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">My Wyras</h2>
-        <Link href="/create-wyra" passHref>
-          <button className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition">
-            <Plus size={18} /> Create Wyra
-          </button>
-        </Link>
-      </div>
-
+    <>
       {loading ? (
         <div className="text-center py-10">Loading Wyras...</div>
       ) : wyraList.length === 0 ? (
@@ -106,7 +98,7 @@ export default function MyWyras({ userId }: MyWyrasProps) {
           {wyraList.map((wyra) => (
             <div
               key={wyra.id}
-              className="border rounded-xl p-4 shadow hover:shadow-md transition relative bg-white flex flex-col gap-4"
+              className="border rounded-xl p-4 shadow  hover:bg-gray-100 hover:shadow-md transition relative bg-white flex flex-col gap-4"
             >
               <p className="text-sm text-gray-500">
                 {formatDate(wyra.created_at)} • {relativeTime(wyra.created_at)}
@@ -163,13 +155,13 @@ export default function MyWyras({ userId }: MyWyrasProps) {
               </div>
 
               <div className="mt-4 text-sm text-gray-500 flex gap-4">
-                <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-gray-200 text-gray-800 hover:bg-gray-300">
+                <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-green-200 text-gray-800 hover:bg-green-300">
                   <ThumbsUp className="w-4 h-4 mr-1" size={18} /> 0{" "}
                 </span>
-                <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-gray-200 text-gray-800 hover:bg-gray-300">
+                <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-red-200 text-gray-800 hover:bg-red-300">
                   <ThumbsDown className="w-4 h-4 mr-1" size={18}/> 0
                 </span>
-                <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-gray-200 text-gray-800 hover:bg-gray-300">
+                <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-blue-200 text-gray-800 hover:bg-blue-300">
                   <MessageCircle className="w-4 h-4 mr-1"  size={18} /> 0 
                 </span>
               </div>
@@ -177,6 +169,6 @@ export default function MyWyras({ userId }: MyWyrasProps) {
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }
