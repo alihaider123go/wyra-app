@@ -5,13 +5,31 @@ import WyraTimeLine from "@/components/wyra/TimeLine";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import Settings from "@/components/account/Settings";
-import Header from "@/components/header"
-import BottomNavigation from "@/components/bottom-navigation"
+import Header from "@/components/header";
+import BottomNavigation from "@/components/bottom-navigation";
 import Chat from "@/components/chat";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Loader from "@/components/common/loader";
 import Profile from "@/components/profile";
 import CreateWyra from "@/components/wyra/CreateWyra";
+import AboutUs from "@/components/about-us";
+import ContactUs from "@/components/contact-us";
+import Cookies from "@/components/policies/cookies";
+import TermsOfService from "@/components/tos";
+import PrivacyPolicy from "@/components/policies/privacy";
+import CommunityGuidelines from "@/components/community";
+import CSAEPolicy from "@/components/policies/csae";
+import HelpCenter from "@/components/help";
+import InviteFriends from "@/components/invite";
+import AccountPrivacySettings from "@/components/account-privacy";
+import NotificationsSettings from "@/components/notifications/setting";
+import BlockUserInfo from "@/components/blockuser";
 
 export default function Home() {
   const supabase = createClient();
@@ -39,38 +57,39 @@ export default function Home() {
   };
 
   const renderCurrentTab = () => {
-
     switch (activeTab) {
       case "home":
         return <WyraTimeLine />;
       case "create":
-        return <CreateWyra />; 
+        return <CreateWyra />;
       case "chat":
         return <Chat userId={user?.id} />;
       case "profile":
         return <Profile userId={user?.id} />;
       case "account-settings":
-        return <Settings user={user} />;
+        return <AccountPrivacySettings />;
       case "notification-settings":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Notification Settings</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+        return <NotificationsSettings />;
       case "invite":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">invite</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+        return <InviteFriends />;
       case "block-unblock":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">block unblock</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+        return <BlockUserInfo />;
       case "help-faqs":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Faqs</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+        return <HelpCenter/>;
       case "about-us":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">About Us</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+        return <AboutUs />;
+      case "contact":
+        return <ContactUs />;
       case "terms":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Terms</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+        return <TermsOfService />;
       case "privacy":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Privacy</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+        return <PrivacyPolicy />;
       case "cookies":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Cookies</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+        return <Cookies />;
       case "community":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Community</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
-      case "case":
-        return <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> <CardHeader className="text-center pb-6"> <CardTitle className="text-2xl font-bold text-gray-800">Case</CardTitle> </CardHeader> <CardContent className="text-center"> COMING SOON </CardContent> </Card>;
+        return <CommunityGuidelines/>;
+      case "csae":
+        return <CSAEPolicy/>;
       default:
         return null;
     }
@@ -88,11 +107,7 @@ export default function Home() {
 
       <main className="pb-20 md:pb-4">
         <div className="max-w-2xl mx-auto p-4">
-          {/* <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right"> */}
-            {/* <CardContent> */}
-              {renderCurrentTab()}
-              {/* </CardContent> */}
-          {/* </Card> */}
+          {renderCurrentTab()}
         </div>
       </main>
 
