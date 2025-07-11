@@ -29,6 +29,8 @@ export async function signUp(formData: FormData) {
   const lastname = formData.get("lastname")?.toString() || "";
   const dob = formData.get("dob")?.toString() || "";
   const email = formData.get("email")?.toString() || "";
+  const gender = formData.get("gender")?.toString() || "";
+  const username = formData.get("username")?.toString() || "";
   const password = formData.get("password")?.toString() || "";
 
   if (!email || !password) {
@@ -43,6 +45,8 @@ export async function signUp(formData: FormData) {
         firstname,
         lastname,
         dob,
+        gender,
+        username,
       },
     },
   });
@@ -85,6 +89,8 @@ export async function signIn(formData: FormData) {
       firstname: data.user.user_metadata.firstname || "",
       lastname: data.user.user_metadata.lastname || "",
       dob: data.user.user_metadata.dob || "",
+      gender: data.user.user_metadata.gender || "",
+      username: data.user.user_metadata.username || "",
     });
     if(insertError){
       return { status: insertError?.message, user: null };
