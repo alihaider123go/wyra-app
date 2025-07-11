@@ -3,36 +3,30 @@
 import React, { useEffect, useState } from "react";
 import { getUnifiedHomeWyras } from "@/actions/wyra";
 import { createClient } from "@/utils/supabase/client";
-import Link from "next/link";
 import LikeButton from "./LikeBtn";
 import DislikeButton from "./DislikeBtn";
 import CommentButton from "./CommentBtn";
-import FollowButton from "./FollowUnFollowBtn";
+import FollowButton from "./FollowUnfollowButton";
 import { Tooltip } from "@heroui/tooltip";
 import CreateWyra from "@/components/wyra/CreateWyra";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Home,
-  Heart,
   Plus,
   MoreHorizontal,
   Trash2,
   Edit,
   Flag,
   X,
-  SquareCheck,
-  MessageCircle,
   User as UserIcon,
 } from "lucide-react";
 import { Sparkles, TrendingUp, Clock } from "lucide-react";
-import {  Modal,  ModalContent,  ModalHeader,  ModalBody,  ModalFooter} from "@heroui/modal";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +37,7 @@ import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 
 import { Wyra } from "@/actions/types";
+import { relativeTime } from "@/utils/helper";
 
 export default function WyraTimeline() {
   const [wyraList, setWyraList] = useState<Wyra[]>([]);
@@ -52,7 +47,6 @@ export default function WyraTimeline() {
   const [activeTab, setActiveTab] = useState<string>("trending");
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
 
-  
   const [reaction, setReaction] = useState<"like" | "dislike" | null>(null);
   // Map to track follow status per profileUserId
   const [followStatus, setFollowStatus] = useState<Record<string, boolean>>({});
@@ -183,9 +177,16 @@ export default function WyraTimeline() {
           Create Wyra
         </div>
       </Link> */}
-      <Tooltip className="bg-black text-white" color="success" content="Create Wyra">
-        <Button onClick={() => setShowCreateWyraModal(true) } className="rounded-full h-12 w-12 fixed bottom-[5%] right-[5%] z-50">
-          <Plus className="h-8 w-8 text-white"/>
+      <Tooltip
+        className="bg-black text-white"
+        color="success"
+        content="Create Wyra"
+      >
+        <Button
+          onClick={() => setShowCreateWyraModal(true)}
+          className="rounded-full h-12 w-12 fixed bottom-[5%] right-[5%] z-50"
+        >
+          <Plus className="h-8 w-8 text-white" />
         </Button>
       </Tooltip>
 
@@ -301,87 +302,95 @@ export default function WyraTimeline() {
                     </DropdownMenu>
                   </div>
                 </div>
-                {/* <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-black">
-                    Would you rather...
-                  </h2>
-                  {user?.id && wyra?.created_by && (
-                    <FollowButton
-                      currentUserId={user?.id}
-                      profileUserId={wyra.created_by}
-                    />
-                  )}
-                </div> */}
                 <div className="mt-3">
-                  <span className="font-bold text-lg mt-6">Asks, </span><small className="text-gray-500">21 seconds ago</small>
+                  <span className="font-bold text-lg mt-6">Asks, </span>
+                  <small className="text-gray-500">{relativeTime(wyra.created_at)}</small>
                   <p className="my-3 font-bold text-xl text-center">
                     Would you rather:
                   </p>
                 </div>
                 <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                   {wyra.wyra_option
-  .sort((a, b) => a.position - b.position)
-  .map((opt: any, index: number) => {
-    const isSelected = selectedOptionId === opt.id;
-    const isDisabled = selectedOptionId !== null && !isSelected;
+                    .sort((a, b) => a.position - b.position)
+                    .map((opt: any, index: number) => {
+                      const isSelected = selectedOptionId === opt.id;
+                      const isDisabled =
+                        selectedOptionId !== null && !isSelected;
 
-    return (
-      <React.Fragment key={opt.id}>
-        {index === 1 && (
-          <span className="w-12 h-12 text-white rounded-full flex justify-center items-center text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900">
-            OR
-          </span>
-        )}
+                      return (
+                        <React.Fragment key={opt.id}>
+                          {index === 1 && (
+                            <span className="w-12 h-12 text-white rounded-full flex justify-center items-center text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900">
+                              OR
+                            </span>
+                          )}
 
-        <div
-          className={`
+                          <div
+                            className={`
             my-3 relative overflow-hidden border shadow p-4 rounded-lg cursor-pointer w-full md:w-1/2 transition-all duration-300 transform hover:scale-[1.02]
-            ${isSelected ? "bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-600 hover:to-blue-700" : "hover:bg-gray-100"}
-            ${isDisabled ? "cursor-not-allowed pointer-events-none opacity-70" : ""}
-          `}
-          onClick={() => {
-            if (!selectedOptionId) {
-              setSelectedOptionId(opt.id);
+            ${
+              isSelected
+                ? "bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-600 hover:to-blue-700"
+                : "hover:bg-gray-100"
             }
-          }}
-        >
-          {isSelected && (
-            <small className="absolute top-0 right-0 rounded-l-lg bg-white px-1">
-              Selected
-            </small>
-          )}
+            ${
+              isDisabled
+                ? "cursor-not-allowed pointer-events-none opacity-70"
+                : ""
+            }
+          `}
+                            onClick={() => {
+                              if (!selectedOptionId) {
+                                setSelectedOptionId(opt.id);
+                              }
+                            }}
+                          >
+                            {isSelected && (
+                              <small className="absolute top-0 right-0 rounded-l-lg bg-white px-1">
+                                Selected
+                              </small>
+                            )}
 
-          <p className={`text-sm font-medium mb-1 ${isSelected ? "text-white" : "text-gray-500"}`}>
-            Option {index + 1}:
-          </p>
-          <p className={`font-bold text-lg mb-1 ${isSelected ? "text-white" : "text-gray-800"}`}>
-            {opt.option_text}
-          </p>
+                            <p
+                              className={`text-sm font-medium mb-1 ${
+                                isSelected ? "text-white" : "text-gray-500"
+                              }`}
+                            >
+                              Option {index + 1}:
+                            </p>
+                            <p
+                              className={`font-bold text-lg mb-1 ${
+                                isSelected ? "text-white" : "text-gray-800"
+                              }`}
+                            >
+                              {opt.option_text}
+                            </p>
 
-          <div className="flex flex-wrap gap-3">
-            {opt.wyra_media.map((media: any) => (
-              <div key={media.id} className="w-32">
-                {media.media_type === "image" ? (
-                  <img
-                    src={media.media_url}
-                    alt="Option media"
-                    className="rounded-md object-cover max-h-28 w-full"
-                  />
-                ) : (
-                  <video
-                    src={media.media_url}
-                    controls
-                    className="rounded-md max-h-28 w-full"
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </React.Fragment>
-    );
-  })}
+                            <div className="flex flex-wrap gap-3">
+                              {opt.wyra_media.map((media: any) => (
+                                <div key={media.id} className="w-32">
+                                  {media.media_type === "image" ? (
+                                    <img
+                                      src={media.media_url}
+                                      alt="Option media"
+                                      className="rounded-md object-cover max-h-28 w-full"
+                                    />
+                                  ) : (
+                                    <video
+                                      src={media.media_url}
+                                      controls
+                                      className="rounded-md max-h-28 w-full"
+                                    />
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </React.Fragment>
+                      );
+                    })}
                 </div>
+                <hr />
                 <div className="flex items-center gap-2 mt-5">
                   <LikeButton wyraId={wyra.id} userId={user?.id} />
                   <DislikeButton wyraId={wyra.id} userId={user?.id} />
@@ -414,23 +423,23 @@ export default function WyraTimeline() {
           </CardContent>
         </Card>
       )}
-        <Modal isOpen={showCreateWyraModal} hideCloseButton={true}>
-          <ModalContent>
-              <ModalHeader className="flex flex-col justify-center items-center gap-1">
-                Create Wyra
-              <button
-                        onClick={() => setShowCreateWyraModal(false)}
-                        className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
-                        aria-label="Close comment modal"
-                      >
-                        <X className="w-6 h-6" />
-                      </button>
-              </ModalHeader>
+      <Modal isOpen={showCreateWyraModal} hideCloseButton={true}>
+        <ModalContent>
+          <ModalHeader className="flex flex-col justify-center items-center gap-1">
+            Create Wyra
+            <button
+              onClick={() => setShowCreateWyraModal(false)}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
+              aria-label="Close comment modal"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </ModalHeader>
 
-              <ModalBody>
-                  <CreateWyra />
-              </ModalBody>
-              {/* <ModalFooter className="flex justify-between">
+          <ModalBody>
+            <CreateWyra />
+          </ModalBody>
+          {/* <ModalFooter className="flex justify-between">
                   <Button className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => setShowCreateWyraModal(false)}>
                   No
                   </Button>
@@ -438,7 +447,7 @@ export default function WyraTimeline() {
                   Yes
                   </Button>
               </ModalFooter> */}
-          </ModalContent>
+        </ModalContent>
       </Modal>
     </>
   );
