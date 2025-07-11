@@ -23,6 +23,7 @@ import {
   Mail,
   LogOut,
   MessageCircle,
+  UserRoundCog,
   Home,
 } from "lucide-react";
 import Link from "next/link";
@@ -32,9 +33,15 @@ interface HeaderProps {
   user: User;
   onTabChange: (tab: string) => void;
   activeTab: string;
+  isVerified: boolean;
 }
 
-export default function Header({ activeTab, onTabChange, user }: HeaderProps) {
+export default function Header({
+  activeTab,
+  onTabChange,
+  user,
+  isVerified,
+}: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -72,22 +79,65 @@ export default function Header({ activeTab, onTabChange, user }: HeaderProps) {
   };
 
   const menuItems = [
-    { icon: Settings, label: "Account Settings", slug: "account-settings" },
+    { icon: UserRoundCog, label: "Profile Settings", slug: "profile-settings" },
+    {
+      icon: Settings,
+      label: "Account Settings",
+      slug: "account-settings",
+      disable: !isVerified,
+    },
+
     {
       icon: Bell,
       label: "Notification Settings",
       slug: "notification-settings",
+      disable: !isVerified,
     },
-    { icon: UserPlus, label: "Invite", slug: "invite" },
-    { icon: Shield, label: "Block/Unblock", slug: "block-unblock" },
-    { icon: HelpCircle, label: "Help/FAQs", slug: "help-faqs" },
-    { icon: Info, label: "About Us", slug: "about-us" },
-    { icon: FileText, label: "Terms & Conditions", slug: "terms" },
-    { icon: Lock, label: "Privacy & Data Policy", slug: "privacy" },
-    { icon: Cookie, label: "Cookies Policy", slug: "cookies" },
-    { icon: Users, label: "Community Guidelines", slug: "community" },
-    { icon: AlertTriangle, label: "CSAE Policy", slug: "csae" },
-    { icon: Mail, label: "Contact Us", slug: "contact" },
+    { icon: UserPlus, label: "Invite", slug: "invite", disable: !isVerified },
+    {
+      icon: Shield,
+      label: "Block/Unblock",
+      slug: "block-unblock",
+      disable: !isVerified,
+    },
+    {
+      icon: HelpCircle,
+      label: "Help/FAQs",
+      slug: "help-faqs",
+      disable: !isVerified,
+    },
+    { icon: Info, label: "About Us", slug: "about-us", disable: !isVerified },
+    {
+      icon: FileText,
+      label: "Terms & Conditions",
+      slug: "terms",
+      disable: !isVerified,
+    },
+    {
+      icon: Lock,
+      label: "Privacy & Data Policy",
+      slug: "privacy",
+      disable: !isVerified,
+    },
+    {
+      icon: Cookie,
+      label: "Cookies Policy",
+      slug: "cookies",
+      disable: !isVerified,
+    },
+    {
+      icon: Users,
+      label: "Community Guidelines",
+      slug: "community",
+      disable: !isVerified,
+    },
+    {
+      icon: AlertTriangle,
+      label: "CSAE Policy",
+      slug: "csae",
+      disable: !isVerified,
+    },
+    { icon: Mail, label: "Contact Us", slug: "contact", disable: !isVerified },
   ];
 
   return (
@@ -192,11 +242,15 @@ export default function Header({ activeTab, onTabChange, user }: HeaderProps) {
                       <nav className="flex-1 p-4 space-y-1">
                         {menuItems.map((item, index) => (
                           <button
+                            disabled={item.disable}
                             key={index}
                             onClick={() => onHandlePageClick(item.slug)}
-                            className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                            className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors
+                            ${
                               activeTab === item.slug
                                 ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-105"
+                                : item.disable
+                                ? "text-gray-400 cursor-not-allowed bg-gray-50"
                                 : "text-gray-700 hover:bg-gray-100"
                             }`}
                           >
@@ -263,29 +317,55 @@ export default function Header({ activeTab, onTabChange, user }: HeaderProps) {
               />
             </div>
             <button
+              disabled={!isVerified}
               onClick={() => onTabChange("home")}
-              className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+              className={`relative p-2 rounded-full transition-colors
+              ${
+                !isVerified
+                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              }`}
             >
-              <Home className="w-5 h-5" />
+              <Home
+                className={`w-5 h-5 ${!isVerified ? "text-gray-400" : ""}`}
+              />
               <span className="sr-only">Home</span>
             </button>
             <button
+              disabled={!isVerified}
               onClick={() => onTabChange("chat")}
-              className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+              className={`relative p-2 rounded-full transition-colors
+              ${
+                !isVerified
+                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              }`}
             >
-              <MessageCircle className="w-5 h-5" />
+              <MessageCircle
+                className={`w-5 h-5 ${!isVerified ? "text-gray-400" : ""}`}
+              />
               <span className="sr-only">Chat</span>
             </button>
+
             <button
+              disabled={!isVerified}
               onClick={() => onTabChange("notifications")}
-              className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+              className={`relative p-2 rounded-full transition-colors
+              ${
+                !isVerified
+                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              }`}
             >
-              <Bell className="w-5 h-5" />
-              {notificationCount > 0 && (
+              <Bell
+                className={`w-5 h-5 ${!isVerified ? "text-gray-400" : ""}`}
+              />
+              {notificationCount > 0 && isVerified && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {notificationCount > 99 ? "99+" : notificationCount}
                 </span>
               )}
+              <span className="sr-only">Notifications</span>
             </button>
           </div>
         </div>

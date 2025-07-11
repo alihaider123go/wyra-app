@@ -8,13 +8,7 @@ import Settings from "@/components/account/Settings";
 import Header from "@/components/header";
 import BottomNavigation from "@/components/bottom-navigation";
 import Chat from "@/components/chat";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import Loader from "@/components/common/loader";
 import Profile from "@/components/profile";
 import CreateWyra from "@/components/wyra/CreateWyra";
@@ -30,9 +24,12 @@ import InviteFriends from "@/components/invite";
 import AccountPrivacySettings from "@/components/account-privacy";
 import NotificationsSettings from "@/components/notifications/setting";
 import BlockUserInfo from "@/components/blockuser";
+import { useSessionUser } from "@/utils/useSessionUser";
 
 export default function Home() {
   const supabase = createClient();
+  const { user: sessionUser, loading, isVerified } = useSessionUser();
+
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState("home");
   useEffect(() => {
@@ -66,6 +63,8 @@ export default function Home() {
         return <Chat userId={user?.id} />;
       case "profile":
         return <Profile userId={user?.id} />;
+      case "profile-settings":
+        return <Settings user={user} isVerified={isVerified} />;
       case "account-settings":
         return <AccountPrivacySettings />;
       case "notification-settings":
@@ -75,7 +74,7 @@ export default function Home() {
       case "block-unblock":
         return <BlockUserInfo />;
       case "help-faqs":
-        return <HelpCenter/>;
+        return <HelpCenter />;
       case "about-us":
         return <AboutUs />;
       case "contact":
@@ -87,9 +86,9 @@ export default function Home() {
       case "cookies":
         return <Cookies />;
       case "community":
-        return <CommunityGuidelines/>;
+        return <CommunityGuidelines />;
       case "csae":
-        return <CSAEPolicy/>;
+        return <CSAEPolicy />;
       default:
         return null;
     }
@@ -103,15 +102,19 @@ export default function Home() {
     );
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
-      <Header user={user} onTabChange={handleTabClick} activeTab={activeTab} />
+      <Header
+        isVerified={isVerified}
+        user={user}
+        onTabChange={handleTabClick}
+        activeTab={activeTab}
+      />
 
       <main className="pb-20 md:pb-4">
-        <div className="max-w-2xl mx-auto p-4">
-          {renderCurrentTab()}
-        </div>
+        <div className="max-w-2xl mx-auto p-4">{renderCurrentTab()}</div>
       </main>
 
       <BottomNavigation
+        isVerified={isVerified}
         activeTab={activeTab}
         onTabChange={handleTabClick}
         user={user}
