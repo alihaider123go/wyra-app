@@ -1,42 +1,26 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getUnifiedHomeWyras } from "@/actions/wyra"; // path to your function
-import { createClient } from "@/utils/supabase/client"; // your supabase client
+import { getUnifiedHomeWyras } from "@/actions/wyra";
+import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import LikeButton from "./LikeBtn";
-import { Button } from "@/components/ui/button";
-import { User } from "@supabase/supabase-js";
 import DislikeButton from "./DislikeBtn";
 import CommentButton from "./CommentBtn";
-import FollowButton from "./FollowUnFollowBtn";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Home,
-  Heart,
-  Plus,
-  MoreHorizontal,
-  Trash2,
-  Edit,
-  Flag,
-  MessageCircle,
-  User as UserIcon,
-} from "lucide-react";
-import { Sparkles, TrendingUp, Clock } from "lucide-react";
+import FollowButton from "./FollowUnfollowButton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserProfile, Wyra } from "@/actions/types";
+import { MoreHorizontal, Trash2, Edit, Flag } from "lucide-react";
+import { User } from "@supabase/supabase-js";
+import { TrendingUp, Clock, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+import { Wyra } from "@/actions/types";
 
 export default function WyraTimeline() {
   const [wyraList, setWyraList] = useState<Wyra[]>([]);
@@ -44,10 +28,17 @@ export default function WyraTimeline() {
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<string>("trending");
 
-  const [reaction, setReaction] = useState<"like" | "dislike" | null>(null);
+  // Map to track follow status per profileUserId
+  const [followStatus, setFollowStatus] = useState<Record<string, boolean>>({});
+  const [loadingStatus, setLoadingStatus] = useState<Record<string, boolean>>(
+    {}
+  );
+
+  const supabase = createClient();
+
+  // Fetch wyras & current user
   useEffect(() => {
     async function fetchWyras() {
-      const supabase = createClient();
       const {
         data: { user },
         error,
@@ -62,7 +53,7 @@ export default function WyraTimeline() {
       }
 
       try {
-        const result = await getUnifiedHomeWyras(user.id); // call query function
+        const result = await getUnifiedHomeWyras(user.id);
         setWyraList(result || []);
       } catch (err) {
         console.error("Failed to fetch wyras", err);
@@ -73,15 +64,91 @@ export default function WyraTimeline() {
 
     fetchWyras();
   }, []);
+
+  // Fetch follow status for all unique profileUserIds when user or wyraList changes
+  useEffect(() => {
+    if (!user) return;
+    async function fetchFollowStatusForAll() {
+      const uniqueProfileUserIds = Array.from(
+        new Set(
+          wyraList.map((w) => w.created_by).filter((id) => id !== user?.id)
+        )
+      );
+
+      // Query user_followers table for all following relations
+      const { data, error } = await supabase
+        .from("user_followers")
+        .select("following_id")
+        .eq("follower_id", user?.id)
+        .in("following_id", uniqueProfileUserIds);
+
+      if (error) {
+        console.error("Failed to fetch follow statuses", error);
+        return;
+      }
+
+      // Create map of profileUserId -> true if following
+      const followMap: Record<string, boolean> = {};
+      uniqueProfileUserIds.forEach((id) => {
+        followMap[id] = false;
+      });
+      if (data) {
+        data.forEach((row) => {
+          followMap[row.following_id] = true;
+        });
+      }
+
+      setFollowStatus(followMap);
+    }
+
+    fetchFollowStatusForAll();
+  }, [user, wyraList, supabase]);
+
+  // Handler to toggle follow/unfollow for a given profileUserId
+  const toggleFollow = async (profileUserId: string) => {
+    if (!user) return;
+    setLoadingStatus((prev) => ({ ...prev, [profileUserId]: true }));
+
+    try {
+      if (followStatus[profileUserId]) {
+        // Unfollow
+        const { error } = await supabase
+          .from("user_followers")
+          .delete()
+          .eq("follower_id", user.id)
+          .eq("following_id", profileUserId);
+
+        if (!error) {
+          setFollowStatus((prev) => ({ ...prev, [profileUserId]: false }));
+        }
+      } else {
+        // Follow
+        const { error } = await supabase
+          .from("user_followers")
+          .upsert([{ follower_id: user.id, following_id: profileUserId }], {
+            onConflict: "follower_id,following_id",
+          });
+
+        if (!error) {
+          setFollowStatus((prev) => ({ ...prev, [profileUserId]: true }));
+        }
+      }
+    } catch (err) {
+      console.error("Error toggling follow", err);
+    } finally {
+      setLoadingStatus((prev) => ({ ...prev, [profileUserId]: false }));
+    }
+  };
+
+  if (loading) return <div className="text-center py-10">Loading Wyras...</div>;
+  if (!wyraList.length)
+    return <div className="text-center py-10">No Wyras yet.</div>;
+
   const tabs = [
     { id: "trending", icon: TrendingUp, label: "Trending" },
     { id: "recent", icon: Clock, label: "Recent" },
     { id: "following", icon: Sparkles, label: "Following" },
   ];
-
-  if (loading) return <div className="text-center py-10">Loading Wyras...</div>;
-  if (!wyraList.length)
-    return <div className="text-center py-10">No Wyras yet.</div>;
 
   return (
     <>
@@ -120,7 +187,8 @@ export default function WyraTimeline() {
           );
         })}
       </div>
-      {activeTab == "trending" ? (
+
+      {activeTab === "trending" ? (
         <div className="max-w-3xl space-y-6">
           {wyraList.map((wyra) => (
             <Card
@@ -129,7 +197,7 @@ export default function WyraTimeline() {
             >
               <CardContent>
                 <div className="grid grid-cols-2 gap-3">
-                  {/* user information */}
+                  {/* user info */}
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
                       <img
@@ -147,17 +215,9 @@ export default function WyraTimeline() {
                       </p>
                     </div>
                   </div>
-                  {/* <div className="flex-1"> */}
-                  <div className="flex justify-end">
-                    {user?.id &&
-                      wyra?.created_by &&
-                      user.id !== wyra.created_by && (
-                        <FollowButton
-                          currentUserId={user.id}
-                          profileUserId={wyra.created_by}
-                        />
-                      )}
 
+                  {/* dropdown menu */}
+                  <div className="flex justify-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -168,11 +228,12 @@ export default function WyraTimeline() {
                           <MoreHorizontal className="w-5 h-5" />
                         </Button>
                       </DropdownMenuTrigger>
+
                       <DropdownMenuContent
                         align="end"
                         className="w-48 bg-white mt-1"
                       >
-                        {user?.id == wyra?.created_by ? (
+                        {user?.id === wyra.created_by ? (
                           <>
                             <DropdownMenuItem className="cursor-pointer hover:bg-gray-50">
                               <Edit className="w-4 h-4 mr-2" />
@@ -184,30 +245,35 @@ export default function WyraTimeline() {
                             </DropdownMenuItem>
                           </>
                         ) : (
-                          <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50">
-                            <Flag className="w-4 h-4 mr-2" />
-                            Report Wyra
-                          </DropdownMenuItem>
+                          <>
+                            <DropdownMenuItem className="cursor-pointer hover:bg-gray-50">
+                              <FollowButton
+                                isFollowing={
+                                  followStatus[wyra.created_by] ?? false
+                                }
+                                loading={
+                                  loadingStatus[wyra.created_by] ?? false
+                                }
+                                toggleFollow={() =>
+                                  toggleFollow(wyra.created_by)
+                                }
+                              />
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50">
+                              <Flag className="w-4 h-4 mr-2" />
+                              Report Wyra
+                            </DropdownMenuItem>
+                          </>
                         )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  {/* </div> */}
                 </div>
-                {/* <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold text-black">
-                    Would you rather...
-                  </h2>
-                  {user?.id && wyra?.created_by && (
-                    <FollowButton
-                      currentUserId={user?.id}
-                      profileUserId={wyra.created_by}
-                    />
-                  )}
-                </div> */}
+
+                {/* Wyra options */}
                 {wyra.wyra_option
                   .sort((a, b) => a.position - b.position)
-                  .map((opt: any, index: number) => (
+                  .map((opt, index) => (
                     <div key={opt.id} className="mb-4">
                       <p className="text-gray-800 font-medium mb-1">
                         Option {index + 1}: {opt.option_text}
@@ -233,19 +299,18 @@ export default function WyraTimeline() {
                       </div>
                     </div>
                   ))}
+
+                {/* Actions */}
                 <div className="flex items-center gap-2">
                   <LikeButton wyraId={wyra.id} userId={user?.id} />
-
                   <DislikeButton wyraId={wyra.id} userId={user?.id} />
-
                   <CommentButton wyraId={wyra.id} userId={user?.id} />
                 </div>
               </CardContent>
             </Card>
-            // </div>
           ))}
         </div>
-      ) : activeTab == "recent" ? (
+      ) : activeTab === "recent" ? (
         <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-2xl font-bold text-gray-800">
