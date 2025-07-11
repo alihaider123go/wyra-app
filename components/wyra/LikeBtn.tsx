@@ -75,7 +75,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
   return (
     <button
       onClick={toggleLike}
-      className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition 
+      className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer
         ${liked ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"}`}
     >
       <ThumbsUp className="w-4 h-4 mr-1" />

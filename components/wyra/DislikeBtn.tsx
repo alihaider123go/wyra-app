@@ -76,7 +76,7 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId }) => {
   return (
     <button
       onClick={toggleDislike}
-      className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition 
+      className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer 
         ${disliked ? "bg-red-600 text-white" : "bg-gray-200 text-gray-800"}`}
     >
       <ThumbsDown className="w-4 h-4 mr-1" />

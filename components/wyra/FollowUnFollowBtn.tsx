@@ -79,7 +79,7 @@ export default function FollowButton({
   <Button
       onClick={toggleFollow}
       disabled={loading}
-      className={`px-2 py-1 text-sm text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
+      className={`px-2 py-0 h-8 text-sm text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
         isFollowing
           ? "bg-gradient-to-r from-red-500 to-red-800 hover:from-red-600 hover:to-red-900"
           : "bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900"

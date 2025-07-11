@@ -156,18 +156,18 @@ export default function CreateWyra() {
   };
 
   return (
-      <div className="w-full flex mt-20 mb-20 justify-center">
+      <div className="w-full flex justify-center">
         <section className="flex flex-col max-w-md">
-          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+          <Card className="border-0 animate-slide-in-right">
             {/* <CardHeader className="text-center pb-6">
               <CardTitle className="text-2xl font-bold text-gray-800">Welcome Back</CardTitle>
               <CardDescription className="text-gray-600 text-lg">Sign in to start making choices</CardDescription>
             </CardHeader> */}
             <CardContent>
 
-        <h1 className="text-3xl w-full text-center font-bold mb-6 font-semibold text-xl text-gray-700 mb-8">
+        {/* <h1 className="text-3xl w-full text-center font-bold mb-6 font-semibold text-xl text-gray-700 mb-8">
           Create Wyra
-        </h1>
+        </h1> */}
         <div className="max-w-2xl mx-auto p-6">
           <h1 className="text-center text-3xl font-bold mb-10 text-black">
             Would you rather...

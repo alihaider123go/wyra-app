@@ -83,8 +83,7 @@ const CommentModal: React.FC<Props> = ({ wyraId, userId, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto shadow-lg relative">
+      <div className="bg-white p-6 pt-1 rounded-lg w-full">
         {/* Close icon */}
         <button
           onClick={onClose}
@@ -112,10 +111,15 @@ const CommentModal: React.FC<Props> = ({ wyraId, userId, onClose }) => {
         <div className="flex justify-end gap-2 mb-6">
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+            className={`px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+             ${
+        loading
+          ? "bg-gradient-to-r from-gray-500 to-gray-800 hover:from-gray-600 hover:to-gray-900"
+          : "bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900"
+      }`}
             disabled={loading}
           >
-            {loading ? "Commenting..." : "Comment"}
+            {loading ? <div className="flex "><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div> Commenting </div> : "Comment"}
           </button>
         </div>
 
@@ -140,13 +144,12 @@ const CommentModal: React.FC<Props> = ({ wyraId, userId, onClose }) => {
                     {new Date(comment.created_at).toLocaleString()}
                   </span>
                 </div>
-                <p className="text-sm text-gray-800">{comment.content}</p>
+                <p className="text-sm text-gray-800 text-left">{comment.content}</p>
               </li>
             ))}
           </ul>
         )}
       </div>
-    </div>
   );
 };
 
