@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { headers } from "next/headers";
 import { error } from "console";
-import { WyraInsertInput } from "./types";
+import { Wyra, WyraInsertInput } from "./types";
 
 export async function insertWyra(data: WyraInsertInput) {
   const supabase = await createClient();
@@ -137,12 +137,14 @@ export const getUnifiedHomeWyras = async (userId: string) => {
   const orFilters: string[] = [];
 
   if (allAuthorIds.length > 0) {
-    const authorFilter = allAuthorIds.map(id => `created_by.eq.${id}`).join(',');
+    const authorFilter = allAuthorIds
+      .map((id) => `created_by.eq.${id}`)
+      .join(",");
     orFilters.push(authorFilter);
   }
 
   if (wyraFromCircles.length > 0) {
-    const wyraFilter = wyraFromCircles.map(id => `id.eq.${id}`).join(',');
+    const wyraFilter = wyraFromCircles.map((id) => `id.eq.${id}`).join(",");
     orFilters.push(wyraFilter);
   }
 
@@ -155,6 +157,13 @@ export const getUnifiedHomeWyras = async (userId: string) => {
       title,
       created_at,
       created_by,
+      user_profiles (
+        id,
+        firstname,
+        lastname,
+        username,
+        avatar
+      ),
       wyra_option (
         id,
         option_text,
@@ -170,7 +179,7 @@ export const getUnifiedHomeWyras = async (userId: string) => {
     .order("created_at", { ascending: false });
 
   if (orFilters.length > 0) {
-    query = query.or(orFilters.join(','));
+    query = query.or(orFilters.join(","));
   }
 
   const { data, error } = await query;
@@ -179,5 +188,15 @@ export const getUnifiedHomeWyras = async (userId: string) => {
     console.error("Unified Wyras fetch error:", error);
     return [];
   }
-  return data ?? [];
+
+  // ✅ Rename `user_profiles` to `creator`
+  const formattedData: Wyra[] = (data ?? []).map((wyra) => {
+    const { user_profiles, ...rest } = wyra;
+    return {
+      ...rest,
+      creator: Array.isArray(user_profiles) ? user_profiles[0] : user_profiles,
+    };
+  });
+
+  return formattedData;
 };

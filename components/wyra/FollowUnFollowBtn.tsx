@@ -2,18 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Button } from "@/components/ui/button"
-import {
-  
-UserRoundPlus,
-UserRoundCheck,
-  Plus,
-} from "lucide-react";
-import { Sparkles, TrendingUp, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { UserRoundPlus, UserRoundCheck } from "lucide-react";
 
 interface FollowButtonProps {
-  currentUserId: string|undefined; // the user currently logged in
-  profileUserId: string|undefined; // the user being viewed
+  currentUserId: string | undefined; // the user currently logged in
+  profileUserId: string | undefined; // the user being viewed
 }
 
 export default function FollowButton({
@@ -25,26 +19,26 @@ export default function FollowButton({
   const supabase = createClient();
 
   // Prevent self-follow
-  if (currentUserId === profileUserId) return null;
+  if (!currentUserId || !profileUserId || currentUserId === profileUserId) return null;
 
   useEffect(() => {
-    if (currentUserId && profileUserId) {
-      checkFollowStatus();
-    }
-  }, [currentUserId, profileUserId]);
+    const checkFollowStatus = async () => {
+      const { data, error } = await supabase
+        .from("user_followers")
+        .select("id")
+        .eq("follower_id", currentUserId)
+        .eq("following_id", profileUserId)
+        .maybeSingle();
 
-  const checkFollowStatus = async () => {
-    const { data, error } = await supabase
-      .from("user_followers")
-      .select("id")
-      .eq("follower_id", currentUserId)
-      .eq("following_id", profileUserId)
-      .maybeSingle();
+      if (!error && data) {
+        setIsFollowing(true);
+      } else {
+        setIsFollowing(false);
+      }
+    };
 
-    if (data && !error) {
-      setIsFollowing(true);
-    }
-  };
+    checkFollowStatus();
+  }, [currentUserId, profileUserId, supabase]);
 
   const toggleFollow = async () => {
     setLoading(true);
@@ -61,11 +55,13 @@ export default function FollowButton({
         setIsFollowing(false);
       }
     } else {
-      // Follow
-      const { error } = await supabase.from("user_followers").insert({
-        follower_id: currentUserId,
-        following_id: profileUserId,
-      });
+      // Follow (safe insert)
+      const { error } = await supabase
+        .from("user_followers")
+        .upsert(
+          [{ follower_id: currentUserId, following_id: profileUserId }],
+          { onConflict: "follower_id,following_id"  }
+        );
 
       if (!error) {
         setIsFollowing(true);
@@ -76,24 +72,27 @@ export default function FollowButton({
   };
 
   return (
-  <Button
+    <Button
       onClick={toggleFollow}
       disabled={loading}
-      className={`px-2 py-1 text-sm text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
+      className={`px-3 py-1 text-sm text-white rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
         isFollowing
           ? "bg-gradient-to-r from-red-500 to-red-800 hover:from-red-600 hover:to-red-900"
           : "bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900"
       }`}
     >
-      {loading ? <><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div> Following </> : isFollowing ? 
-      (
+      {loading ? (
+        <div className="flex items-center">
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+          Loading...
+        </div>
+      ) : isFollowing ? (
         <>
-         <UserRoundCheck className="w-6 h-6" /> Unfollow
+          <UserRoundCheck className="w-5 h-5 mr-1" /> Unfollow
         </>
-      )
-      : (
+      ) : (
         <>
-         <UserRoundPlus className="w-6 h-6" /> Follow
+          <UserRoundPlus className="w-5 h-5 mr-1" /> Follow
         </>
       )}
     </Button>

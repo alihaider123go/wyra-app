@@ -47,3 +47,25 @@ export interface Circle {
   created_by: string;
   created_at: string;
 }
+
+export interface WyraMedia {
+  id: string;
+  media_url: string;
+  media_type: "image" | "video";
+}
+
+export interface WyraOption {
+  id: string;
+  option_text: string;
+  position: number;
+  wyra_media: WyraMedia[];
+}
+
+export interface Wyra {
+  id: string;
+  title?: string;
+  created_at: string;
+  created_by: string;
+  creator: UserProfile;
+  wyra_option: WyraOption[];
+}
