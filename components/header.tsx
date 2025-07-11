@@ -2,7 +2,6 @@
 
 import { signOut } from "@/actions/auth";
 import { useEffect, useState, Fragment } from "react";
-import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Dialog, Transition } from "@headlessui/react";
@@ -27,10 +26,10 @@ import {
   Home,
 } from "lucide-react";
 import Link from "next/link";
-import { UserProfile } from "@/actions/types";
+import { ExtendedUser, UserProfile } from "@/actions/types";
 
 interface HeaderProps {
-  user: User;
+  user: ExtendedUser | null;
   onTabChange: (tab: string) => void;
   activeTab: string;
   isVerified: boolean;
@@ -54,22 +53,9 @@ export default function Header({
   };
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const { data: profile, error: profileError } = await supabase
-        .from("user_profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
 
-      if (profileError) {
-        console.error("Profile fetch error:", profileError);
-        return;
-      }
-
-      setUserProfile(profile);
-    };
     if (user) {
-      fetchUserProfile();
+      setUserProfile(user?.user_profile);
     }
   }, [user]);
 

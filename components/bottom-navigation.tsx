@@ -1,15 +1,14 @@
 "use client";
 
 import { Home, Heart, Plus, MessageCircle, User } from "lucide-react";
-import { UserProfile } from "@/actions/types";
+import { ExtendedUser, UserProfile } from "@/actions/types";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import { User as UserType } from "@supabase/supabase-js";
 
 interface BottomNavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  user: UserType;
+  user: ExtendedUser|null;
   isVerified: boolean;
 }
 
@@ -20,24 +19,9 @@ export default function BottomNavigation({
   isVerified,
 }: BottomNavigationProps) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const supabase = createClient();
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const { data: profile, error: profileError } = await supabase
-        .from("user_profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError) {
-        console.error("Profile fetch error:", profileError);
-        return;
-      }
-
-      setUserProfile(profile);
-    };
-    if (user) {
-      fetchUserProfile();
+    if(user){
+      setUserProfile(user?.user_profile || null);
     }
   }, [user]);
   const tabs = [

@@ -1,3 +1,5 @@
+import { User } from "@supabase/supabase-js";
+
 export type WyraInsertInput = {
   title?: string | null; // optional title, can be null
   created_by?: string; // user id if any
@@ -37,6 +39,8 @@ export interface UserProfile {
   lastname: string;
   username: string;
   avatar?: string;
+  gender?:string;
+  dob?: string;
   email?: string;
   bio?: string;
 }
@@ -69,3 +73,9 @@ export interface Wyra {
   creator: UserProfile;
   wyra_option: WyraOption[];
 }
+
+
+export type ExtendedUser = User & {
+  user_profile: UserProfile; // or replace `any` with your actual profile type
+  isVerified?: boolean;
+};

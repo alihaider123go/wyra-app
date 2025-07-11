@@ -172,11 +172,6 @@ export default function WyraTimeline() {
 
   return (
     <>
-      {/* <Link href="/create-wyra">
-        <div className="bg-gray-600 text-white text-sm px-4 py-2 rounded-md cursor-pointer hover:bg-gray-700 transition ">
-          Create Wyra
-        </div>
-      </Link> */}
       <Tooltip
         className="bg-black text-white"
         color="success"
@@ -184,7 +179,7 @@ export default function WyraTimeline() {
       >
         <Button
           onClick={() => setShowCreateWyraModal(true)}
-          className="rounded-full h-12 w-12 fixed bottom-[5%] right-[5%] z-50"
+    className="rounded-full h-12 w-12 fixed bottom-[5%] right-[5%] z-50 hidden md:flex items-center justify-center"
         >
           <Plus className="h-8 w-8 text-white" />
         </Button>

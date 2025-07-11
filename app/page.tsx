@@ -30,24 +30,24 @@ export default function Home() {
   const supabase = createClient();
   const { user: sessionUser, loading, isVerified } = useSessionUser();
 
-  const [user, setUser] = useState<User | null>(null);
+  // const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState("home");
-  useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     const {
+  //       data: { user },
+  //       error: authError,
+  //     } = await supabase.auth.getUser();
 
-      if (authError || !user) {
-        console.error("Auth error:", authError);
-        return;
-      }
-      setUser(user);
-    };
+  //     if (authError || !user) {
+  //       console.error("Auth error:", authError);
+  //       return;
+  //     }
+  //     setUser(user);
+  //   };
 
-    fetchUser();
-  }, []);
+  //   fetchUser();
+  // }, []);
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
@@ -60,11 +60,11 @@ export default function Home() {
       case "create":
         return <CreateWyra />;
       case "chat":
-        return <Chat userId={user?.id} />;
+        return <Chat userId={sessionUser?.id} />;
       case "profile":
-        return <Profile userId={user?.id} />;
+        return <Profile userId={sessionUser?.id} />;
       case "profile-settings":
-        return <Settings user={user} isVerified={isVerified} />;
+        return <Settings user={sessionUser} isVerified={isVerified} />;
       case "account-settings":
         return <AccountPrivacySettings />;
       case "notification-settings":
@@ -94,7 +94,7 @@ export default function Home() {
     }
   };
 
-  if (!user)
+  if (!loading && !sessionUser)
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 flex items-center justify-center">
         <Loader width={20} height={20} color="border-gray-700" />
@@ -104,7 +104,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
       <Header
         isVerified={isVerified}
-        user={user}
+        user={sessionUser}
         onTabChange={handleTabClick}
         activeTab={activeTab}
       />
@@ -117,7 +117,7 @@ export default function Home() {
         isVerified={isVerified}
         activeTab={activeTab}
         onTabChange={handleTabClick}
-        user={user}
+        user={sessionUser}
       />
     </div>
   );
