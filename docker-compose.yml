@@ -1,0 +1,11 @@
+version: '3'
+services:
+   nextapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7070:7070"
+    environment:
+      - PORT=7070
+    command: npm start  # Run the app in production mode  

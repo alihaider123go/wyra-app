@@ -24,9 +24,6 @@ export default function FollowButton({
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
-  // Prevent self-follow
-  if (currentUserId === profileUserId) return null;
-
   useEffect(() => {
     if (currentUserId && profileUserId) {
       checkFollowStatus();
@@ -74,6 +71,9 @@ export default function FollowButton({
 
     setLoading(false);
   };
+
+    // Prevent self-follow
+  if (currentUserId === profileUserId) return null;
 
   return (
   <Button

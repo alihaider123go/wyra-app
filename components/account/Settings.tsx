@@ -17,7 +17,7 @@ import {
 
 interface SettingsProps {
   user: User | null;
-  isVerified: boolean;
+  isVerified?: boolean;
 }
 
 export default function Settings({ user, isVerified }: SettingsProps) {
@@ -44,7 +44,7 @@ export default function Settings({ user, isVerified }: SettingsProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ProfileUpdateCard userId={user?.id} />
+          <ProfileUpdateCard userId={user?.id ?? ""} />
         </CardContent>
       </Card>
 

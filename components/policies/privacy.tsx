@@ -134,7 +134,7 @@ export default function PrivacyPolicy() {
                   >
                     info@wyra.xyz
                   </a>
-                  . If you're in the EU/EEA, you can also complain to your local data authority.
+                  . If you&apos;re in the EU/EEA, you can also complain to your local data authority.
                 </p>
               </>
             ),

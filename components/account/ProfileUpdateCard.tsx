@@ -34,7 +34,7 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
     bio: "",
     avatar: "",
   });
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [originalUsername, setOriginalUsername] = useState(""); // Track original username
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -173,7 +173,9 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
   }
 
   const handleButtonClick = () => {
-    fileInputRef.current?.click();
+    if(fileInputRef.current){
+      fileInputRef.current.click();
+    }
   };
 
   if (loading) return <div>Loading profile...</div>;
