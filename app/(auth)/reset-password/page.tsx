@@ -1,4 +1,5 @@
 import ResetPassword from "@/components/ResetPassword";
+import React, { Suspense } from "react";
 
 export default function ResetPasswordPage() {
   return (
@@ -8,7 +9,9 @@ export default function ResetPasswordPage() {
           <h1 className="text-3xl w-full text-center font-bold mb-6">
             Reset Password
           </h1>
-          <ResetPassword />
+          <Suspense fallback={<div>Loading...</div>}>
+            <ResetPassword />
+          </Suspense>
         </section>
       </div>
     </>

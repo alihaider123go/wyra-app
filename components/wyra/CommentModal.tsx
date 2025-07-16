@@ -49,7 +49,7 @@ const CommentModal: React.FC<Props> = ({ wyraId, userId, onClose }) => {
       .order("created_at", { ascending: false });
 
     if (!error) {
-      setComments(data);
+      setComments(data as any);
     } else {
       console.error("Failed to fetch comments", error);
     }

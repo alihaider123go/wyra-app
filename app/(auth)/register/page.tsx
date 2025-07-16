@@ -12,13 +12,11 @@ import { Eye, EyeOff, Heart, Sparkles, Zap, Users } from "lucide-react"
 export default function LoginPage() {
     const router = useRouter();
   
-    const goToSingInPage = () => {
-      router.push("/login");
-    };
+ 
 
     return (
       <div className="w-full flex mt-20 mb-20 justify-center">
-        <section className="flex flex-col  max-w-md">
+        <section className="flex flex-col md:max-w-xl">
           <div className="w-full flex justify-center items-center mb-8">
             <Link href="/login">
               <div className="flex items-center">
@@ -43,6 +41,40 @@ export default function LoginPage() {
             </Link>
           </div>
 
+           {/* ===== Tagline ===== */}
+    <div className="text-center mb-8 animate-fade-in">
+      <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 leading-tight">
+        Life&apos;s full of choices – <br />
+        <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          make them fun! ✨
+        </span>
+      </h2>
+      <p className="text-gray-600 text-lg">
+        Join millions making meaningful choices together
+      </p>
+    </div>
+
+       <div className="grid grid-cols-3 gap-4 mb-8 animate-slide-in-left">
+          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <p className="text-sm font-semibold text-gray-700">Create</p>
+          </div>
+          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <Zap className="w-6 h-6 text-white" />
+            </div>
+            <p className="text-sm font-semibold text-gray-700">Choose</p>
+          </div>
+          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
+            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <p className="text-sm font-semibold text-gray-700">Connect</p>
+          </div>
+        </div>
+
           <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
             <CardHeader className="text-center pb-6">
               <CardTitle className="text-2xl font-bold text-gray-800">Sign Up</CardTitle>
@@ -52,11 +84,7 @@ export default function LoginPage() {
 
           {/* Sign Up Form */}
         <SignUpForm />
-            <div className="space-y-4 pt-2">
-              <Button onClick={() => goToSingInPage()} className="w-full h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                Sign In
-              </Button>
-            </div>
+           
             
           {/* <div className="mt-2 flex items-center">
             <h1>{`Don't have an account?`}</h1>
