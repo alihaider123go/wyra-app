@@ -6,9 +6,13 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, Heart, Sparkles, Zap, Users } from "lucide-react"
 import { useRouter } from "next/navigation";
-import { signIn } from "@/actions/auth";
+import { signIn, updatePassword } from "@/actions/auth";
 
-const ResetPasswordForm = () => {
+interface ResetPasswordProps {
+  email: string | undefined;
+}
+
+const ResetPasswordForm = ({email}:ResetPasswordProps) => {
   
     const [showOldPassword, setShowOldPassword] = useState(false)
     const [showNewPassword, setShowNewPassword] = useState(false)
@@ -23,17 +27,28 @@ const ResetPasswordForm = () => {
         event.preventDefault();
         setLoading(true);
         setErrorMsg(null);
-        // const formData = new FormData(event.currentTarget);
-        // const result = await signIn(formData);
-        // if (result.status === "success") {
-        //     setSuccessMsg("Password updated successfully!");
-        // } else {
-        //   setErrorMsg(result.status);
-        // }
-        setTimeout(() => {
-            setSuccessMsg("Password updated successfully!");
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const newPassword = formData.get("newPassword")?.toString() || "";
+        const confirmPassword = formData.get("confirmNewPassword")?.toString() || "";
+        if (newPassword !== confirmPassword) {
+            setErrorMsg("New password and confirm password do not match.");
             setLoading(false);
-        }, 2000);
+            return;
+        }
+        const result = await updatePassword(formData);
+        if (result.status === "success") {
+            setSuccessMsg("Password updated successfully!");
+            form.reset();
+            setLoading(false);
+        } else {
+          setErrorMsg(result.status);
+           setLoading(false);
+        }
+        // setTimeout(() => {
+        //     setSuccessMsg("Password updated successfully!");
+        //     setLoading(false);
+        // }, 2000);
 
   };
   return (
@@ -50,7 +65,9 @@ const ResetPasswordForm = () => {
                 <AlertDescription className="text-green-700">{successMsg}</AlertDescription>
             </Alert>
             )}
-    
+            <div className="hidden">
+              <input type="email" name="email" value={email} placeholder="Email" required readOnly/>
+            </div> 
             <div className="space-y-2">
               <Label htmlFor="oldPassword" className="text-sm font-semibold text-gray-700">
                 Old Password

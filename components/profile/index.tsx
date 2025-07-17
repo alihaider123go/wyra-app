@@ -118,7 +118,7 @@ export default function Profile({ userId }: ProfileProps) {
               }}
               onShareProfile={() => {
                 navigator.clipboard.writeText(window.location.href);
-                alert("Profile link copied!");
+                // alert("Profile link copied!");
               }}
             />
           </CardContent>

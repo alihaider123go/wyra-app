@@ -17,7 +17,12 @@ import Link from "next/link";
 
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
-export default function CreateWyra() {
+interface CreateWyraProps {
+  onTabChange?: (tab: string) => void;
+  
+}
+
+export default function CreateWyra({onTabChange}:CreateWyraProps) {
   const [optionOne, setOptionOne] = useState("");
   const [optionTwo, setOptionTwo] = useState("");
   const [filesOne, setFilesOne] = useState<File[]>([]);
@@ -152,7 +157,10 @@ export default function CreateWyra() {
     }
 
     setLoading(false);
-    router.push("/");
+    if (onTabChange){
+      onTabChange("home");
+    }
+
   };
 
   return (

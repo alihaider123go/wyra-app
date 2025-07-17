@@ -3,30 +3,32 @@ import { createClient } from "@/utils/supabase/client";
 import { Chat, Message } from "@/actions/types";
 import MessageItem from "./MessageItem";
 import MessageInput from "./MessageInput";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 interface MessagesSectionProps {
   chat: Chat | null;
   currentUserId: string | undefined;
   onSendMessage: (msg: Message) => void;
+  onBack:any
 }
 
 export default function MessagesSection({
   chat,
   currentUserId,
   onSendMessage,
+  onBack,
 }: MessagesSectionProps) {
   const supabase = createClient();
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagePage, setMessagePage] = useState(1);
   const messagesPerPage = 20;
 
-  useEffect(() => {
+  const fetchMessages = async () => {
     if (!chat) {
       setMessages([]);
       return;
     }
 
-    const fetchMessages = async () => {
       const { data, error } = await supabase
         .from("messages")
         .select("*")
@@ -43,6 +45,7 @@ export default function MessagesSection({
       }
     };
 
+  useEffect(() => {
     fetchMessages();
   }, [chat, messagePage, supabase]);
 
@@ -69,6 +72,7 @@ export default function MessagesSection({
           });
 
           onSendMessage(newMessage);
+          fetchMessages()
         }
       )
       .subscribe();
@@ -94,33 +98,39 @@ export default function MessagesSection({
   }
 
   return (
-    <div className="w-3/4 flex flex-col">
-      <div className="p-4 border-b">
-        <h3>{chat.name || "Unnamed chat"}</h3>
+<div className=" flex flex-col md:h-[88vh] h-[80vh]">
+  {/* Chat Header */}
+   <div className="md:hidden flex items-center p-3 border-b bg-white">
+        <button onClick={onBack} className="text-blue-600 text-2xl font-semibold">
+          <IoMdArrowRoundBack />
+        </button>
+        <h2 className="ml-3 font-bold text-center w-full">{chat?.name || "Chat"}</h2>
       </div>
-      <div
-        className="flex-1 overflow-y-auto p-4"
-        onScroll={onScroll}
-        style={{ height: "calc(100vh - 100px)" }}
-      >
-        {messages.map((msg) => (
-          <MessageItem
-            key={msg.id}
-            message={msg}
-            currentUserId={currentUserId}
-          />
-        ))}
-      </div>
-      <MessageInput
-        supabase={supabase}
-        chatId={chat.id}
+
+  {/* Scrollable Messages */}
+  <div className="flex-1 overflow-y-auto p-4">
+    {messages.map((msg) => (
+      <MessageItem
+        key={msg.id}
+        message={msg}
         currentUserId={currentUserId}
-        onNewMessage={(msg) => {
-          // Remove this line to avoid duplicates:
-          // setMessages((prev) => [...prev, msg]);
-          onSendMessage(msg);
-        }}
       />
-    </div>
+    ))}
+  </div>
+
+  {/* Fixed Input at Bottom */}
+  <div className="flex-shrink-0">
+    <MessageInput
+      supabase={supabase}
+      chatId={chat.id}
+      currentUserId={currentUserId}
+      onNewMessage={(msg) => {
+        onSendMessage(msg);
+      }}
+    />
+  </div>
+</div>
+
+
   );
 }

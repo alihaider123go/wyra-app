@@ -122,6 +122,41 @@ export async function signIn(formData: FormData) {
   return { status: "success", user: data.user };
 }
 
+export async function updatePassword(formData: FormData) {
+  const supabase = await createClient();
+
+  const oldPassword = formData.get("oldPassword")?.toString() || "";
+  const newPassword = formData.get("newPassword")?.toString() || "";
+  const email = formData.get("email")?.toString() || "";
+
+  if (!email || !oldPassword || !newPassword) {
+    return { status: "Email, old password, and new password are requi123123123red", user: null };
+  }
+
+  // ✅ 1. Re-authenticate the user with old password
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password: oldPassword,
+  });
+
+  if (signInError) {
+    return { status: "Old password is incorrect", user: null };
+  }
+
+  // ✅ 2. Update password if old password is correct
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) {
+    return { status: error.message, user: null };
+  }
+
+  revalidatePath("/", "layout");
+
+  return { status: "success", user: data.user };
+}
+
 export async function signOut() {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();

@@ -21,7 +21,7 @@ const CommentButton: React.FC<Props> = ({ wyraId, userId }) => {
         className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-gray-200 text-gray-800 hover:bg-gray-300 cursor-pointer"
       >
         <MessageCircle className="w-4 h-4 mr-1" />
-        Comment
+               <span className="md:block hidden">Comment</span>
       </button>
 
 {/* Circle Detail Modal */}

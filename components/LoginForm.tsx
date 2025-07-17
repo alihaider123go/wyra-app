@@ -18,6 +18,7 @@ const LoginForm = () => {
     setLoading(true);
     setError(null);
     const formData = new FormData(event.currentTarget);
+    
     const result = await signIn(formData);
     if (result.status === "success") {
       router.push("/");

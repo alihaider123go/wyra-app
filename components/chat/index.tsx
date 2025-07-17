@@ -12,6 +12,12 @@ export default function ChatPage({ userId }: ChatProps) {
   const supabase = createClient();
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+  const [showMessages, setShowMessages] = useState(false); // For mobile view
+
+  const handleSelectChat = (chat: any) => {
+    setSelectedChat(chat);
+    setShowMessages(true); // Show messages on mobile
+  };
 
   const fetchChats = async () => {
     if (!userId) return;
@@ -105,24 +111,57 @@ export default function ChatPage({ userId }: ChatProps) {
   }, [userId, selectedChat?.id]);
 
   return (
-    <div className="flex h-screen">
-      <ChatList
-        userId={userId}
-        chats={chats}
-        selectedChat={selectedChat}
-        onSelectChat={setSelectedChat}
-        onNewChat={(chat) => {
-          setChats((prev) => [chat, ...prev]);
-          setSelectedChat(chat);
-        }}
-      />
-      <MessagesSection
-        chat={selectedChat}
-        currentUserId={userId}
-        onSendMessage={(msg) => {
-          // Optional: handle side effects on new message here if needed
-        }}
-      />
+    <div className="flex md:h-[88vh] h-[80vh]">
+      {/* Chat List */}
+      <div
+        className={`
+          w-full md:w-1/3 border-r
+          ${showMessages ? "hidden md:block" : "block"}
+        `}
+      >
+        <ChatList
+          userId={userId}
+          chats={chats}
+          selectedChat={selectedChat}
+          onSelectChat={handleSelectChat}
+          onNewChat={(chat: any) => {
+            setChats((prev) => {
+              // ✅ Check if a chat with this user already exists
+              const exists = prev.some((c: any) => c.userId === chat.userId);
+
+              if (!exists) {
+                return [chat, ...prev];
+              }
+              return prev; // No change if already exists
+            });
+
+            handleSelectChat(chat);
+          }}
+        />
+      </div>
+
+      {/* Messages Section */}
+      <div
+        className={`
+          w-full md:w-2/3
+          ${showMessages ? "block" : "hidden md:block"}
+        `}
+      >
+        {selectedChat ? (
+          <MessagesSection
+            chat={selectedChat}
+            currentUserId={userId}
+            onSendMessage={(msg) => {
+              // handle new message side effects if needed
+            }}
+            onBack={() => setShowMessages(false)} // For mobile back button
+          />
+        ) : (
+          <div className="hidden md:flex items-center justify-center w-full">
+            <p className="text-gray-500">Select a chat to start messaging</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

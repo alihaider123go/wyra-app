@@ -57,7 +57,7 @@ export default function ChatList({
       </div>
 
       {/* Chat list */}
-      <div className="overflow-y-auto flex-1">
+      <div className="overflow-y-auto">
         {filteredChats.length === 0 ? (
           <p className="p-4 text-gray-500 text-center">No chats found</p>
         ) : (

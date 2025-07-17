@@ -80,7 +80,7 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId }) => {
         ${disliked ? "bg-red-600 text-white" : "bg-gray-200 text-gray-800"}`}
     >
       <ThumbsDown className="w-4 h-4 mr-1" />
-      Dislike
+       <span className="md:block hidden">Dislike</span>
     </button>
   );
 };

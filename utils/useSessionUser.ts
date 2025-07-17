@@ -1,56 +1,68 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { UserProfile } from "@/actions/types";
+
 type ExtendedUser = User & {
-  user_profile: UserProfile; // or replace `any` with your actual profile type
+  user_profile: UserProfile;
   isVerified?: boolean;
+  isProfileCompleted?: boolean;
 };
+
 export function useSessionUser() {
   const [user, setUser] = useState<ExtendedUser | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null); // Added to
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
-  useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      setLoading(true);
+  const fetchUser = useCallback(async () => {
+    setLoading(true);
 
-      const user = data.user;
-      const isVerified =
-        user?.identities?.[0]?.identity_data?.email_verified ?? false;
+    const { data } = await supabase.auth.getUser();
+    const authUser = data.user;
 
-      // Fetch user_profile data
-      const { data: profileData, error: profileError } = await supabase
+    const isVerified =
+      authUser?.identities?.[0]?.identity_data?.email_verified ?? false;
+
+    let profileData: UserProfile | null = null;
+    if (authUser?.id) {
+      const { data: fetchedProfile, error: profileError } = await supabase
         .from("user_profiles")
         .select("*")
-        .eq("id", user?.id)
+        .eq("id", authUser.id)
         .single();
 
       if (profileError) {
         console.error("Error fetching profile:", profileError);
       }
+      profileData = fetchedProfile;
+    }
 
-      // Merge auth user with profile data
-      if (user && user.id) {
-        setUser({
-          ...user,
-          user_profile: profileData || null,
-          isVerified,
-        });
-      } else {
-        setUser(null);
-      }
+    const isProfileCompleted = !!(profileData?.bio && profileData?.avatar);
 
-      setLoading(false);
-    });
-  }, []);
+    if (authUser) {
+      setUser({
+        ...authUser,
+        user_profile: profileData || ({} as UserProfile),
+        isVerified,
+        isProfileCompleted,
+      });
+    } else {
+      setUser(null);
+    }
+
+    setLoading(false);
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   return {
     user,
-    userProfile: userProfile,
     loading,
-    isVerified: user?.identities?.[0]?.identity_data?.email_verified ?? false,
+    isVerified: user?.isVerified ?? false,
+    isProfileCompleted: user?.isProfileCompleted ?? false,
+    refetch: fetchUser, 
   };
 }

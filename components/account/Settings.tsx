@@ -18,9 +18,10 @@ import {
 interface SettingsProps {
   user: User | null;
   isVerified?: boolean;
+  refetch?:any
 }
 
-export default function Settings({ user, isVerified }: SettingsProps) {
+export default function Settings({ user, isVerified,refetch}: SettingsProps) {
   return (
     <>
       {!isVerified ? (
@@ -44,7 +45,7 @@ export default function Settings({ user, isVerified }: SettingsProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ProfileUpdateCard userId={user?.id ?? ""} />
+          <ProfileUpdateCard userId={user?.id ?? ""} refetch={refetch}/>
         </CardContent>
       </Card>
 
@@ -56,12 +57,12 @@ export default function Settings({ user, isVerified }: SettingsProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ResetPasswordForm />
+          <ResetPasswordForm email={user?.email}/>
         </CardContent>
       </Card>
 
       {/* Delete account card */}
-      <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+      {/* <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
         <CardHeader className="pb-6">
           <CardTitle className="text-3xl text-left font-bold text-red-600">
             Danger Zone
@@ -77,7 +78,7 @@ export default function Settings({ user, isVerified }: SettingsProps) {
         <CardContent>
           <DeleteAccountButton />
         </CardContent>
-      </Card>
+      </Card> */}
     </>
   );
 }

@@ -82,7 +82,7 @@ export default function MyWyras({ userId }: MyWyrasProps) {
     fetchWyras();
   }, [userId]);
 
-  if (loading) return <div className="text-center py-10">Loading Wyras...</div>;
+  if (loading) return <div className="text-center py-10">Loading...</div>;
 
   if (wyraList.length === 0)
     return <div className="text-center py-10">No Wyras yet.</div>;
@@ -90,7 +90,7 @@ export default function MyWyras({ userId }: MyWyrasProps) {
   return (
     <>
       {loading ? (
-        <div className="text-center py-10">Loading Wyras...</div>
+        <div className="text-center py-10">Loading...</div>
       ) : wyraList.length === 0 ? (
         <div className="text-center py-10">No Wyras yet.</div>
       ) : (
@@ -105,7 +105,7 @@ export default function MyWyras({ userId }: MyWyrasProps) {
               </p>
 
               {/* Options Row */}
-              <div className="flex items-center justify-between gap-4">
+              <div className="md:flex items-center md:justify-between gap-4">
                 {/* Option 1 */}
                 <div className="flex-1 border rounded-lg p-3 bg-gray-50 flex flex-col items-center gap-2">
                   <p className="font-medium text-center">
@@ -129,7 +129,7 @@ export default function MyWyras({ userId }: MyWyrasProps) {
                 </div>
 
                 {/* OR */}
-                <div className="text-gray-500 font-bold">OR</div>
+                <div className="text-gray-500 font-bold text-center my-2">OR</div>
 
                 {/* Option 2 */}
                 <div className="flex-1 border rounded-lg p-3 bg-gray-50 flex flex-col items-center gap-2">

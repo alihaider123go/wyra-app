@@ -33,6 +33,7 @@ interface HeaderProps {
   onTabChange: (tab: string) => void;
   activeTab: string;
   isVerified: boolean;
+  isProfileCompleted:boolean
 }
 
 export default function Header({
@@ -40,6 +41,7 @@ export default function Header({
   onTabChange,
   user,
   isVerified,
+  isProfileCompleted
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -70,60 +72,60 @@ export default function Header({
       icon: Settings,
       label: "Account Settings",
       slug: "account-settings",
-      disable: !isVerified,
+      disable: !isProfileCompleted,
     },
 
     {
       icon: Bell,
       label: "Notification Settings",
       slug: "notification-settings",
-      disable: !isVerified,
+      disable: !isProfileCompleted,
     },
-    { icon: UserPlus, label: "Invite", slug: "invite", disable: !isVerified },
+    { icon: UserPlus, label: "Invite", slug: "invite", disable: !isProfileCompleted },
     {
       icon: Shield,
       label: "Block/Unblock",
       slug: "block-unblock",
-      disable: !isVerified,
+      disable: !isProfileCompleted,
     },
     {
       icon: HelpCircle,
       label: "Help/FAQs",
       slug: "help-faqs",
-      disable: !isVerified,
+      disable: !isProfileCompleted,
     },
-    { icon: Info, label: "About Us", slug: "about-us", disable: !isVerified },
+    { icon: Info, label: "About Us", slug: "about-us", disable: !isProfileCompleted },
     {
       icon: FileText,
       label: "Terms & Conditions",
       slug: "terms",
-      disable: !isVerified,
+      disable: !isProfileCompleted,
     },
     {
       icon: Lock,
       label: "Privacy & Data Policy",
       slug: "privacy",
-      disable: !isVerified,
+      disable: !isProfileCompleted,
     },
     {
       icon: Cookie,
       label: "Cookies Policy",
       slug: "cookies",
-      disable: !isVerified,
+      disable: !isProfileCompleted,
     },
     {
       icon: Users,
       label: "Community Guidelines",
       slug: "community",
-      disable: !isVerified,
+      disable: !isProfileCompleted,
     },
     {
       icon: AlertTriangle,
       label: "CSAE Policy",
       slug: "csae",
-      disable: !isVerified,
+      disable: !isProfileCompleted,
     },
-    { icon: Mail, label: "Contact Us", slug: "contact", disable: !isVerified },
+    { icon: Mail, label: "Contact Us", slug: "contact", disable: !isProfileCompleted },
   ];
 
   return (
@@ -172,7 +174,7 @@ export default function Header({
                       <div className="flex items-center p-6 border-b border-gray-200">
                         <Link
                           href="/"
-                          onClick={() => onHandlePageClick("home")}
+                          onClick={() => {isProfileCompleted ? onHandlePageClick("home"): ""}}
                         >
                           <div className="flex items-center">
                             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
@@ -198,7 +200,7 @@ export default function Header({
                       {/* User Info */}
                       <div
                         className="p-6 border-b border-gray-200 flex items-center cursor-pointer hover:bg-gray-50"
-                        onClick={() => onHandlePageClick("profile")}
+                        onClick={() => isProfileCompleted ? onHandlePageClick("profile") : ""}
                       >
                         {userProfile?.avatar ? (
                           <img
@@ -265,7 +267,7 @@ export default function Header({
 
           {/* Center - Logo */}
           <div className="flex items-center">
-            <Link href="/">
+            <Link href={"/"}>
               <div className="max-w-md mx-auto flex items-center justify-center">
                 <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg">
                   <svg
@@ -303,50 +305,51 @@ export default function Header({
               />
             </div>
             <button
-              disabled={!isVerified}
+              disabled={!isProfileCompleted}
               onClick={() => onTabChange("home")}
-              className={`relative p-2 rounded-full transition-colors
+              className={`relative p-2 rounded-full transition-colors  md:block hidden
               ${
-                !isVerified
+                !isProfileCompleted
                   ? "text-gray-400 bg-gray-100 cursor-not-allowed"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
               <Home
-                className={`w-5 h-5 ${!isVerified ? "text-gray-400" : ""}`}
+                className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
               <span className="sr-only">Home</span>
             </button>
             <button
-              disabled={!isVerified}
+              disabled={!isProfileCompleted}
               onClick={() => onTabChange("chat")}
               className={`relative p-2 rounded-full transition-colors
+                md:block hidden
               ${
-                !isVerified
+                !isProfileCompleted
                   ? "text-gray-400 bg-gray-100 cursor-not-allowed"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
               <MessageCircle
-                className={`w-5 h-5 ${!isVerified ? "text-gray-400" : ""}`}
+                className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
               <span className="sr-only">Chat</span>
             </button>
 
             <button
-              disabled={!isVerified}
+              disabled={!isProfileCompleted}
               onClick={() => onTabChange("notifications")}
               className={`relative p-2 rounded-full transition-colors
               ${
-                !isVerified
+                !isProfileCompleted
                   ? "text-gray-400 bg-gray-100 cursor-not-allowed"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
               <Bell
-                className={`w-5 h-5 ${!isVerified ? "text-gray-400" : ""}`}
+                className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
-              {notificationCount > 0 && isVerified && (
+              {notificationCount > 0 && isProfileCompleted && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {notificationCount > 99 ? "99+" : notificationCount}
                 </span>

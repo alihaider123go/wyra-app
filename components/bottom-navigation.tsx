@@ -10,6 +10,7 @@ interface BottomNavigationProps {
   onTabChange: (tab: string) => void;
   user: ExtendedUser|null;
   isVerified: boolean;
+  isProfileCompleted:boolean;
 }
 
 export default function BottomNavigation({
@@ -17,6 +18,7 @@ export default function BottomNavigation({
   onTabChange,
   user,
   isVerified,
+  isProfileCompleted
 }: BottomNavigationProps) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   useEffect(() => {
@@ -25,11 +27,11 @@ export default function BottomNavigation({
     }
   }, [user]);
   const tabs = [
-    { id: "home", icon: Home, label: "Home", disable: !isVerified },
-    { id: "favorites", icon: Heart, label: "Favorites", disable: !isVerified },
-    { id: "create", icon: Plus, label: "Create", disable: !isVerified },
-    { id: "chat", icon: MessageCircle, label: "Chat", disable: !isVerified },
-    { id: "profile", icon: User, label: "Profile", disable: !isVerified },
+    { id: "home", icon: Home, label: "Home", disable: !isVerified && !isProfileCompleted },
+    { id: "favorites", icon: Heart, label: "Favorites", disable: !isVerified && !isProfileCompleted },
+    { id: "create", icon: Plus, label: "Create", disable: !isVerified && !isProfileCompleted },
+    { id: "chat", icon: MessageCircle, label: "Chat", disable: !isVerified && !isProfileCompleted },
+    { id: "profile", icon: User, label: "Profile", disable: !isVerified && !isProfileCompleted },
   ];
 
   return (

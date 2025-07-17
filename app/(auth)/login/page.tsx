@@ -124,7 +124,7 @@ return (
       {/* Right Side: Empty Card */}
       <div className="w-full md:w-1/2 md:pl-4 mt-8 md:mt-0 flex justify-center items-start">
         <Card className="shadow-2xl border-0 bg-white/80 h-[522px] overflow-y-auto backdrop-blur-lg animate-slide-in-right w-full max-w-md flex items-center justify-center">
-          <p className="text-gray-500 text-lg">Empty Card Content</p>
+          <p className="text-gray-500 text-lg">Trending Wyras</p>
         </Card>
       </div>
     </div>

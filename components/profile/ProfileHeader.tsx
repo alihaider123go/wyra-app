@@ -38,7 +38,7 @@ export default function UserProfileHeader({
       {/* Left: Avatar & Info */}
       <div className="flex items-start sm:items-center gap-4 w-full">
         {/* Avatar */}
-        <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden">
+        <div className="md:w-32 md:h-32 w-20 h-20 rounded-full bg-gray-200 overflow-hidden">
           {user.avatar ? (
             <img src={user.avatar} alt="Avatar" className="w-full h-full shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover"/>
           ) : (
@@ -71,7 +71,7 @@ export default function UserProfileHeader({
         <div className="flex flex-row gap-2 mt-2 sm:mt-2">
           <Button
             onClick={onEditProfile}
-            className="w-[40%] px-4 py-2 text-md font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded hover:bg-blue-50"
+            className="md:w-[40%] w-[60%] px-4 py-2 text-md font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded hover:bg-blue-50"
           >
             <Settings className="w-12 h-12 mr-2" />
             Edit Profile

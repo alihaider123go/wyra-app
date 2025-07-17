@@ -3,15 +3,16 @@
 import React, { useEffect, useState, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { uploadFiles } from "@/actions/common";
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Eye, EyeOff, Heart, Sparkles, Zap, Users } from "lucide-react"
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Eye, EyeOff, Heart, Sparkles, Zap, Users } from "lucide-react";
 
 interface ProfileInformationProps {
   userId: string;
+  refetch?: any;
 }
 
 interface ProfileData {
@@ -21,9 +22,14 @@ interface ProfileData {
   username: string;
   bio: string;
   avatar: string;
+  gender: string;
+  email: string;
 }
 
-export default function ProfileInformation({ userId }: ProfileInformationProps) {
+export default function ProfileInformation({
+  userId,
+  refetch,
+}: ProfileInformationProps) {
   const supabase = createClient();
 
   const [profile, setProfile] = useState<ProfileData>({
@@ -32,6 +38,8 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
     dob: "",
     username: "",
     bio: "",
+    gender: "",
+    email: "",
     avatar: "",
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -43,9 +51,18 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
+    null
+  );
   const [checkingUsername, setCheckingUsername] = useState(false);
-
+  const today = new Date();
+  const minAgeDate = new Date(
+    today.getFullYear() - 13,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
   // Fetch user profile on mount
   useEffect(() => {
     async function fetchProfile() {
@@ -58,7 +75,6 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
           .single();
 
         if (error) throw error;
-
         setProfile({
           firstname: data.firstname || "",
           lastname: data.lastname || "",
@@ -66,6 +82,8 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
           username: data.username || "",
           bio: data.bio || "",
           avatar: data.avatar || "",
+          email: data.email || "",
+          gender: data.gender || "",
         });
 
         setOriginalUsername(data.username || "");
@@ -136,7 +154,7 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
         const uploaded = await uploadFiles(
           [avatarFile],
           userId,
-          "profile-avatars",
+          "profile-avatars"
         );
         if (uploaded.length === 0) {
           alert("Failed to upload profile image");
@@ -164,6 +182,7 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
       if (error) throw error;
 
       setSuccessMsg("Profile updated successfully!");
+      refetch();
       setOriginalUsername(profile.username); // reset original
     } catch (error: any) {
       setErrorMsg(error.message || "Failed to update profile");
@@ -173,10 +192,24 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
   }
 
   const handleButtonClick = () => {
-    if(fileInputRef.current){
+    if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
+
+ const handleSetProfilePicture = (e: any) => {
+  const file = e.target.files?.[0];
+
+  if (file) {
+    const previewUrl = URL.createObjectURL(file);
+
+    setAvatarFile(file);
+    setProfile((prev) => ({
+      ...prev,
+      avatar: previewUrl, // store preview URL instead of file object
+    }));
+  }
+};
 
   if (loading) return <div>Loading profile...</div>;
 
@@ -184,19 +217,23 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
     <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-5">
       {errorMsg && (
         <Alert className="border-red-200 bg-red-50/80 backdrop-blur-sm">
-          <AlertDescription className="text-red-700">{errorMsg}</AlertDescription>
+          <AlertDescription className="text-red-700">
+            {errorMsg}
+          </AlertDescription>
         </Alert>
       )}
 
       {successMsg && (
         <Alert className="border-green-200 bg-green-50/80 backdrop-blur-sm">
-          <AlertDescription className="text-green-700">{successMsg}</AlertDescription>
+          <AlertDescription className="text-green-700">
+            {successMsg}
+          </AlertDescription>
         </Alert>
       )}
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block font-semibold mb-1">Choose Avatar</label>
+          <label className="block font-semibold mb-1">Profile Picture</label>
           {profile.avatar && (
             <img
               src={profile.avatar}
@@ -209,22 +246,27 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
             accept="image/*"
             ref={fileInputRef}
             className="hidden"
-            onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+            onChange={(e) => handleSetProfilePicture(e)}
           />
         </div>
         <button
-        type="button"
-        onClick={handleButtonClick}
-        className="h-12 w-full mx-[-50px] my-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-      >
-        Choose Avatar
-      </button>
+          type="button"
+          onClick={handleButtonClick}
+          className="h-12 w-full mx-[-50px] my-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Upload Profile Picture
+        </button>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        
         <div className="space-y-2">
-          <Label htmlFor="firstname" className="text-sm font-semibold text-gray-700"> First Name </Label>
+          <Label
+            htmlFor="firstname"
+            className="text-sm font-semibold text-gray-700"
+          >
+            {" "}
+            First Name{" "}
+          </Label>
           <Input
             type="text"
             placeholder="First Name"
@@ -239,7 +281,13 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="lastname" className="text-sm font-semibold text-gray-700"> Last Name </Label>
+          <Label
+            htmlFor="lastname"
+            className="text-sm font-semibold text-gray-700"
+          >
+            {" "}
+            Last Name{" "}
+          </Label>
           <Input
             type="text"
             placeholder="Last Name"
@@ -252,13 +300,17 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
             required
           />
         </div>
-
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-
         <div className="space-y-2">
-          <Label htmlFor="username" className="text-sm font-semibold text-gray-700"> Username </Label>
+          <Label
+            htmlFor="username"
+            className="text-sm font-semibold text-gray-700"
+          >
+            {" "}
+            Username{" "}
+          </Label>
           <Input
             type="text"
             placeholder="Username"
@@ -275,10 +327,14 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
             {profile.username !== originalUsername && (
               <>
                 {checkingUsername && (
-                  <span className="text-gray-500">Checking availability...</span>
+                  <span className="text-gray-500">
+                    Checking availability...
+                  </span>
                 )}
                 {!checkingUsername && usernameAvailable === true && (
-                  <span className="text-green-600">Username is available ✓</span>
+                  <span className="text-green-600">
+                    Username is available ✓
+                  </span>
                 )}
                 {!checkingUsername && usernameAvailable === false && (
                   <span className="text-red-600">Username is taken ✗</span>
@@ -289,38 +345,112 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dob" className="text-sm font-semibold text-gray-700"> Date of Birth </Label>
+          <Label htmlFor="dob" className="text-sm font-semibold text-gray-700">
+            {" "}
+            Date of Birth{" "}
+          </Label>
           <Input
             type="date"
             placeholder="Date of Birth"
             id="dob"
             value={profile.dob}
-            onChange={(e) =>
-              setProfile((p) => ({ ...p, dob: e.target.value }))
-            }
+            onChange={(e) => setProfile((p) => ({ ...p, dob: e.target.value }))}
             className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
             required
           />
         </div>
-
-    </div>
-
+      </div>
+      <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
-          <Label htmlFor="bio" className="text-sm font-semibold text-gray-700"> Bio </Label>
-          <Textarea
-            placeholder="Write something about yourself"
-            id="bio"
-            rows={4}
-            maxLength={200}
-            value={profile.bio}
-            onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
-            className="text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
-            required
-          />
-          <div className="text-right text-sm text-gray-500 mt-1">
-            {profile.bio.length}/200 characters
+          <Label
+            htmlFor="gender"
+            className="text-sm font-semibold text-gray-700"
+          >
+            Gender
+          </Label>
+          <div className="relative w-full">
+            <select
+              id="gender"
+              name="gender"
+              required
+              value={profile.gender}
+              onChange={(e) =>
+                setProfile((p) => ({ ...p, gender: e.target.value }))
+              }
+              className={`w-full h-14 text-base border-2 border-gray-200 focus:border-blue-500 focus:ring-0 focus:outline-none rounded-xl bg-white/90 backdrop-blur-sm px-4 pr-10 appearance-none 
+                          ${
+                            profile.gender === ""
+                              ? "text-gray-400"
+                              : "text-gray-900"
+                          }`}
+            >
+              <option value="" disabled>
+                Select Gender
+              </option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+              <option value="prefer_not_to_say">Prefer not to say</option>
+            </select>
+
+            {/* Custom Dropdown Icon */}
+            <svg
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
           </div>
         </div>
+        <div className="space-y-2">
+          <Label
+            htmlFor="email"
+            className="text-sm font-semibold text-gray-700"
+          >
+            Email
+          </Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            value={profile.email}
+            onChange={(e) =>
+              setProfile((p) => ({ ...p, email: e.target.value }))
+            }
+            placeholder="Email"
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            disabled
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="bio" className="text-sm font-semibold text-gray-700">
+          {" "}
+          Bio{" "}
+        </Label>
+        <Textarea
+          placeholder="Write something about yourself"
+          id="bio"
+          rows={4}
+          maxLength={200}
+          value={profile.bio}
+          onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
+          className="text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+          required
+        />
+        <div className="text-right text-sm text-gray-500 mt-1">
+          {profile.bio.length}/200 characters
+        </div>
+      </div>
 
       {/* <div>
         <label className="block font-semibold mb-1">First Name</label>
@@ -419,20 +549,20 @@ export default function ProfileInformation({ userId }: ProfileInformationProps) 
         />
       </div> */}
 
-    <Button
-      type="submit"
-      disabled={updating}
-      className="w-full h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-    >
-      {updating ? (
-        <>
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-          Updating ...
-        </>
-      ) : (
-        "Update Profile"
-      )}
-    </Button>
+      <Button
+        type="submit"
+        disabled={updating}
+        className="w-full h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+      >
+        {updating ? (
+          <>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+            Updating ...
+          </>
+        ) : (
+          "Update Profile"
+        )}
+      </Button>
       {/* <button
         type="submit"
         disabled={updating}
