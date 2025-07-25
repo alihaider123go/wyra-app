@@ -64,10 +64,12 @@ export default function Home() {
     setActiveTab(tab);
   };
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const renderCurrentTab = () => {
     switch (activeTab) {
       case "home":
-        return <WyraTimeLine />;
+        return <WyraTimeLine searchTerm={searchTerm}/>;
       case "create":
         return <CreateWyra onTabChange={handleTabClick}/>;
       case "chat":
@@ -77,9 +79,9 @@ export default function Home() {
       case "profile-settings":
         return <Settings user={sessionUser} isVerified={isVerified} refetch={refetch}/>;
       case "account-settings":
-        return <AccountPrivacySettings />;
+        return <AccountPrivacySettings userId={sessionUser?.id}/>;
       case "notification-settings":
-        return <NotificationsSettings />;
+        return <NotificationsSettings userId={sessionUser?.id}/>;
       case "invite":
         return <InviteFriends />;
       case "block-unblock":
@@ -119,6 +121,8 @@ export default function Home() {
         onTabChange={handleTabClick}
         activeTab={activeTab}
         isProfileCompleted={isProfileCompleted}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
       />
 
       <main className="pb-20 md:pb-4">

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 interface Setting {
   id: string;
@@ -12,37 +13,37 @@ interface Setting {
 const settings: Setting[] = [
   // Account & Privacy
   {
-    id: "showRealName",
+    id: "show_real_name",
     label: "Show my real name on posts",
     description: "Your name is your badge of honor… unless you prefer staying low-key with just your username.",
     category: "Account & Privacy",
   },
   {
-    id: "findByEmail",
+    id: "find_by_email",
     label: "Allow people to find me by email",
     description: "For those who love surprise connections. Otherwise? Cloak of invisibility it is.",
     category: "Account & Privacy",
   },
   {
-    id: "findByPhone",
+    id: "find_by_phone",
     label: "Allow people to find me by phone number",
     description: "Only for the bold. Or the social butterflies.",
     category: "Account & Privacy",
   },
   {
-    id: "showOnlineStatus",
+    id: "show_online_status",
     label: "Show online status",
     description: "Sometimes you wanna glow green. Sometimes you wanna ghost.",
     category: "Account & Privacy",
   },
   {
-    id: "showCirclesOnProfile",
+    id: "show_circles_on_profile",
     label: "Show which Circles I’m in on my profile",
     description: "Wear your Circles proudly — or keep them your little secret.",
     category: "Account & Privacy",
   },
   {
-    id: "showWhyAnswers",
+    id: "show_why_answers",
     label: "Let followers see my ‘Why’ answers",
     description: "Share your wisdom… or keep them guessing.",
     category: "Account & Privacy",
@@ -50,25 +51,25 @@ const settings: Setting[] = [
 
   // Appearance & Theme
   {
-    id: "darkMode",
+    id: "dark_mode",
     label: "Dark Mode",
     description: "For your inner night owl.",
     category: "Appearance & Theme",
   },
   {
-    id: "highContrast",
+    id: "high_contrast",
     label: "High-contrast mode",
     description: "Make things pop, accessibility-style.",
     category: "Appearance & Theme",
   },
   {
-    id: "animateFloatingEffects",
+    id: "animate_floating_effects",
     label: "Animate floating ‘Agree/Disagree’ effects",
     description: "Because we all deserve a little flair. Or keep it chill.",
     category: "Appearance & Theme",
   },
   {
-    id: "multiColoredWhyBoxes",
+    id: "multi_color_why_boxes",
     label: "Multi-colored ‘Why’ boxes",
     description: "Life’s too short for just one color.",
     category: "Appearance & Theme",
@@ -76,19 +77,19 @@ const settings: Setting[] = [
 
   // Direct Messages (DMs)
   {
-    id: "allowDMsEveryone",
+    id: "allow_dm_everyone",
     label: "Allow DMs from everyone",
     description: "You’re an open book. Or maybe not.",
     category: "Direct Messages (DMs)",
   },
   {
-    id: "allowDMsFollowers",
+    id: "allow_dm_followers",
     label: "Allow DMs only from followers",
     description: "Friendly circle only.",
     category: "Direct Messages (DMs)",
   },
   {
-    id: "noDMs",
+    id: "no_dm",
     label: "Don’t allow DMs at all",
     description: "Anti-social? Anti-noise? We got you.",
     category: "Direct Messages (DMs)",
@@ -96,19 +97,19 @@ const settings: Setting[] = [
 
   // Circles & Community
   {
-    id: "autoJoinCircles",
+    id: "auto_join_circles",
     label: "Auto-join suggested Circles",
     description: "Let us match you to your tribe automatically.",
     category: "Circles & Community",
   },
   {
-    id: "showPostsPublicFeed",
+    id: "show_posts_public_feed",
     label: "Show my posts in public home feed",
     description: "For the extroverts.",
     category: "Circles & Community",
   },
   {
-    id: "showPostsCirclesOnly",
+    id: "show_posts_circles_only",
     label: "Only show my posts in my Circles",
     description: "For the cozy, private vibes.",
     category: "Circles & Community",
@@ -116,52 +117,121 @@ const settings: Setting[] = [
 
   // Extras & Fun
   {
-    id: "showEditedTag",
+    id: "show_edited_tag",
     label: "Show 'edited' tag on my edited Wyras",
     description: "Honesty is the best policy — or you can keep it stealthy.",
     category: "Extras & Fun",
   },
   {
-    id: "showFavoritesPublicly",
+    id: "show_favorites_publicly",
     label: "Show favourites publicly on my profile",
     description: "Flex your taste — or keep your faves secret.",
     category: "Extras & Fun",
   },
   {
-    id: "showLikesDislikes",
+    id: "show_likes_dislikes",
     label: "Show who liked/disliked my Wyras",
     description: "Names or just numbers? Your call.",
     category: "Extras & Fun",
   },
   {
-    id: "enableFloatingReactions",
+    id: "enable_floating_reactions",
     label: "Enable floating reactions (Agree/Disagree)",
     description: "It’s extra. But extra is fun.",
     category: "Extras & Fun",
   },
 ];
 
-export default function AccountPrivacySettings() {
+interface SettingsProps {
+  userId: string | undefined;
+}
+
+export default function AccountPrivacySettings({userId}:SettingsProps) {
   // Track toggle states per setting id (default all false)
-  const [toggles, setToggles] = useState<Record<string, boolean>>(() => {
-    const initialState: Record<string, boolean> = {};
-    settings.forEach((s) => (initialState[s.id] = false));
-    return initialState;
-  });
+  // const [toggles, setToggles] = useState<Record<string, boolean>>(() => {
+  //   const initialState: Record<string, boolean> = {};
+  //   settings.forEach((s) => (initialState[s.id] = false));
+  //   return initialState;
+  // });
+  const supabase = createClient();
 
-  const handleToggle = (id: string) => {
-    setToggles((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
+    const [toggles, setToggles] = useState<{ [key: string]: boolean }>({});
 
-  // Group settings by category
+    // Group settings by category
   const groupedSettings = settings.reduce<Record<string, Setting[]>>((acc, setting) => {
     if (!acc[setting.category]) acc[setting.category] = [];
     acc[setting.category].push(setting);
     return acc;
   }, {});
+
+  // const handleToggle = (id: string) => {
+  //   setToggles((prev) => ({
+  //     ...prev,
+  //     [id]: !prev[id],
+  //   }));
+  // };
+
+  // ✅ Toggle handler with UPSERT
+  const handleToggle = async (id: string) => {
+    setToggles((prev) => {
+      const updated = { ...prev, [id]: !prev[id] };
+
+      supabase
+        .from("account_settings") // ✅ using new table
+        .upsert(
+          {
+            user_id: userId, // primary key / unique constraint
+            [id]: updated[id],
+          },
+          { onConflict: "user_id" } // updates if exists, inserts if not
+        )
+        .then(({ error }) => {
+          if (error) console.error("Upsert error:", error);
+        });
+
+      return updated;
+    });
+  };
+
+  // ✅ Fetch settings on mount
+useEffect(() => {
+  async function fetchAllAccountSettings() {
+    try {
+      const { data: settingsData, error }: any = await supabase
+        .from("account_settings")
+        .select("*")
+        .eq("user_id", userId)
+        .limit(1);
+
+      if (error && error.code !== "PGRST116") {
+        console.error("Fetch error:", error);
+        return;
+      }
+
+      if (settingsData && settingsData.length > 0) {
+        const row = settingsData[0]; // ✅ extract first row
+
+        const initialToggles: { [key: string]: boolean } = {};
+        settings.forEach(({ id }) => {
+          initialToggles[id] = row[id] ?? false; // ✅ now correctly maps
+        });
+
+        setToggles(initialToggles);
+      } else {
+        // ✅ No row exists → default to false
+        const defaultToggles: { [key: string]: boolean } = {};
+        settings.forEach(({ id }) => {
+          defaultToggles[id] = false;
+        });
+        setToggles(defaultToggles);
+      }
+    } catch (err: any) {
+      console.error("Error fetching account settings:", err.message);
+    }
+  }
+
+  if (userId) fetchAllAccountSettings();
+}, [userId]);
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-8 text-gray-800">
@@ -181,7 +251,7 @@ export default function AccountPrivacySettings() {
                   <input
                     type="checkbox"
                     id={id}
-                    checked={toggles[id]}
+                    checked={toggles[id] || false}
                     onChange={() => handleToggle(id)}
                     className="w-5 h-5 cursor-pointer accent-indigo-600"
                   />

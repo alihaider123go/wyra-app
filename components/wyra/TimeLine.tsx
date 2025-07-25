@@ -42,7 +42,7 @@ import { relativeTime } from "@/utils/helper";
 import ShareButton from "./ShareBtn";
 import FavouriteButton from "./FavouriteBtn";
 
-export default function WyraTimeline() {
+export default function WyraTimeline({searchTerm}:any) {
   const [wyraList, setWyraList] = useState<Wyra[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateWyraModal, setShowCreateWyraModal] = useState(false);
@@ -66,11 +66,24 @@ export default function WyraTimeline() {
   const [loadingStatus, setLoadingStatus] = useState<Record<string, boolean>>(
     {}
   );
+  // const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
+
+   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  console.log(searchTerm,"searchTerm")
   const supabase = createClient();
 
-  // Fetch wyras & current user
-  useEffect(() => {
+ useEffect(() => {
     async function fetchWyras() {
       const {
         data: { user },
@@ -86,7 +99,7 @@ export default function WyraTimeline() {
       }
 
       try {
-        const result = await getUnifiedHomeWyras(user.id);
+        const result = await getUnifiedHomeWyras(user.id, debouncedSearch);
         setWyraList(result || []);
       } catch (err) {
         console.error("Failed to fetch wyras", err);
@@ -96,7 +109,7 @@ export default function WyraTimeline() {
     }
 
     fetchWyras();
-  }, []);
+  }, [debouncedSearch]);
 
   // Fetch follow status for all unique profileUserIds when user or wyraList changes
   useEffect(() => {
@@ -207,19 +220,17 @@ export default function WyraTimeline() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center justify-center p-3 min-w-0 flex-1 rounded-2xl transition-all duration-300 transform ${
-                isActive
+              className={`flex flex-col items-center justify-center p-3 min-w-0 flex-1 rounded-2xl transition-all duration-300 transform ${isActive
                   ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-110"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
-              }`}
+                }`}
             >
               <Icon
                 className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
               />
               <span
-                className={`text-xs mt-1 font-semibold ${
-                  isActive ? "text-white" : ""
-                }`}
+                className={`text-xs mt-1 font-semibold ${isActive ? "text-white" : ""
+                  }`}
               >
                 {tab.label}
               </span>
@@ -236,7 +247,7 @@ export default function WyraTimeline() {
               className="shadow-md hover:shadow-2xl border-0 bg-white/80 backdrop-blur-lg transition-all pt-4 animate-slide-in-right"
             >
               <CardContent>
-                <div className="flex gap-3">
+                <div className="flex md:gap-2">
                   {/* user info */}
                   <div className="flex items-center gap-3 w-full">
                     <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
@@ -344,16 +355,14 @@ export default function WyraTimeline() {
                           <div
                             className={`
             my-3 relative overflow-hidden border shadow p-4 rounded-lg cursor-pointer w-full md:w-1/2 transition-all duration-300 transform hover:scale-[1.02]
-            ${
-              isSelected
-                ? "bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-600 hover:to-blue-700"
-                : "hover:bg-gray-100"
-            }
-            ${
-              isDisabled
-                ? "cursor-not-allowed pointer-events-none opacity-70"
-                : ""
-            }
+            ${isSelected
+                                ? "bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-600 hover:to-blue-700"
+                                : "hover:bg-gray-100"
+                              }
+            ${isDisabled
+                                ? "cursor-not-allowed pointer-events-none opacity-70"
+                                : ""
+                              }
           `}
                             // onClick={() => {
                             //   if (!selectedOptionId) {
@@ -384,16 +393,14 @@ export default function WyraTimeline() {
                             )}
 
                             <p
-                              className={`text-sm font-medium mb-1 ${
-                                isSelected ? "text-white" : "text-gray-500"
-                              }`}
+                              className={`text-sm font-medium mb-1 ${isSelected ? "text-white" : "text-gray-500"
+                                }`}
                             >
                               Option {index + 1}:
                             </p>
                             <p
-                              className={`font-bold text-lg mb-1 ${
-                                isSelected ? "text-white" : "text-gray-800"
-                              }`}
+                              className={`font-bold text-lg mb-1 ${isSelected ? "text-white" : "text-gray-800"
+                                }`}
                             >
                               {opt.option_text}
                             </p>
@@ -424,7 +431,7 @@ export default function WyraTimeline() {
                 </div>
                 {isShowWhyReasonContainer[wyra.id] && (
                   <div className="my-3 p-2 border shadow rounded-md ">
-                    <p className={`font-bold text-lg mb-1`}>Why:</p>
+                    <p className={`font-bold text-lg mb-1`}>Why? <span className="italic font-normal text-md">(Optional):</span></p>
                     <div className="flex items-end">
                       <Input
                         id={`why-${wyra.id}`}

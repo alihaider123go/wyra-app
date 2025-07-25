@@ -6,7 +6,7 @@ export default function MessageInput({
   supabase,
   chatId,
   currentUserId,
-  onNewMessage,
+  onNewMessage, 
 }: {
   supabase: SupabaseClient;
   chatId: string | undefined;

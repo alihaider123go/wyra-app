@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Heart, Sparkles, Zap, Users } from "lucide-react";
+import { getAvatarInitials } from "@/utils/helper";
 
 interface ProfileInformationProps {
   userId: string;
@@ -234,13 +235,23 @@ export default function ProfileInformation({
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block font-semibold mb-1">Profile Picture</label>
-          {profile.avatar && (
+          {profile.avatar ? (
             <img
               src={profile.avatar}
               alt="avatar preview"
               className="shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 w-24 h-24 rounded-full mb-2 object-cover"
             />
-          )}
+          )
+          :
+          <div
+          className="flex items-center justify-center shadow-2xl p-1 bg-gradient-to-r 
+                     from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
+                     border-gray-700 w-24 h-24 rounded-full mb-2 
+                     text-white text-3xl font-bold uppercase"
+        >
+          {getAvatarInitials(profile?.firstname + " " + profile?.lastname)}
+        </div>
+          }
           <input
             type="file"
             accept="image/*"
@@ -252,7 +263,7 @@ export default function ProfileInformation({
         <button
           type="button"
           onClick={handleButtonClick}
-          className="h-12 w-full mx-[-50px] my-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          className="h-12 w-full text-[13px] md:text-[16px] mx-[-50px] my-auto px-2 md:px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
         >
           Upload Profile Picture
         </button>

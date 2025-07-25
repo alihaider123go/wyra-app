@@ -34,6 +34,8 @@ interface HeaderProps {
   activeTab: string;
   isVerified: boolean;
   isProfileCompleted:boolean
+  searchTerm?:string;
+  setSearchTerm?:any
 }
 
 export default function Header({
@@ -41,7 +43,9 @@ export default function Header({
   onTabChange,
   user,
   isVerified,
-  isProfileCompleted
+  isProfileCompleted,
+  searchTerm,
+  setSearchTerm
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -50,8 +54,8 @@ export default function Header({
   const supabase = createClient();
 
   const handleLogout = async () => {
-    setIsDrawerOpen(false);
     await signOut();
+    setIsDrawerOpen(false);
   };
 
   useEffect(() => {
@@ -294,14 +298,15 @@ export default function Header({
 
           {/* Right - Search, Home, Chat, and Notifications */}
           <div className="flex items-center space-x-4">
-            <div className="relative hidden md:block">
+            <div className="relative block">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
                 type="text"
                 placeholder="Search users or Wyras..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 w-64 bg-gray-50 border-gray-200 focus:bg-white"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                
+                className="pl-10 pr-4 py-2 w-28 md:w-64 bg-gray-50 border-gray-200 focus:bg-white"
               />
             </div>
             <button

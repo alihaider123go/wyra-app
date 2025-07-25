@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Chat, Message } from "@/actions/types";
+import { Chat, Message,UserProfile } from "@/actions/types";
 import MessageItem from "./MessageItem";
 import MessageInput from "./MessageInput";
 import { IoMdArrowRoundBack } from "react-icons/io";
@@ -22,6 +22,7 @@ export default function MessagesSection({
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagePage, setMessagePage] = useState(1);
   const messagesPerPage = 20;
+  const [user, setUser] = useState<UserProfile | null>(null);
 
   const fetchMessages = async () => {
     if (!chat) {
@@ -45,8 +46,22 @@ export default function MessagesSection({
       }
     };
 
+    const currentUserData = async () => {
+ const { data: profile, error: profileError } = await supabase
+        .from("user_profiles")
+        .select("id,firstname, lastname, username, avatar")
+        .eq("id", currentUserId)
+        .single();
+
+      if (!profileError) {
+        setUser(profile);
+      }
+    }
+   
+
   useEffect(() => {
     fetchMessages();
+    currentUserData()
   }, [chat, messagePage, supabase]);
 
   useEffect(() => {
@@ -113,6 +128,8 @@ export default function MessagesSection({
       <MessageItem
         key={msg.id}
         message={msg}
+        avatar={chat?.avatar}
+        currenctUserAvatar={user?.avatar}
         currentUserId={currentUserId}
       />
     ))}
