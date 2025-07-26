@@ -86,24 +86,43 @@ export async function signIn(formData: FormData) {
   const password = formData.get("password")?.toString() || "";
 
   if (!email || !password) {
-    return { status: "Email and password are required" };
+    return { status: "Email and password are required", user: null };
   }
 
+  // ✅ First, check if the user exists and is active before login
+  const { data: userProfile, error: profileError } = await supabase
+    .from("user_profiles")
+    .select("status")
+    .eq("email", email)
+    .limit(1)
+    .maybeSingle();
+
+  if (profileError) {
+    return { status: profileError.message, user: null };
+  }
+
+  if (userProfile && userProfile.status === "deactivate") {
+    return { status: "Your account is deactivated. Please contact support.", user: null };
+  }
+
+  // ✅ Proceed with login
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
   if (error) {
-    return { status: error?.message, user: null };
+    return { status: error.message, user: null };
   }
 
+  // ✅ If no profile exists, create one
   const { data: existingUser } = await supabase
     .from("user_profiles")
     .select("*")
     .eq("email", email)
     .limit(1)
     .single();
+
   if (!existingUser) {
     const { error: insertError } = await supabase.from("user_profiles").insert({
       email: data.user.email,
@@ -112,9 +131,11 @@ export async function signIn(formData: FormData) {
       dob: data.user.user_metadata.dob || "",
       gender: data.user.user_metadata.gender || "",
       username: data.user.user_metadata.username || "",
+      status: "active",
     });
+
     if (insertError) {
-      return { status: insertError?.message, user: null };
+      return { status: insertError.message, user: null };
     }
   }
 
@@ -226,4 +247,21 @@ export async function markEmailAsVerified() {
     .update({ is_verified: true })
     .eq("id", user.id);
   return true;
+}
+
+
+export async function updateUserStatus(email: string, status: "active" | "deactivate") {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("user_profiles")
+    .update({ status })
+    .eq("email", email);
+
+  if (error) {
+    console.error("Error updating user status:", error.message);
+    return { success: false, message: error.message };
+  }
+
+  return { success: true, message: "Status updated successfully" };
 }

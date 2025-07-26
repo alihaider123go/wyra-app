@@ -296,9 +296,9 @@ export const getUnifiedHomeWyras = async (
     )
     .order("created_at", { ascending: false });
 
-  if (orFilters.length > 0) {
-    query = query.or(orFilters.join(","));
-  }
+  // if (orFilters.length > 0) {
+  //   query = query.or(orFilters.join(","));
+  // }
 
   const { data, error } = await query;
 
@@ -331,6 +331,91 @@ export const getUnifiedHomeWyras = async (
       return (
         username.includes(lowerSearch) ||
         optionTexts.some((text) => text.includes(lowerSearch))
+      );
+    });
+  }
+
+  return formattedData;
+};
+
+
+export const getFavoriteWyras = async (userId: string, search: string = "") => {
+  const supabase = createClient();
+
+  // ✅ Fetch all favorites (unsorted)
+  const { data, error } = await supabase
+    .from("wyra_favorites")
+    .select(
+      `
+      wyra (
+        id,
+        title,
+        created_at,
+        created_by,
+        user_profiles (
+          id,
+          firstname,
+          lastname,
+          username,
+          avatar
+        ),
+        wyra_option (
+          id,
+          option_text,
+          position,
+          wyra_media (
+            id,
+            media_url,
+            media_type
+          )
+        )
+      )
+      `
+    )
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Favorite Wyras fetch error:", error);
+    return [];
+  }
+
+  // ✅ Extract Wyra objects
+  let formattedData: any[] =
+    data?.map((fav: any) => {
+      const wyra = fav.wyra;
+      if (!wyra) return null;
+
+      const { user_profiles, ...rest } = wyra;
+      return {
+        ...rest,
+        creator: Array.isArray(user_profiles)
+          ? user_profiles[0]
+          : user_profiles,
+      };
+    }) ?? [];
+
+  formattedData = formattedData.filter(Boolean);
+
+  // ✅ Sort by Wyra creation date (DESC)
+  formattedData.sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
+  // ✅ Search Filter (username or option_text)
+  if (search.trim()) {
+    const lowerSearch = search.toLowerCase();
+
+    formattedData = formattedData.filter((wyra) => {
+      const username =
+        wyra.creator?.username?.toLowerCase() ||
+        wyra.creator?.firstname?.toLowerCase() ||
+        "";
+      const optionTexts =
+        wyra.wyra_option?.map((opt: any) => opt.option_text.toLowerCase()) || [];
+
+      return (
+        username.includes(lowerSearch) ||
+        optionTexts.some((text: any) => text.includes(lowerSearch))
       );
     });
   }

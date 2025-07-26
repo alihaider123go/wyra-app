@@ -25,6 +25,7 @@ import AccountPrivacySettings from "@/components/account-privacy";
 import NotificationsSettings from "@/components/notifications/setting";
 import BlockUserInfo from "@/components/blockuser";
 import { useSessionUser } from "@/utils/useSessionUser";
+import FavoritesWyra from "@/components/wyra/FavoritesWyra";
 
 export default function Home() {
   const supabase = createClient();
@@ -59,12 +60,13 @@ export default function Home() {
   // }, []);
 
 
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
+    setSearchTerm("")
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
 
   const renderCurrentTab = () => {
     switch (activeTab) {
@@ -102,6 +104,8 @@ export default function Home() {
         return <CommunityGuidelines />;
       case "csae":
         return <CSAEPolicy />;
+      case "favorites":
+        return <FavoritesWyra searchTerm={searchTerm}/>;
       default:
         return null;
     }

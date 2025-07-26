@@ -62,11 +62,11 @@ export default function Settings({ user, isVerified,refetch}: SettingsProps) {
       </Card>
 
       {/* Delete account card */}
-      {/* <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+      <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
         <CardHeader className="pb-6">
-          <CardTitle className="text-3xl text-left font-bold text-red-600">
+          {/* <CardTitle className="text-3xl text-left font-bold text-red-600">
             Danger Zone
-          </CardTitle>
+          </CardTitle> */}
           <CardTitle className="text-2xl text-center font-bold text-gray-800">
             Delete Account
           </CardTitle>
@@ -78,7 +78,7 @@ export default function Settings({ user, isVerified,refetch}: SettingsProps) {
         <CardContent>
           <DeleteAccountButton />
         </CardContent>
-      </Card> */}
+      </Card>
     </>
   );
 }

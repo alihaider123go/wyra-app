@@ -24,6 +24,7 @@ import {
   MessageCircle,
   UserRoundCog,
   Home,
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
 import { ExtendedUser, UserProfile } from "@/actions/types";
@@ -336,6 +337,23 @@ export default function Header({
               }`}
             >
               <MessageCircle
+                className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
+              />
+              <span className="sr-only">Chat</span>
+            </button>
+
+                        <button
+              disabled={!isProfileCompleted}
+              onClick={() => onTabChange("favorites")}
+              className={`relative p-2 rounded-full transition-colors
+                md:block hidden
+              ${
+                !isProfileCompleted
+                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              }`}
+            >
+              <Heart
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
               <span className="sr-only">Chat</span>

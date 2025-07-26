@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getUnifiedHomeWyras } from "@/actions/wyra";
+import { getFavoriteWyras, getUnifiedHomeWyras } from "@/actions/wyra";
 import { createClient } from "@/utils/supabase/client";
 import LikeButton from "./LikeBtn";
 import DislikeButton from "./DislikeBtn";
@@ -42,7 +42,7 @@ import { relativeTime } from "@/utils/helper";
 import ShareButton from "./ShareBtn";
 import FavouriteButton from "./FavouriteBtn";
 
-export default function WyraTimeline({searchTerm}:any) {
+export default function FavoritesWyra({searchTerm}:any) {
   const [wyraList, setWyraList] = useState<Wyra[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateWyraModal, setShowCreateWyraModal] = useState(false);
@@ -98,10 +98,10 @@ export default function WyraTimeline({searchTerm}:any) {
       }
 
       try {
-        const result = await getUnifiedHomeWyras(user.id, debouncedSearch);
+        const result = await getFavoriteWyras(user.id, debouncedSearch);
         setWyraList(result || []);
       } catch (err) {
-        console.error("Failed to fetch wyras", err);
+        // console.error("Failed to fetch wyras", err);
       } finally {
         setLoading(false);
       }
@@ -189,57 +189,8 @@ export default function WyraTimeline({searchTerm}:any) {
   if (!wyraList.length)
     return <div className="text-center py-10">No Wyras yet.</div>;
 
-  const tabs = [
-    { id: "trending", icon: TrendingUp, label: "Trending" },
-    { id: "recent", icon: Clock, label: "Recent" },
-    { id: "following", icon: Sparkles, label: "Following" },
-  ];
-
-
   return (
     <>
-      <Tooltip
-        className="bg-black text-white"
-        color="success"
-        content="Create Wyra"
-      >
-        <Button
-          onClick={() => setShowCreateWyraModal(true)}
-          className="rounded-full h-12 w-12 fixed bottom-[5%] right-[5%] z-50 hidden md:flex items-center justify-center"
-        >
-          <Plus className="h-8 w-8 text-white" />
-        </Button>
-      </Tooltip>
-
-      <div className="w-full flex items-center justify-around gap-4 py-2 px-2">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          const Icon = tab.icon;
-
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center justify-center p-3 min-w-0 flex-1 rounded-2xl transition-all duration-300 transform ${isActive
-                  ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-110"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
-                }`}
-            >
-              <Icon
-                className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
-              />
-              <span
-                className={`text-xs mt-1 font-semibold ${isActive ? "text-white" : ""
-                  }`}
-              >
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {activeTab === "trending" ? (
         <div className="max-w-3xl space-y-6">
           {wyraList.map((wyra: any) => (
             <Card
@@ -347,7 +298,7 @@ export default function WyraTimeline({searchTerm}:any) {
                       return (
                         <React.Fragment key={opt.id}>
                           {index === 1 && (
-                            <span className="w-12 h-12 px-4 text-white rounded-full flex justify-center items-center text-sm font-semibold  bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900">
+                            <span className="w-12 h-12 text-white rounded-full flex justify-center items-center text-sm font-semibold  bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900">
                               OR
                             </span>
                           )}
@@ -472,55 +423,6 @@ export default function WyraTimeline({searchTerm}:any) {
             </Card>
           ))}
         </div>
-      ) : activeTab === "recent" ? (
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-2xl font-bold text-gray-800">
-              Recent
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Recent feeds will be shown here...</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-2xl font-bold text-gray-800">
-              Following
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Following feeds will be shown here...</p>
-          </CardContent>
-        </Card>
-      )}
-      <Modal isOpen={showCreateWyraModal} hideCloseButton={true}>
-        <ModalContent>
-          <ModalHeader className="flex flex-col justify-center items-center gap-1">
-            Create Wyra
-            <button
-              onClick={() => setShowCreateWyraModal(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
-              aria-label="Close comment modal"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </ModalHeader>
-
-          <ModalBody>
-            <CreateWyra />
-          </ModalBody>
-          {/* <ModalFooter className="flex justify-between">
-                  <Button className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => setShowCreateWyraModal(false)}>
-                  No
-                  </Button>
-                  <Button className="w-full h-14 bg-gradient-to-r from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => setShowCreateWyraModal(false)}>
-                  Yes
-                  </Button>
-              </ModalFooter> */}
-        </ModalContent>
-      </Modal>
     </>
   );
 }

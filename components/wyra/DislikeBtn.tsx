@@ -12,6 +12,7 @@ interface DislikeButtonProps {
 
 const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId }) => {
   const [disliked, setDisliked] = useState(false);
+  const [showDisagree, setShowDisagree] = useState(false); // ✅ for floating text
   const supabase = createClient();
 
   useEffect(() => {
@@ -49,6 +50,9 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId }) => {
     setDisliked(newDisliked);
 
     if (newDisliked) {
+      setShowDisagree(true); // ✅ show floating text
+      setTimeout(() => setShowDisagree(false), 1000);
+
       await supabase.from("wyra_reaction").upsert(
         {
           wyra_id: wyraId,
@@ -74,14 +78,23 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId }) => {
   };
 
   return (
-    <button
-      onClick={toggleDislike}
-      className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer 
+    <div className="relative inline-block">
+      <button
+        onClick={toggleDislike}
+        className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer 
         ${disliked ? "bg-red-600 text-white" : "bg-gray-200 text-gray-800"}`}
-    >
-      <ThumbsDown className="w-4 h-4 mr-1" />
-       <span className="md:block hidden">Dislike</span>
-    </button>
+      >
+        <ThumbsDown className="w-4 h-4 mr-1" />
+        <span className="md:block hidden">Dislike</span>
+      </button>
+
+      {/* ✅ Floating "Disagree" Text */}
+      {showDisagree && (
+        <span className="absolute left-1/2 -translate-x-1/2 -top-6 animate-float text-red-600 font-bold">
+          Disagree
+        </span>
+      )}
+    </div>
   );
 };
 

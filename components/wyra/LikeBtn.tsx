@@ -12,6 +12,7 @@ interface LikeButtonProps {
 
 const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
   const [liked, setLiked] = useState(false);
+  const [showAgree, setShowAgree] = useState(false); // ✅ for floating text
   const supabase = createClient();
 
   useEffect(() => {
@@ -33,7 +34,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
     const handleExternalDislike = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (detail?.wyraId === wyraId && detail.type === "dislike") {
-        setLiked(false); // someone clicked dislike, clear like
+        setLiked(false);
       }
     };
 
@@ -48,6 +49,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
     setLiked(newLiked);
 
     if (newLiked) {
+      setShowAgree(true); // ✅ trigger floating text
+      setTimeout(() => setShowAgree(false), 1000); // hide after 1s
+
       await supabase.from("wyra_reaction").upsert(
         {
           wyra_id: wyraId,
@@ -57,7 +61,6 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
         { onConflict: "wyra_id,user_id" }
       );
 
-      // Notify sibling (DislikeButton)
       reactionBus.dispatchEvent(
         new CustomEvent("reaction-change", {
           detail: { wyraId, type: "like" },
@@ -73,14 +76,23 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
   };
 
   return (
-    <button
-      onClick={toggleLike}
-      className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer
+    <div className="relative inline-block">
+      <button
+        onClick={toggleLike}
+        className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer
         ${liked ? "bg-green-600 text-white" : "bg-gray-200 text-gray-800"}`}
-    >
-      <ThumbsUp className="w-4 h-4 mr-1" />
-      <span className="md:block hidden">Like</span>
-    </button>
+      >
+        <ThumbsUp className="w-4 h-4 mr-1" />
+        <span className="md:block hidden">Like</span>
+      </button>
+
+      {/* ✅ Floating Text */}
+      {showAgree && (
+        <span className="absolute left-1/2 -translate-x-1/2 -top-6 animate-float text-green-600 font-bold">
+          Agree
+        </span>
+      )}
+    </div>
   );
 };
 
