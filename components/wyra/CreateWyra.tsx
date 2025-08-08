@@ -89,19 +89,19 @@ export default function CreateWyra({onTabChange}:CreateWyraProps) {
       .eq("created_by", user.id);
 
     // ✅ Only keep circles with at least one member
-    const circlesWithMembers = (myCircles ?? []).filter(
-      (circle) => circle.circle_members && circle.circle_members.length > 0
-    );
+    // const circlesWithMembers = (myCircles ?? []).filter(
+    //   (circle) => circle.circle_members && circle.circle_members.length > 0
+    // );
 
-    console.log("Circles with members:", circlesWithMembers);
+    console.log("Circles with members:", myCircles);
     if (error) {
       console.error("Failed to fetch user circles:", error.message);
       alert("Failed to load your circles.");
       return;
     }
 
-    if (circlesWithMembers.length > 0) {
-      setAvailableCircles(circlesWithMembers);
+    if (myCircles.length > 0) {
+      setAvailableCircles(myCircles);
       setShowCircleModal(true);
     } else {
       handleSubmit([]);

@@ -8,196 +8,223 @@ import {
   ModalBody,
   ModalFooter,
 } from "@heroui/modal";
-import { createClient } from "@/utils/supabase/client";
+import { createAdminClient, createClient } from "@/utils/supabase/client";
 import { signOut } from "@/actions/auth";
 
-// ✅ Function to update user status in database
-async function updateUserStatus(email: string, status: "active" | "deactivate") {
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("user_profiles")
-    .update({ status })
-    .eq("email", email);
-
-  if (error) {
-    console.error("Error updating user status:", error.message);
-    return { success: false, message: error.message };
-  }
-
-  return { success: true, message: "Status updated successfully" };
-}
+const reasonsMap: Record<string, { message: string; action: "stay" | "deactivate"; buttonText: string }> = {
+  "Bored / Not fun anymore": {
+    message:
+      "Let’s spice things up! Have you checked out the Trending Wyras lately? Or joined a Circle? There’s always a juicy debate waiting for you.",
+    action: "stay",
+    buttonText: "Continue on Wyra",
+  },
+  "I don’t understand how to use Wyra": {
+    message:
+      "No worries — Wyra’s meant to be simple and fun. Would you rather… watch a quick 1-minute tutorial or poke around at your own pace? Either way, you’ll be posting like a pro in no time.",
+    action: "stay",
+    buttonText: "Continue on Wyra",
+  },
+  "Too many notifications": {
+    message:
+      "We get it — dings can be a drag. You can tweak your notification settings anytime in your profile. Silence what you don’t care about and keep just the good stuff.",
+    action: "stay",
+    buttonText: "Continue on Wyra",
+  },
+  "Don’t feel connected to people here": {
+    message:
+      "Your vibe attracts your tribe. Try following a few more users or joining Circles that match your interests. Your people are already here — go find them!",
+    action: "stay",
+    buttonText: "Continue on Wyra",
+  },
+  "Privacy concerns": {
+    message:
+      "We take your privacy seriously. You’re always in control of what you share and who sees it. Check out our privacy settings to fine-tune your experience.",
+    action: "stay",
+    buttonText: "Continue on Wyra",
+  },
+  "Just need a break": {
+    message:
+      "We hear you. Sometimes you just need to unplug. Instead of deleting, you can simply deactivate your account for now — and come back when you’re ready.",
+    action: "deactivate",
+    buttonText: "Deactivate Instead",
+  },
+  Other: {
+    message:
+      "Thanks for letting us know — we’d love to hear your feedback. But remember, Wyra is always evolving, and so is your experience. Why not stick around a little longer?",
+    action: "stay",
+    buttonText: "Continue on Wyra",
+  },
+};
 
 const DeleteAccountButton = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedReason, setSelectedReason] = useState("");
+  const [stage, setStage] = useState<"select" | "suggestion" | "final" | "stay">("select");
 
-  const [selectedReason, setSelectedReason] = useState<string>("");
-  const [showFinalOptions, setShowFinalOptions] = useState<boolean>(false);
-
-  const reasons = [
-    "Too many notifications",
-    "I found a better alternative",
-    "Privacy concerns",
-    "Other",
-  ];
-
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-    setSelectedReason("");
-    setShowFinalOptions(false);
-  };
-
-  const handleContinue = () => {
-    if (!selectedReason) return alert("Please select a reason before proceeding.");
-    setShowFinalOptions(true);
-  };
-
-  const handleFinalAction = async (action: "deactivate" | "delete") => {
+  const handleFinalDelete = async () => {
     setLoading(true);
-
     const supabase = await createClient();
+    const adminSupabase = await createAdminClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    const email = user?.email || "";
 
-    if (!email) {
-      alert("No user found. Please login again.");
+    if (!user || !user.email) {
+      alert("No user found.");
       setLoading(false);
       return;
     }
 
-    if (action === "deactivate") {
-      // ✅ Update status to deactivate
-      const { success, message } = await updateUserStatus(email, "deactivate");
-      setLoading(false);
-      setIsModalOpen(false);
+    const email = user.email;
 
-      if (success) {
-        // alert("Your account has been deactivated. You can restore it anytime.");
-       await signOut();
-      } else {
-        alert("Error: " + message);
-      }
+    const { error } = await supabase.from("user_profiles").delete().eq("id", user.id);
+    const { error:supabaseError } = await adminSupabase.auth.admin.deleteUser(user.id);
+
+    if (error) {
+      alert("Error deleting: " + error.message);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+    setIsModalOpen(false);
+    await signOut();
+  };
+
+  const handleFinalDeactivate = async () => {
+    setLoading(true);
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user || !user.email) {
+      alert("No user found.");
+      setLoading(false);
+      return;
+    }
+
+    await supabase.from("user_profiles").update({ status: "deactivate" }).eq("email", user.email);
+    setLoading(false);
+    setIsModalOpen(false);
+    await signOut();
+  };
+
+  const handleMainAction = () => {
+    const action = reasonsMap[selectedReason]?.action;
+    if (action === "deactivate") {
+      handleFinalDeactivate();
     } else {
-      // ✅ Placeholder for permanent delete
-      setTimeout(() => {
-        setLoading(false);
-        setIsModalOpen(false);
-        // alert("Your account has been permanently deleted.");
-        // TODO: Call delete API to remove from auth & database
-      }, 2000);
+      setStage("stay");
     }
   };
 
   return (
     <>
-      {/* Main Delete Button */}
-      <Button
-        disabled={loading}
-        onClick={handleOpenModal}
-        className="w-full h-14 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-      >
-        {loading ? (
-          <>
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-            Deleting Account...
-          </>
-        ) : (
-          <>
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete Account
-          </>
-        )}
+      <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 hover:bg-red-600 text-lg text-bold text-white w-full h-12">
+        <Trash2 className="w-4 h-4 mr-2" /> Delete Account
       </Button>
 
-      {/* Modal */}
-      <Modal isOpen={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Modal isOpen={isModalOpen} onOpenChange={(open) => {
+        setIsModalOpen(open);
+        if (!open) {
+          setStage("select");
+          setSelectedReason("");
+        }
+      }}>
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col justify-center items-center gap-1">
-                {showFinalOptions ? "Confirm Action" : "Delete Account"}
+              <ModalHeader className="text-center">
+                {stage === "select"
+                  ? "We’d hate to see you go"
+                  : stage === "suggestion"
+                    ? "Before you leave..."
+                    : stage === "final"
+                      ? "Are you sure?"
+                      : "We're Glad You're Staying!"}
               </ModalHeader>
 
               <ModalBody>
-                {!showFinalOptions ? (
+                {stage === "select" && (
                   <>
-                    <p className="text-center">
-                      We’d love to know why you are leaving us. Please select a reason:
+                    <p className="text-center mb-4">
+                      What’s making you want to leave Wyra?
                     </p>
-                    <div className="flex flex-col gap-3 mt-3">
-                      {reasons.map((reason) => (
-                        <label
-                          key={reason}
-                          className="flex items-center gap-2 cursor-pointer"
-                        >
+                    <div className="flex flex-col gap-2">
+                      {Object.keys(reasonsMap).map((reason) => (
+                        <label key={reason} className="flex items-center gap-2">
                           <input
                             type="radio"
-                            name="deleteReason"
+                            name="reason"
                             value={reason}
                             checked={selectedReason === reason}
-                            onChange={(e) => setSelectedReason(e.target.value)}
-                            className="accent-red-600 w-4 h-4"
+                            onChange={() => setSelectedReason(reason)}
                           />
-                          <span className="text-sm">{reason}</span>
+                          <span>{reason}</span>
                         </label>
                       ))}
                     </div>
+                  </>
+                )}
 
-                    {selectedReason && (
-                      <p className="text-center text-sm text-gray-600 mt-3">
-                        We’re sorry to hear this. We’ll work on improving. 
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <p className="text-center">
-                      What would you like to do with your account?
+                {stage === "suggestion" && selectedReason && (
+                  <div className="text-center">
+                    <p className="mb-4">{reasonsMap[selectedReason]?.message}</p>
+                    <Button onClick={handleMainAction}>
+                      {reasonsMap[selectedReason]?.buttonText}
+                    </Button>
+                    <p className="mt-4 text-sm text-gray-500">
+                      Still want to delete your account?{" "}
+                      <button
+                        className="text-red-600 hover:text-red-600 underline"
+                        onClick={() => setStage("final")}
+                      >
+                        Delete Anyway
+                      </button>
                     </p>
-                    <p className="text-center text-sm text-gray-600 mt-2">
-                      <strong>Deactivate:</strong> You can restore your account anytime.
-                      <br />
-                      <strong>Delete Permanently:</strong> All data will be lost forever.
+                  </div>
+                )}
+
+                {stage === "final" && (
+                  <div className="text-center">
+                    <p className="mb-2">
+                      Are you sure? You can always choose to deactivate instead — it lets you take a
+                      break without losing your posts, messages, and followers.
                     </p>
-                  </>
+                    <div className="flex flex-col gap-2 mt-4">
+                      <Button
+                        className="bg-yellow-500 hover:bg-yellow-500 text-white"
+                        onClick={handleFinalDeactivate}
+                      >
+                        Deactivate Instead
+                      </Button>
+                      <Button
+                        className="bg-red-600 hover:bg-red-600 text-white"
+                        onClick={handleFinalDelete}
+                        disabled={loading}
+                      >
+                        {loading ? "Deleting..." : "Delete Anyway"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {stage === "stay" && (
+                  <p className="text-center">
+                    🎉 Glad you decided to stay — we’d rather have you with us than without!
+                    <br />
+                    Now go fire up some fresh Wyras and keep the fun rolling.
+                  </p>
                 )}
               </ModalBody>
 
-              <ModalFooter className="flex justify-between gap-2">
-                {!showFinalOptions ? (
-                  <>
-                    <Button
-                      className="w-full h-12 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white font-bold rounded-lg shadow-md"
-                      onClick={() => onClose()}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      disabled={!selectedReason}
-                      className="w-full h-12 bg-gradient-to-r from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white font-bold rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={handleContinue}
-                    >
-                      Continue
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      className="w-full h-12 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-white font-bold rounded-lg shadow-md"
-                      onClick={() => handleFinalAction("deactivate")}
-                    >
-                      Deactivate Account
-                    </Button>
-                    <Button
-                      className="w-full h-12 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold rounded-lg shadow-md"
-                      onClick={() => handleFinalAction("delete")}
-                    >
-                      Delete Permanently
-                    </Button>
-                  </>
+              <ModalFooter>
+                {stage === "select" && selectedReason && (
+                  <Button onClick={() => setStage("suggestion")} className="ml-auto">
+                    Continue
+                  </Button>
                 )}
               </ModalFooter>
             </>

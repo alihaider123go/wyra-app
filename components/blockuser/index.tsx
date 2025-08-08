@@ -1,14 +1,217 @@
 "use client";
+import { createClient } from "@/utils/supabase/client";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "../ui/button";
 
 export default function BlockUserInfo() {
+  const supabase = createClient();
+  const [blockedUsers, setBlockedUsers] = useState<any[]>([]);
+  const [userID, setUserID] = useState("");
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+const dropdownRef = useRef<HTMLDivElement>(null);
+
+ const fetchBlockedUsers = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        setUserID(user.id);
+        const { data, error } = await supabase
+          .from("user_blocks")
+          .select(`
+            blocked_id,
+            user_profiles:blocked_id (
+              id,
+              firstname,
+              lastname,
+              username,
+              avatar
+            )
+          `)
+          .eq("blocker_id", user.id);
+
+        if (error) {
+          console.error("Failed to fetch blocked users", error);
+        } else {
+          setBlockedUsers(data || []);
+        }
+      }
+    };
+
+  useEffect(() => {
+    fetchBlockedUsers();
+  }, []);
+
+  useEffect(() => {
+    if (!search.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const fetchUsers = async () => {
+      const blockedIds = blockedUsers.map((u) => u.blocked_id);
+
+      const { data, error } = await supabase
+        .from("user_profiles")
+        .select("id, firstname, lastname, username, email")
+        .or(
+          `firstname.ilike.%${search}%,lastname.ilike.%${search}%,username.ilike.%${search}%,email.ilike.%${search}%`
+        )
+        .neq("id", userID)
+        .not("id", "in", `(${blockedIds.join(",")})`)
+        .limit(5);
+
+      if (error) {
+        // console.error("User search error:", error);
+        return;
+      }
+
+      setResults(data || []);
+    };
+
+    const delayDebounce = setTimeout(fetchUsers, 300);
+    return () => clearTimeout(delayDebounce);
+  }, [search, userID, supabase, blockedUsers]);
+
+  const blockUser = async (id: string) => {
+    const { error } = await supabase.from("user_blocks").insert({
+      blocker_id: userID,
+      blocked_id: id,
+    });
+
+    if (error) {
+      console.error("Failed to block user", error);
+    } else {
+      setSearch(""); // Clear input
+      setResults([]);
+      // Refresh blocked users
+      const { data } = await supabase
+        .from("user_blocks")
+        .select("blocked_id")
+        .eq("blocker_id", userID);
+      setBlockedUsers(data || []);
+    }
+  };
+
+  const unblockUser = async (id: string) => {
+    const { error } = await supabase
+      .from("user_blocks")
+      .delete()
+      .match({ blocker_id: userID, blocked_id: id });
+
+    if (error) {
+      console.error("Failed to unblock user", error);
+    } else {
+      fetchBlockedUsers()
+    }
+  };
+
+  useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setSearch("");       // Clear the input
+      setResults([]);      // Hide results
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-6 text-gray-800">
+      <div className="flex justify-between">
       <h2 className="text-2xl font-semibold flex items-center gap-2">
-        <span role="img" aria-label="no entry sign">
-          🚫
-        </span>
-        Block User
+        🚫 Block User
       </h2>
+
+      <div ref={dropdownRef} className="relative w-60">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search users..."
+          className="border p-2 w-full rounded"
+          autoFocus
+        />
+        {search && results.length > 0 && (
+          <div className="absolute top-full left-0 w-full bg-white border rounded mt-1 shadow-lg z-10 max-h-60 overflow-y-auto">
+            {results.map((user) => (
+              <div
+                key={user.id}
+                className="flex justify-between items-center p-2 hover:bg-gray-100"
+              >
+                <div>
+                  <div className="font-medium">
+                    {user.firstname} {user.lastname}
+                  </div>
+                  <div className="text-sm text-gray-500">@{user.username}</div>
+                  <div className="text-xs text-gray-400">{user.email}</div>
+                </div>
+                <Button
+                  onClick={() => blockUser(user.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white p-2 text-xs"
+                >
+                  Block
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+        {search && results.length === 0 && (
+          <p className="text-sm text-gray-500 mt-2">No users found</p>
+        )}
+      </div>
+      </div>
+
+
+
+      {blockedUsers.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Blocked Users</h3>
+          {blockedUsers.map((item: any) => (
+            <div
+              key={item?.blocked_id}
+              className="flex justify-between items-center border p-3 rounded shadow-sm"
+            >
+              <div className="flex items-center space-x-3">
+                {item?.user_profiles?.avatar ? (
+                  <img
+                    src={item?.user_profiles?.avatar}
+                    alt="Avatar"
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-lg font-bold text-white">
+                    {item?.user_profiles?.firstname?.[0]?.toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <p className="font-semibold">
+                    {item?.user_profiles?.firstname}{" "}
+                    {item?.user_profiles?.lastname}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    @{item?.user_profiles?.username}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => unblockUser(item?.blocked_id)}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm"
+              >
+                Unblock
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+
 
       <p>
         Sometimes, the best choice you can make is… <em>neither.</em>

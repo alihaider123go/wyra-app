@@ -71,6 +71,7 @@ export interface Wyra {
   created_at: string;
   created_by: string;
   creator: UserProfile;
+  likeCount?:number;
   wyra_option: WyraOption[];
 }
 
