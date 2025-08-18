@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ExtendedUser, UserProfile } from "@/actions/types";
+import { useNotifications } from "./notifications/useNotifications";
 
 interface HeaderProps {
   user: ExtendedUser | null;
@@ -46,12 +47,12 @@ export default function Header({
   isVerified,
   isProfileCompleted,
   searchTerm,
-  setSearchTerm
+  setSearchTerm,
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [notificationCount, setNotificationCount] = useState(12);
+  const { unreadCount,unreadMessagesCount } = useNotifications();
   const supabase = createClient();
 
   const handleLogout = async () => {
@@ -339,6 +340,11 @@ export default function Header({
               <MessageCircle
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
+               {unreadMessagesCount > 0 && isProfileCompleted && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                </span>
+              )}
               <span className="sr-only">Chat</span>
             </button>
 
@@ -356,7 +362,7 @@ export default function Header({
               <Heart
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
-              <span className="sr-only">Chat</span>
+              <span className="sr-only">Favourite</span>
             </button>
 
             <button
@@ -372,9 +378,9 @@ export default function Header({
               <Bell
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
-              {notificationCount > 0 && isProfileCompleted && (
+              {unreadCount > 0 && isProfileCompleted && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {notificationCount > 99 ? "99+" : notificationCount}
+                  {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
               <span className="sr-only">Notifications</span>

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ThumbsDown } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import reactionBus from "@/utils/reactionBus";
+import { isNotificationAllowed } from "@/utils/helper";
 
 interface DislikeButtonProps {
   wyraId: string;
@@ -68,6 +69,29 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId }) => {
           detail: { wyraId, type: "dislike" },
         })
       );
+
+      // 3. Insert notification for wyra owner
+      const { data: wyra } = await supabase
+        .from("wyra")
+        .select("created_by")
+        .eq("id", wyraId)
+        .single();
+
+      if (wyra?.created_by && wyra.created_by !== userId) {
+
+        const isAllowed = await isNotificationAllowed(wyra.created_by, "likes_dislikes_my_wyra")
+        if (isAllowed) {
+          await supabase.from("notifications").insert([
+            {
+              type: "dislike",
+              sender_id: userId,
+              recipient_id: wyra.created_by,
+              post_id: wyraId,
+              message: "disliked your wyra",
+            },
+          ]);
+        }
+      }
     } else {
       await supabase
         .from("wyra_reaction")

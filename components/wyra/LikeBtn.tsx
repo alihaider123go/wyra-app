@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ThumbsUp } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import reactionBus from "@/utils/reactionBus";
+import { isNotificationAllowed } from "@/utils/helper";
 
 interface LikeButtonProps {
   wyraId: string;
@@ -12,9 +13,10 @@ interface LikeButtonProps {
 
 const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
   const [liked, setLiked] = useState(false);
-  const [showAgree, setShowAgree] = useState(false); // ✅ for floating text
+  const [showAgree, setShowAgree] = useState(false);
   const supabase = createClient();
 
+  // ✅ Fetch initial like status
   useEffect(() => {
     const fetchReaction = async () => {
       const { data } = await supabase
@@ -30,6 +32,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
     if (userId) fetchReaction();
   }, [wyraId, userId]);
 
+  // ✅ Sync dislike events across clients
   useEffect(() => {
     const handleExternalDislike = (e: Event) => {
       const detail = (e as CustomEvent).detail;
@@ -44,14 +47,18 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
     };
   }, [wyraId]);
 
+  // ✅ Toggle like + insert notification
   const toggleLike = async () => {
+    if (!userId) return;
+
     const newLiked = !liked;
     setLiked(newLiked);
 
     if (newLiked) {
-      setShowAgree(true); // ✅ trigger floating text
-      setTimeout(() => setShowAgree(false), 1000); // hide after 1s
+      setShowAgree(true);
+      setTimeout(() => setShowAgree(false), 1000);
 
+      // 1. Upsert reaction
       await supabase.from("wyra_reaction").upsert(
         {
           wyra_id: wyraId,
@@ -61,12 +68,40 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
         { onConflict: "wyra_id,user_id" }
       );
 
+      // 2. Dispatch reaction event
       reactionBus.dispatchEvent(
         new CustomEvent("reaction-change", {
           detail: { wyraId, type: "like" },
         })
       );
+
+
+
+
+      // 3. Insert notification for wyra owner
+      const { data: wyra } = await supabase
+        .from("wyra")
+        .select("created_by")
+        .eq("id", wyraId)
+        .single();
+
+      if (wyra?.created_by && wyra.created_by !== userId) {
+
+        const isAllowed = await isNotificationAllowed(wyra.created_by, "likes_dislikes_my_wyra")
+        if (isAllowed) {
+          await supabase.from("notifications").insert([
+            {
+              type: "like",
+              sender_id: userId,
+              recipient_id: wyra.created_by,
+              post_id: wyraId,
+              message: "liked your wyra",
+            },
+          ]);
+        }
+      }
     } else {
+      // Remove like
       await supabase
         .from("wyra_reaction")
         .delete()
@@ -86,7 +121,6 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
         <span className="md:block hidden">Like</span>
       </button>
 
-      {/* ✅ Floating Text */}
       {showAgree && (
         <span className="absolute left-1/2 -translate-x-1/2 -top-6 animate-float text-green-600 font-bold">
           Agree

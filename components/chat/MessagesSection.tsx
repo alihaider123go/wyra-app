@@ -4,6 +4,7 @@ import { Chat, Message,UserProfile } from "@/actions/types";
 import MessageItem from "./MessageItem";
 import MessageInput from "./MessageInput";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import { useNotifications } from "../notifications/useNotifications";
 
 interface MessagesSectionProps {
   chat: Chat | null;
@@ -23,6 +24,13 @@ export default function MessagesSection({
   const [messagePage, setMessagePage] = useState(1);
   const messagesPerPage = 20;
   const [user, setUser] = useState<UserProfile | null>(null);
+  const {markChatMessagesAsRead} = useNotifications()
+
+  useEffect(()=>{
+    if(chat?.id){
+      markChatMessagesAsRead(chat?.id)
+    }
+  },[chat?.id,messages?.length])
 
   const fetchMessages = async () => {
     if (!chat) {
@@ -79,6 +87,7 @@ export default function MessagesSection({
         },
         (payload) => {
           const newMessage = payload.new as Message;
+          markChatMessagesAsRead(chat?.id)
 
           // Prevent duplicates if message already exists
           setMessages((prev) => {

@@ -26,6 +26,9 @@ import NotificationsSettings from "@/components/notifications/setting";
 import BlockUserInfo from "@/components/blockuser";
 import { useSessionUser } from "@/utils/useSessionUser";
 import FavoritesWyra from "@/components/wyra/FavoritesWyra";
+import NotificationsList from "@/components/notifications/notificationList";
+import { NotificationsProvider } from "@/components/notifications/useNotifications";
+import { isNotificationAllowed } from "@/utils/helper";
 
 export default function Home() {
   const supabase = createClient();
@@ -84,6 +87,8 @@ export default function Home() {
         return <AccountPrivacySettings userId={sessionUser?.id}/>;
       case "notification-settings":
         return <NotificationsSettings userId={sessionUser?.id}/>;
+      case "notifications":
+        return <NotificationsList userId={sessionUser?.id}/>;  
       case "invite":
         return <InviteFriends />;
       case "block-unblock":
@@ -118,6 +123,7 @@ export default function Home() {
       </div>
     );
   return (
+    <NotificationsProvider userId={sessionUser?.id}>
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
       <Header
         isVerified={isVerified}
@@ -142,5 +148,6 @@ export default function Home() {
 
       />
     </div>
+    </NotificationsProvider>
   );
 }

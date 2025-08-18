@@ -14,10 +14,6 @@ export default function ChatPage({ userId }: ChatProps) {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [showMessages, setShowMessages] = useState(false); // For mobile view
 
-  const handleSelectChat = (chat: any) => {
-    setSelectedChat(chat);
-    setShowMessages(true); // Show messages on mobile
-  };
 
   const fetchChats = async () => {
     if (!userId) return;
@@ -40,6 +36,7 @@ export default function ChatPage({ userId }: ChatProps) {
         username: string | null;
         last_message: string | null;
         last_message_at: string | null;
+        unread_count: any
       }) => ({
         id: item.chat_id,
         is_group: item.is_group,
@@ -48,6 +45,7 @@ export default function ChatPage({ userId }: ChatProps) {
         username: item.username,
         lastMessage: item.last_message,
         lastMessageAt: item.last_message_at,
+        unreadCount: item.unread_count
       })
     );
 
@@ -59,6 +57,13 @@ export default function ChatPage({ userId }: ChatProps) {
 
     setChats(chats);
   };
+
+  const handleSelectChat = (chat: any) => {
+    setSelectedChat(chat);
+    setShowMessages(true); // Show messages on mobile
+    fetchChats()
+  };
+
 
   useEffect(() => {
     fetchChats();

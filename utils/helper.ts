@@ -1,4 +1,5 @@
 import moment from "moment";
+import { createClient } from "./supabase/client";
 
 
 export function formatNumber(num: number): string {
@@ -59,4 +60,17 @@ export function getAvatarInitials(name: string): string {
   return (
     parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase()
   );
+}
+
+
+const supabase = createClient();
+export async function isNotificationAllowed(userId: any, notificationType: any): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("app_notifications")
+    .select(notificationType)
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !data) return false;
+  return !!data[notificationType];
 }

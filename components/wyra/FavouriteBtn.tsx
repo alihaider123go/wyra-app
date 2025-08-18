@@ -10,7 +10,7 @@ interface FavouriteButtonProps {
 }
 
 const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId }) => {
-  const [liked, setLiked] = useState(false);
+  const [favourited, setFavourited] = useState(false);
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
@@ -26,14 +26,14 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId }) => 
         .eq("user_id", userId)
         .maybeSingle();
 
-      if (data) setLiked(true);
+      if (data) setFavourited(true);
     }
 
     checkFavorite();
   }, [wyraId, userId, supabase]);
 
   // ✅ Toggle Favorite / Unfavorite
-  const toggleLike = async () => {
+  const toggleFavourite = async () => {
     if (!userId) {
       alert("Please login to mark as favourite");
       return;
@@ -42,7 +42,7 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId }) => 
     setLoading(true);
 
     try {
-      if (liked) {
+      if (favourited) {
         // ✅ Unfavorite (Delete)
         await supabase
           .from("wyra_favorites")
@@ -50,7 +50,8 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId }) => 
           .eq("wyra_id", wyraId)
           .eq("user_id", userId);
 
-        setLiked(false);
+        setFavourited(false);
+
       } else {
         // ✅ Favorite (Insert)
         await supabase.from("wyra_favorites").insert([
@@ -60,7 +61,24 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId }) => 
           },
         ]);
 
-        setLiked(true);
+        const { data: wyra } = await supabase
+          .from("wyra")
+          .select("created_by")
+          .eq("id", wyraId)
+          .single();
+
+        if (wyra?.created_by && wyra.created_by !== userId) {
+          await supabase.from("notifications").insert([
+            {
+              type: "favourite",
+              sender_id: userId,
+              recipient_id: wyra.created_by,
+              post_id: wyraId,
+              message: "mark favourite your wyra",
+            },
+          ]);
+        }
+        setFavourited(true);
       }
     } catch (error) {
       console.error("Favourite toggle error:", error);
@@ -71,19 +89,17 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId }) => 
 
   return (
     <button
-      onClick={toggleLike}
+      onClick={toggleFavourite}
       disabled={loading}
-      className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer ${
-        liked ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800"
-      }`}
+      className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer ${favourited ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800"
+        }`}
     >
       <Heart
-        className={`w-4 h-4 mr-1 transition ${
-          liked ? "fill-current text-white" : ""
-        }`}
+        className={`w-4 h-4 mr-1 transition ${favourited ? "fill-current text-white" : ""
+          }`}
       />
       <span className="md:block hidden">
-        {liked ? "Favourited" : "Favourite"}
+        {favourited ? "Favourited" : "Favourite"}
       </span>
     </button>
   );

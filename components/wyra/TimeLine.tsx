@@ -40,7 +40,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { Wyra } from "@/actions/types";
-import { relativeTime } from "@/utils/helper";
+import { isNotificationAllowed, relativeTime } from "@/utils/helper";
 import ShareButton from "./ShareBtn";
 import FavouriteButton from "./FavouriteBtn";
 
@@ -220,6 +220,18 @@ export default function WyraTimeline({ searchTerm }: any) {
           });
 
         if (!error) {
+          const isAllowed = await isNotificationAllowed(profileUserId, "follow_me")
+          if (isAllowed) {
+            await supabase.from("notifications").insert([
+              {
+                type: "follow",
+                sender_id: user.id,
+                recipient_id: profileUserId,
+                post_id: null,
+                message: "follow you",
+              },
+            ]);
+          }
           setFollowStatus((prev) => ({ ...prev, [profileUserId]: true }));
         }
       }

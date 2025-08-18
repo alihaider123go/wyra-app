@@ -32,11 +32,18 @@ export default function ChatListItem({
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-center">
           <h4 className="font-medium">{chat.name}</h4>
-          {chat.lastMessageAt && (
-            <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-              {formatDateTime(chat.lastMessageAt)}
-            </span>
-          )}
+          <div className="flex flex-col items-end">
+        {chat.lastMessageAt && (
+          <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+            {formatDateTime(chat.lastMessageAt)}
+          </span>
+        )}
+        {chat?.unreadCount !== 0 && (
+          <span className="mt-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white text-xs font-semibold">
+            {chat.unreadCount}
+          </span>
+        )}
+          </div>
         </div>
         <div className="text-sm text-gray-600 truncate">
           {chat.lastMessage || "No messages yet"}
