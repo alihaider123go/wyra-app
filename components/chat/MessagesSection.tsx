@@ -149,6 +149,7 @@ export default function MessagesSection({
     <MessageInput
       supabase={supabase}
       chatId={chat.id}
+      senderId={chat.sender_id}
       currentUserId={currentUserId}
       onNewMessage={(msg) => {
         onSendMessage(msg);

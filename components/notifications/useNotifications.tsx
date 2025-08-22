@@ -8,6 +8,7 @@ type Notification = {
     type: string;
     message: string;
     is_read: boolean;
+    post_id:string;
     created_at: string;
     sender: {
         id: string;
@@ -55,6 +56,7 @@ export function NotificationsProvider({
         type,
         message,
         is_read,
+        post_id,
         created_at,
         sender:sender_id (
           id,
@@ -98,6 +100,7 @@ export function NotificationsProvider({
               type,
               message,
               is_read,
+              post_id,
               created_at,
               sender:sender_id (
                 id,
@@ -204,6 +207,7 @@ export function NotificationsProvider({
         type,
         message,
         is_read,
+        post_id,
         created_at,
         sender:sender_id (
           id,

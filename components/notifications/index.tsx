@@ -133,12 +133,12 @@ const settings: Setting[] = [
     description: "Names or just numbers? Your call.",
     category: "Extras & Fun",
   },
-  {
-    id: "enableFloatingReactions",
-    label: "Enable floating reactions (Agree/Disagree)",
-    description: "It’s extra. But extra is fun.",
-    category: "Extras & Fun",
-  },
+  // {
+  //   id: "enableFloatingReactions",
+  //   label: "Enable floating reactions (Agree/Disagree)",
+  //   description: "It’s extra. But extra is fun.",
+  //   category: "Extras & Fun",
+  // },
 ];
 
 export default function AccountPrivacySettings() {

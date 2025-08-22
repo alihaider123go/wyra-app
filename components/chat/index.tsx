@@ -21,16 +21,16 @@ export default function ChatPage({ userId }: ChatProps) {
     const { data, error } = await supabase.rpc("get_user_chats", {
       user_uuid: userId,
     });
-
+    
     if (error) {
       console.error("get_user_chats RPC error", error);
       return;
     }
-
     const chats: Chat[] = (data || []).map(
       (item: {
         chat_id: string;
         is_group: boolean;
+        sender_id:string;
         chat_name: string | null;
         avatar: string | null;
         username: string | null;
@@ -40,6 +40,7 @@ export default function ChatPage({ userId }: ChatProps) {
       }) => ({
         id: item.chat_id,
         is_group: item.is_group,
+        sender_id:item.sender_id,
         name: item.chat_name,
         avatar: item.avatar,
         username: item.username,

@@ -87,258 +87,6 @@ export async function getMyWyras(userId: string) {
   return data;
 }
 
-// export const getUnifiedHomeWyras = async (userId: string) => {
-//   const supabase = createClient();
-
-//   // 1. Get following IDs
-//   const { data: followingData, error: followError } = await supabase
-//     .from("user_followers")
-//     .select("following_id")
-//     .eq("follower_id", userId);
-
-//   if (followError) {
-//     console.error("Error fetching following:", followError);
-//     return [];
-//   }
-
-//   const followingIds = followingData?.map((f) => f.following_id) ?? [];
-
-//   // 2. Get circles where user is a member
-//   const { data: memberCircles, error: memberError } = await supabase
-//     .from("circle_members")
-//     .select("circle_id")
-//     .eq("user_id", userId);
-
-//   if (memberError) {
-//     console.error("Error fetching circle memberships:", memberError);
-//     return [];
-//   }
-
-//   const memberCircleIds = memberCircles?.map((r) => r.circle_id) ?? [];
-
-//   // 3. Get Wyra IDs from those circles
-//   let wyraFromCircles: string[] = [];
-//   if (memberCircleIds.length > 0) {
-//     const { data: wyraCircleLinks, error: linkError } = await supabase
-//       .from("wyra_circles")
-//       .select("wyra_id")
-//       .in("circle_id", memberCircleIds);
-
-//     if (linkError) {
-//       console.error("Error fetching wyra_circles:", linkError);
-//       return [];
-//     }
-
-//     wyraFromCircles = wyraCircleLinks?.map((w) => w.wyra_id) ?? [];
-//   }
-
-//   // 4. Build OR condition string
-//   const allAuthorIds = [userId, ...followingIds];
-//   const orFilters: string[] = [];
-
-//   if (allAuthorIds.length > 0) {
-//     const authorFilter = allAuthorIds
-//       .map((id) => `created_by.eq.${id}`)
-//       .join(",");
-//     orFilters.push(authorFilter);
-//   }
-
-//   if (wyraFromCircles.length > 0) {
-//     const wyraFilter = wyraFromCircles.map((id) => `id.eq.${id}`).join(",");
-//     orFilters.push(wyraFilter);
-//   }
-
-//   // 5. Final query
-//   let query = supabase
-//     .from("wyra")
-//     .select(
-//       `
-//       id,
-//       title,
-//       created_at,
-//       created_by,
-//       user_profiles (
-//         id,
-//         firstname,
-//         lastname,
-//         username,
-//         avatar
-//       ),
-//       wyra_option (
-//         id,
-//         option_text,
-//         position,
-//         wyra_media (
-//           id,
-//           media_url,
-//           media_type
-//         )
-//       )
-//       `
-//     )
-//     .order("created_at", { ascending: false });
-
-//   if (orFilters.length > 0) {
-//     query = query.or(orFilters.join(","));
-//   }
-
-//   const { data, error } = await query;
-
-//   if (error) {
-//     console.error("Unified Wyras fetch error:", error);
-//     return [];
-//   }
-
-//   // ✅ Rename `user_profiles` to `creator`
-//   const formattedData: Wyra[] = (data ?? []).map((wyra) => {
-//     const { user_profiles, ...rest } = wyra;
-//     return {
-//       ...rest,
-//       creator: Array.isArray(user_profiles) ? user_profiles[0] : user_profiles,
-//     };
-//   });
-
-//   return formattedData;
-// };
-
-
-// export const getUnifiedHomeWyras = async (
-//   userId: string,
-//   search: string = ""
-// ) => {
-//   const supabase = createClient();
-
-//   // 1. Get following IDs
-//   const { data: followingData, error: followError } = await supabase
-//     .from("user_followers")
-//     .select("following_id")
-//     .eq("follower_id", userId);
-
-//   if (followError) {
-//     console.error("Error fetching following:", followError);
-//     return [];
-//   }
-
-//   const followingIds = followingData?.map((f) => f.following_id) ?? [];
-
-//   // 2. Get circles where user is a member
-//   const { data: memberCircles, error: memberError } = await supabase
-//     .from("circle_members")
-//     .select("circle_id")
-//     .eq("user_id", userId);
-
-//   if (memberError) {
-//     console.error("Error fetching circle memberships:", memberError);
-//     return [];
-//   }
-
-//   const memberCircleIds = memberCircles?.map((r) => r.circle_id) ?? [];
-
-//   // 3. Get Wyra IDs from those circles
-//   let wyraFromCircles: string[] = [];
-//   if (memberCircleIds.length > 0) {
-//     const { data: wyraCircleLinks, error: linkError } = await supabase
-//       .from("wyra_circles")
-//       .select("wyra_id")
-//       .in("circle_id", memberCircleIds);
-
-//     if (linkError) {
-//       console.error("Error fetching wyra_circles:", linkError);
-//       return [];
-//     }
-
-//     wyraFromCircles = wyraCircleLinks?.map((w) => w.wyra_id) ?? [];
-//   }
-
-//   // 4. Build OR condition string for authors & circles
-//   const allAuthorIds = [userId, ...followingIds];
-//   const orFilters: string[] = [];
-
-//   if (allAuthorIds.length > 0) {
-//     const authorFilter = allAuthorIds
-//       .map((id) => `created_by.eq.${id}`)
-//       .join(",");
-//     orFilters.push(authorFilter);
-//   }
-
-//   if (wyraFromCircles.length > 0) {
-//     const wyraFilter = wyraFromCircles.map((id) => `id.eq.${id}`).join(",");
-//     orFilters.push(wyraFilter);
-//   }
-
-//   // 5. Final query (WITHOUT search yet)
-//   let query = supabase
-//     .from("wyra")
-//     .select(
-//       `
-//       id,
-//       title,
-//       created_at,
-//       created_by,
-//       user_profiles (
-//         id,
-//         firstname,
-//         lastname,
-//         username,
-//         avatar
-//       ),
-//       wyra_option (
-//         id,
-//         option_text,
-//         position,
-//         wyra_media (
-//           id,
-//           media_url,
-//           media_type
-//         )
-//       )
-//       `
-//     )
-//     .order("created_at", { ascending: false });
-
-//   // if (orFilters.length > 0) {
-//   //   query = query.or(orFilters.join(","));
-//   // }
-
-//   const { data, error } = await query;
-
-//   if (error) {
-//     console.error("Unified Wyras fetch error:", error);
-//     return [];
-//   }
-
-//   // 6. ✅ Rename `user_profiles` to `creator`
-//   let formattedData: Wyra[] = (data ?? []).map((wyra) => {
-//     const { user_profiles, ...rest } = wyra;
-//     return {
-//       ...rest,
-//       creator: Array.isArray(user_profiles) ? user_profiles[0] : user_profiles,
-//     };
-//   });
-
-//   // 7. ✅ Client-side Search Filter (username or option_text)
-//   if (search.trim()) {
-//     const lowerSearch = search.toLowerCase();
-
-//     formattedData = formattedData.filter((wyra) => {
-//       const username =
-//         wyra.creator?.username?.toLowerCase() ||
-//         wyra.creator?.firstname?.toLowerCase() ||
-//         "";
-//       const optionTexts =
-//         wyra.wyra_option?.map((opt) => opt.option_text.toLowerCase()) || [];
-
-//       return (
-//         username.includes(lowerSearch) ||
-//         optionTexts.some((text) => text.includes(lowerSearch))
-//       );
-//     });
-//   }
-
-//   return formattedData;
-// };
-
-
 export const getUnifiedHomeWyras = async (
   userId: string,
   search: string = ""
@@ -401,7 +149,7 @@ export const getUnifiedHomeWyras = async (
   const blockedIds = blockedUsers?.map((b) => b.blocked_id) ?? [];
 
   // 5. Build OR filter (optional — disabled in your code)
-  const allAuthorIds = [userId, ...followingIds];
+  const allAuthorIds = [...followingIds];
   const orFilters: string[] = [];
 
   if (allAuthorIds.length > 0) {
@@ -430,7 +178,13 @@ export const getUnifiedHomeWyras = async (
         firstname,
         lastname,
         username,
-        avatar
+        avatar,
+        account_settings (
+          show_real_name,
+          animate_floating_effects,
+          show_edited_tag,
+          show_posts_public_feed
+        )
       ),
       wyra_option (
         id,
@@ -484,13 +238,37 @@ export const getUnifiedHomeWyras = async (
       likeCountsMap[wyra_id] = (likeCountsMap[wyra_id] || 0) + 1;
     }
   }
-
   // 11. Format result
   let formattedData: Wyra[] = filteredWyras.map((wyra) => {
-    const { user_profiles, ...rest } = wyra;
+    const { user_profiles, ...rest }: any = wyra;
     return {
       ...rest,
-      creator: Array.isArray(user_profiles) ? user_profiles[0] : user_profiles,
+      creator: Array.isArray(user_profiles)
+        ? {
+            id: user_profiles[0]?.id,
+            firstname: user_profiles[0]?.account_settings?.show_real_name
+              ? user_profiles[0]?.firstname
+              : "Anonymous",
+            lastname: user_profiles[0]?.account_settings?.show_real_name
+              ? user_profiles[0]?.lastname
+              : "",
+            username: user_profiles[0]?.username,
+            avatar: user_profiles[0]?.avatar,
+          }
+        : {
+            id: user_profiles?.id,
+            firstname: user_profiles?.account_settings?.show_real_name
+              ? user_profiles?.firstname
+              : "Anonymous",
+            lastname: user_profiles?.account_settings?.show_real_name
+              ? user_profiles?.lastname
+              : "",
+            username: user_profiles?.username,
+            avatar: user_profiles?.avatar,
+          },
+      settings: Array.isArray(user_profiles)
+        ? user_profiles[0]?.account_settings
+        : user_profiles?.account_settings,
       likeCount: likeCountsMap[wyra.id] || 0,
     };
   });
@@ -514,9 +292,15 @@ export const getUnifiedHomeWyras = async (
     });
   }
 
+  formattedData = formattedData.filter((wyra:any) => {
+    if (wyra.created_by === userId && wyra.settings?.show_posts_public_feed === false) {
+      return false;
+    }
+    return true;
+  });
+
   return formattedData;
 };
-
 
 export const getFavoriteWyras = async (userId: string, search: string = "") => {
   const supabase = createClient();
@@ -536,7 +320,13 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
           firstname,
           lastname,
           username,
-          avatar
+          avatar,
+            account_settings (
+          show_real_name,
+          animate_floating_effects,
+          show_edited_tag,
+          show_posts_public_feed
+        )
         ),
         wyra_option (
           id,
@@ -568,8 +358,31 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
       return {
         ...rest,
         creator: Array.isArray(user_profiles)
-          ? user_profiles[0]
-          : user_profiles,
+          ? {
+              id: user_profiles[0]?.id,
+              firstname: user_profiles[0]?.account_settings?.show_real_name
+                ? user_profiles[0]?.firstname
+                : "Anonymous",
+              lastname: user_profiles[0]?.account_settings?.show_real_name
+                ? user_profiles[0]?.lastname
+                : "",
+              username: user_profiles[0]?.username,
+              avatar: user_profiles[0]?.avatar,
+            }
+          : {
+              id: user_profiles?.id,
+              firstname: user_profiles?.account_settings?.show_real_name
+                ? user_profiles?.firstname
+                : "Anonymous",
+              lastname: user_profiles?.account_settings?.show_real_name
+                ? user_profiles?.lastname
+                : "",
+              username: user_profiles?.username,
+              avatar: user_profiles?.avatar,
+            },
+        settings: Array.isArray(user_profiles)
+          ? user_profiles[0]?.account_settings
+          : user_profiles?.account_settings,
       };
     }) ?? [];
 
@@ -577,7 +390,8 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
 
   // ✅ Sort by Wyra creation date (DESC)
   formattedData.sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
   // ✅ Search Filter (username or option_text)
@@ -590,11 +404,133 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
         wyra.creator?.firstname?.toLowerCase() ||
         "";
       const optionTexts =
-        wyra.wyra_option?.map((opt: any) => opt.option_text.toLowerCase()) || [];
+        wyra.wyra_option?.map((opt: any) => opt.option_text.toLowerCase()) ||
+        [];
 
       return (
         username.includes(lowerSearch) ||
         optionTexts.some((text: any) => text.includes(lowerSearch))
+      );
+    });
+  }
+
+  return formattedData;
+};
+
+export const getWyrasWithCircles = async (search: string = "") => {
+  const supabase = createClient();
+
+  // ✅ Fetch wyras with circles
+  const { data, error } = await supabase.from("wyra").select(`
+      id,
+      title,
+      created_at,
+      created_by,
+      user_profiles (
+        id,
+        firstname,
+        lastname,
+        username,
+        avatar,
+          account_settings (
+          show_real_name,
+          animate_floating_effects,
+          show_edited_tag,
+          show_posts_public_feed
+        )
+      ),
+      wyra_option (
+        id,
+        option_text,
+        position,
+        wyra_media (
+          id,
+          media_url,
+          media_type
+        )
+      ),
+      wyra_circles (
+        circle:circles (
+          id,
+          name
+        )
+      )
+    `);
+
+  if (error) {
+    console.error("Wyras fetch error:", error);
+    return [];
+  }
+
+  // ✅ Format the data
+  // ✅ Format the data and remove wyras with no circles
+  let formattedData: any[] =
+    data
+      ?.map((wyra: any) => {
+        const { user_profiles, wyra_circles, ...rest } = wyra;
+
+        const circles =
+          wyra_circles?.map((wc: any) => wc.circle).filter(Boolean) || [];
+
+        return {
+          ...rest,
+          creator: Array.isArray(user_profiles)
+            ? {
+                id: user_profiles[0]?.id,
+                firstname: user_profiles[0]?.account_settings?.show_real_name
+                  ? user_profiles[0]?.firstname
+                  : "Anonymous",
+                lastname: user_profiles[0]?.account_settings?.show_real_name
+                  ? user_profiles[0]?.lastname
+                  : "",
+                username: user_profiles[0]?.username,
+                avatar: user_profiles[0]?.avatar,
+              }
+            : {
+                id: user_profiles?.id,
+                firstname: user_profiles?.account_settings?.show_real_name
+                  ? user_profiles?.firstname
+                  : "Anonymous",
+                lastname: user_profiles?.account_settings?.show_real_name
+                  ? user_profiles?.lastname
+                  : "",
+                username: user_profiles?.username,
+                avatar: user_profiles?.avatar,
+              },
+          settings: Array.isArray(user_profiles)
+            ? user_profiles[0]?.account_settings
+            : user_profiles?.account_settings,
+
+          circles,
+        };
+      })
+      .filter((wyra) => wyra.circles.length > 0) ?? [];
+
+  // ✅ Sort by creation date DESC
+  formattedData.sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
+  // ✅ Search filter (username, option_text, circle name)
+  if (search.trim()) {
+    const lowerSearch = search.toLowerCase();
+
+    formattedData = formattedData.filter((wyra) => {
+      const username =
+        wyra.creator?.username?.toLowerCase() ||
+        wyra.creator?.firstname?.toLowerCase() ||
+        "";
+      const optionTexts =
+        wyra.wyra_option?.map((opt: any) => opt.option_text.toLowerCase()) ||
+        [];
+      const circleNames =
+        wyra.circles?.map((c: any) => c.name.toLowerCase()) || [];
+
+      return (
+        username.includes(lowerSearch) ||
+        optionTexts.some((text: any) => text.includes(lowerSearch)) ||
+        circleNames.some((name: string) => name.includes(lowerSearch))
       );
     });
   }

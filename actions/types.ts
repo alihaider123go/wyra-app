@@ -12,6 +12,7 @@ export interface Chat {
   id: string;
   name: string | null;
   avatar?: string | null;
+  sender_id?:string;
   username?: string;
   is_group: boolean;
   lastMessage?: string;
@@ -43,6 +44,7 @@ export interface UserProfile {
   dob?: string;
   email?: string;
   bio?: string;
+  is_email_verified?:boolean;
 }
 
 export interface Circle {

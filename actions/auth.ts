@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { error } from "console";
+import { createAdminClient } from "@/utils/supabase/client";
+import { sendVerificationEmail } from "./sendVerificationEmail";
 
 export async function getUserSession() {
   const supabase = await createClient();
@@ -63,16 +65,22 @@ export async function signUp(formData: FormData) {
     .limit(1)
     .single();
   if (!existingUser) {
-    const { error: insertError } = await supabase.from("user_profiles").insert({
-      email: data?.user?.email,
-      firstname: data?.user?.user_metadata.firstname || "",
-      lastname: data?.user?.user_metadata.lastname || "",
-      dob: data?.user?.user_metadata.dob || "",
-      gender: data?.user?.user_metadata.gender || "",
-      username: data?.user?.user_metadata.username || "",
-    });
+    const {data: insertedData, error: insertError, }: any = await supabase
+      .from("user_profiles")
+      .insert({
+        email: data?.user?.email,
+        firstname: data?.user?.user_metadata.firstname || "",
+        lastname: data?.user?.user_metadata.lastname || "",
+        dob: data?.user?.user_metadata.dob || "",
+        gender: data?.user?.user_metadata.gender || "",
+        username: data?.user?.user_metadata.username || "",
+      })
+       .select() 
+      .single(); 
     if (insertError) {
       return { status: insertError?.message, user: null };
+    } else {
+      sendVerificationEmail(insertedData?.id, email);
     }
   }
   revalidatePath("/", "layout");
@@ -102,7 +110,10 @@ export async function signIn(formData: FormData) {
   }
 
   if (userProfile && userProfile.status === "deactivate") {
-    return { status: "Your account is deactivated. Please contact support.", user: null };
+    return {
+      status: "Your account is deactivated. Please contact support.",
+      user: null,
+    };
   }
 
   // ✅ Proceed with login
@@ -151,7 +162,10 @@ export async function updatePassword(formData: FormData) {
   const email = formData.get("email")?.toString() || "";
 
   if (!email || !oldPassword || !newPassword) {
-    return { status: "Email, old password, and new password are requi123123123red", user: null };
+    return {
+      status: "Email, old password, and new password are requi123123123red",
+      user: null,
+    };
   }
 
   // ✅ 1. Re-authenticate the user with old password
@@ -249,8 +263,10 @@ export async function markEmailAsVerified() {
   return true;
 }
 
-
-export async function updateUserStatus(email: string, status: "active" | "deactivate") {
+export async function updateUserStatus(
+  email: string,
+  status: "active" | "deactivate"
+) {
   const supabase = await createClient();
 
   const { error } = await supabase

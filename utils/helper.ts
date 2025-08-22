@@ -74,3 +74,15 @@ export async function isNotificationAllowed(userId: any, notificationType: any):
   if (error || !data) return false;
   return !!data[notificationType];
 }
+
+
+export async function isSettingAllowed(userId: any, settingType: any): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("account_settings")
+    .select(settingType)
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !data) return false;
+  return !!data[settingType];
+}

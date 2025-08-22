@@ -3,13 +3,19 @@
 import { formatDistanceToNow } from "date-fns";
 import { useNotifications } from "./useNotifications";
 
-export default function NotificationsList({ userId }: any) {
+export default function NotificationsList({ userId,setActiveTab,setPostId }: any) {
   const {
     notifications,
     unreadCount,
     markAsRead,
     markAllAsRead,
   } = useNotifications();
+
+  const handleNotificationClick = (n:any) => {
+    markAsRead(n.id)
+    setActiveTab("home")
+    setPostId(n.post_id)
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -35,8 +41,9 @@ export default function NotificationsList({ userId }: any) {
               className={`p-4 rounded-lg border shadow-sm cursor-pointer transition ${
                 n.is_read ? "bg-gray-100" : "bg-white"
               }`}
-              onClick={() => markAsRead(n.id)}
+              onClick={() => handleNotificationClick(n)}
             >
+
               <div className="flex items-center space-x-3">
                 {n.sender?.avatar ? (
                   <img

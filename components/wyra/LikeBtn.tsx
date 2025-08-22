@@ -9,9 +9,10 @@ import { isNotificationAllowed } from "@/utils/helper";
 interface LikeButtonProps {
   wyraId: string;
   userId: string | undefined;
+  isFloatAllow?:any
 }
 
-const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
+const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId,isFloatAllow }) => {
   const [liked, setLiked] = useState(false);
   const [showAgree, setShowAgree] = useState(false);
   const supabase = createClient();
@@ -121,7 +122,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId }) => {
         <span className="md:block hidden">Like</span>
       </button>
 
-      {showAgree && (
+      {isFloatAllow && showAgree && (
         <span className="absolute left-1/2 -translate-x-1/2 -top-6 animate-float text-green-600 font-bold">
           Agree
         </span>

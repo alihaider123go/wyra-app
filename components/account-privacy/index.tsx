@@ -134,19 +134,19 @@ const settings: Setting[] = [
     description: "Names or just numbers? Your call.",
     category: "Extras & Fun",
   },
-  {
-    id: "enable_floating_reactions",
-    label: "Enable floating reactions (Agree/Disagree)",
-    description: "It’s extra. But extra is fun.",
-    category: "Extras & Fun",
-  },
+  // {
+  //   id: "enable_floating_reactions",
+  //   label: "Enable floating reactions (Agree/Disagree)",
+  //   description: "It’s extra. But extra is fun.",
+  //   category: "Extras & Fun",
+  // },
 ];
 
 interface SettingsProps {
   userId: string | undefined;
 }
 
-export default function AccountPrivacySettings({userId}:SettingsProps) {
+export default function AccountPrivacySettings({ userId }: SettingsProps) {
   // Track toggle states per setting id (default all false)
   // const [toggles, setToggles] = useState<Record<string, boolean>>(() => {
   //   const initialState: Record<string, boolean> = {};
@@ -155,9 +155,9 @@ export default function AccountPrivacySettings({userId}:SettingsProps) {
   // });
   const supabase = createClient();
 
-    const [toggles, setToggles] = useState<{ [key: string]: boolean }>({});
+  const [toggles, setToggles] = useState<{ [key: string]: boolean }>({});
 
-    // Group settings by category
+  // Group settings by category
   const groupedSettings = settings.reduce<Record<string, Setting[]>>((acc, setting) => {
     if (!acc[setting.category]) acc[setting.category] = [];
     acc[setting.category].push(setting);
@@ -171,19 +171,34 @@ export default function AccountPrivacySettings({userId}:SettingsProps) {
   //   }));
   // };
 
+  const dmSettings = ["allow_dm_everyone", "allow_dm_followers", "no_dm"];
+
+
   // ✅ Toggle handler with UPSERT
   const handleToggle = async (id: string) => {
     setToggles((prev) => {
-      const updated = { ...prev, [id]: !prev[id] };
+      let updated = { ...prev, [id]: !prev[id] };
+
+      // If this toggle is part of the DM settings group
+      if (dmSettings.includes(id) && updated[id]) {
+        // Uncheck the other DM options
+        dmSettings.forEach((dmId) => {
+          if (dmId !== id) updated[dmId] = false;
+        });
+      }
 
       supabase
-        .from("account_settings") // ✅ using new table
+        .from("account_settings")
         .upsert(
           {
-            user_id: userId, // primary key / unique constraint
+            user_id: userId,
+            ...dmSettings.reduce((acc:any, key:any) => {
+              acc[key] = updated[key] ?? false;
+              return acc;
+            }, {}),
             [id]: updated[id],
           },
-          { onConflict: "user_id" } // updates if exists, inserts if not
+          { onConflict: "user_id" }
         )
         .then(({ error }) => {
           if (error) console.error("Upsert error:", error);
@@ -192,46 +207,45 @@ export default function AccountPrivacySettings({userId}:SettingsProps) {
       return updated;
     });
   };
-
   // ✅ Fetch settings on mount
-useEffect(() => {
-  async function fetchAllAccountSettings() {
-    try {
-      const { data: settingsData, error }: any = await supabase
-        .from("account_settings")
-        .select("*")
-        .eq("user_id", userId)
-        .limit(1);
+  useEffect(() => {
+    async function fetchAllAccountSettings() {
+      try {
+        const { data: settingsData, error }: any = await supabase
+          .from("account_settings")
+          .select("*")
+          .eq("user_id", userId)
+          .limit(1);
 
-      if (error && error.code !== "PGRST116") {
-        console.error("Fetch error:", error);
-        return;
+        if (error && error.code !== "PGRST116") {
+          console.error("Fetch error:", error);
+          return;
+        }
+
+        if (settingsData && settingsData.length > 0) {
+          const row = settingsData[0]; // ✅ extract first row
+
+          const initialToggles: { [key: string]: boolean } = {};
+          settings.forEach(({ id }) => {
+            initialToggles[id] = row[id] ?? false; // ✅ now correctly maps
+          });
+
+          setToggles(initialToggles);
+        } else {
+          // ✅ No row exists → default to false
+          const defaultToggles: { [key: string]: boolean } = {};
+          settings.forEach(({ id }) => {
+            defaultToggles[id] = false;
+          });
+          setToggles(defaultToggles);
+        }
+      } catch (err: any) {
+        console.error("Error fetching account settings:", err.message);
       }
-
-      if (settingsData && settingsData.length > 0) {
-        const row = settingsData[0]; // ✅ extract first row
-
-        const initialToggles: { [key: string]: boolean } = {};
-        settings.forEach(({ id }) => {
-          initialToggles[id] = row[id] ?? false; // ✅ now correctly maps
-        });
-
-        setToggles(initialToggles);
-      } else {
-        // ✅ No row exists → default to false
-        const defaultToggles: { [key: string]: boolean } = {};
-        settings.forEach(({ id }) => {
-          defaultToggles[id] = false;
-        });
-        setToggles(defaultToggles);
-      }
-    } catch (err: any) {
-      console.error("Error fetching account settings:", err.message);
     }
-  }
 
-  if (userId) fetchAllAccountSettings();
-}, [userId]);
+    if (userId) fetchAllAccountSettings();
+  }, [userId]);
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-8 text-gray-800">

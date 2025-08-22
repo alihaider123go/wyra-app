@@ -20,10 +20,7 @@ export function useSessionUser() {
 
     const { data } = await supabase.auth.getUser();
     const authUser = data.user;
-
-    const isVerified =
-      authUser?.identities?.[0]?.identity_data?.email_verified ?? false;
-
+   
     let profileData: UserProfile | null = null;
     if (authUser?.id) {
       const { data: fetchedProfile, error: profileError } = await supabase
@@ -39,6 +36,7 @@ export function useSessionUser() {
     }
 
     const isProfileCompleted = !!(profileData?.bio && profileData?.avatar);
+    const isVerified = profileData?.is_email_verified;
 
     if (authUser) {
       setUser({

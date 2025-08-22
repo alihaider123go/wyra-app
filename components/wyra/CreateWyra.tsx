@@ -93,7 +93,6 @@ export default function CreateWyra({onTabChange}:CreateWyraProps) {
     //   (circle) => circle.circle_members && circle.circle_members.length > 0
     // );
 
-    console.log("Circles with members:", myCircles);
     if (error) {
       console.error("Failed to fetch user circles:", error.message);
       alert("Failed to load your circles.");
