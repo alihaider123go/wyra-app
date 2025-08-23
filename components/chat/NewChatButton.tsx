@@ -22,9 +22,13 @@ export default function NewChatButton({
     }
 
     const fetchUsers = async () => {
+      const isEmail = search.includes("@"); // simple check to detect if search is email
+
       const { data, error } = await supabase
         .from("user_profiles")
-        .select("id, firstname, lastname, username, email")
+        .select(`id, firstname, lastname, username, email, account_settings (
+      find_by_email
+    )`)
         .or(
           `firstname.ilike.%${search}%,lastname.ilike.%${search}%,username.ilike.%${search}%,email.ilike.%${search}%`
         )
@@ -36,7 +40,15 @@ export default function NewChatButton({
         return;
       }
 
-      setResults(data || []);
+      // Conditionally filter based on search type
+      const filtered = (data || []).filter((user: any) => {
+        if (isEmail) {
+          return user.account_settings?.find_by_email === true;
+        }
+        return true; // allow all if not searching by email
+      });
+
+      setResults(filtered || []);
     };
 
     const delayDebounce = setTimeout(fetchUsers, 300);
@@ -90,7 +102,7 @@ export default function NewChatButton({
         className="bg-blue-500 px-3 py-1 rounded text-white"
       >
         <Plus className="inline mr-1" />
-        
+
       </button>
       {open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">

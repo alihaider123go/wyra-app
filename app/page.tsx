@@ -29,6 +29,7 @@ import FavoritesWyra from "@/components/wyra/FavoritesWyra";
 import NotificationsList from "@/components/notifications/notificationList";
 import { NotificationsProvider } from "@/components/notifications/useNotifications";
 import { isNotificationAllowed } from "@/utils/helper";
+import { checkUserOnlineStatus, updateLastSeen } from "@/actions/common";
 
 export default function Home() {
   const supabase = createClient();
@@ -63,6 +64,15 @@ export default function Home() {
   //   fetchUser();
   // }, []);
 
+  useEffect(() => {
+    if (!sessionUser?.id) return;
+
+    const interval = setInterval(() => {
+      updateLastSeen(sessionUser?.id);
+    }, 30000); // every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [sessionUser?.id]);
 
   const [searchTerm, setSearchTerm] = useState("");
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Message } from "@/actions/types";
 import { formatDateTime } from "@/utils/helper";
+import UserOnlineStatus from "../ui/userOnlineStatus";
 
 export default function MessageItem({
   message,
@@ -22,11 +23,14 @@ export default function MessageItem({
       {
         !isMine
         ?
+        <div className="relative w-12 h-12 rounded-full mr-2">
          <img
           src={avatar}
           alt={""}
-          className="mr-2 w-10 h-10 rounded-full object-cover"
+          className="mr-2 h-full w-full rounded-full object-cover"
         />
+        <UserOnlineStatus userId={message.sender_id}/>
+        </div>
         : null
       }
 
@@ -47,7 +51,7 @@ export default function MessageItem({
          <img
           src={currenctUserAvatar}
           alt={""}
-          className="ml-2 w-10 h-10 rounded-full object-cover"
+          className="ml-2 w-12 h-12 rounded-full object-cover"
         />
         : null
       }

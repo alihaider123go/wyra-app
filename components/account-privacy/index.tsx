@@ -177,7 +177,7 @@ export default function AccountPrivacySettings({ userId }: SettingsProps) {
   // ✅ Toggle handler with UPSERT
   const handleToggle = async (id: string) => {
     setToggles((prev) => {
-      let updated = { ...prev, [id]: !prev[id] };
+      const updated = { ...prev, [id]: !prev[id] };
 
       // If this toggle is part of the DM settings group
       if (dmSettings.includes(id) && updated[id]) {

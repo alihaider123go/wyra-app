@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { createClient } from "@/utils/supabase/client";
-import { Trash2, X } from "lucide-react";
-import { Button } from "@/components/ui/button"
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface UserOption {
   value: string;
@@ -24,6 +24,7 @@ export default function CircleDetailModal({
   const [members, setMembers] = useState<any[]>([]);
   const [userOptions, setUserOptions] = useState<UserOption[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<UserOption[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchCircleDetails();
@@ -57,33 +58,58 @@ export default function CircleDetailModal({
 
     setCircle(data);
     setMembers(data?.circle_members || []);
-
-    // Update user options with fresh members
-    await fetchUserOptions(data?.circle_members || []);
   };
 
-  // Fetch users excluding current members
-  const fetchUserOptions = async (currentMembers: any[] = []) => {
-    const { data: allUsers } = await supabase
-      .from("user_profiles")
-      .select("id, firstname, lastname, username, email");
+  const fetchUserOptions = async (search: string) => {
+    if (!search || search.trim().length < 2) {
+      setUserOptions([]);
+      return;
+    }
 
-    const existingUserIds = currentMembers.map((m) => m.user_profiles.id);
-    const filtered = (allUsers || []).filter(
-      (user) => !existingUserIds.includes(user.id)
-    );
+    const isEmail = search.includes("@"); // simple check to detect if search is email
+
+    const { data: allUsers, error } = await supabase
+      .from("user_profiles")
+      .select(`
+      id,
+      firstname,
+      lastname,
+      username,
+      email,
+      account_settings (
+        find_by_email,
+        find_by_phone
+      )
+    `)
+      .or(
+        `firstname.ilike.%${search}%,lastname.ilike.%${search}%,username.ilike.%${search}%,email.ilike.%${search}%`
+      );
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const existingUserIds = members.map((m) => m.user_profiles.id);
+
+    const filtered = (allUsers || []).filter((user: any) => {
+      if (isEmail) {
+        return (
+          !existingUserIds.includes(user.id) &&
+          user.account_settings?.find_by_email === true
+        );
+      }
+      return !existingUserIds.includes(user.id);
+    });
 
     const options: UserOption[] = filtered.map((user) => ({
       value: user.id,
-      label: `${user.firstname} ${user.lastname} (${
-        user.username ?? user.email
-      })`,
+      label: `${user.firstname} ${user.lastname} (${user.username ?? user.email})`,
       email: user.email,
     }));
 
     setUserOptions(options);
   };
-
   const handleAddMembers = async () => {
     if (!selectedUsers.length) return;
 
@@ -101,12 +127,7 @@ export default function CircleDetailModal({
     }
 
     setSelectedUsers([]);
-
-    // Refresh members and options
     await fetchCircleDetails();
-
-    // Optionally close modal after adding members:
-    // onClose();
   };
 
   const handleRemoveMember = async (memberId: string) => {
@@ -121,10 +142,6 @@ export default function CircleDetailModal({
     }
     await fetchCircleDetails();
   };
-
-  const closeDetailsModal = () => {
-    onClose()
-  }
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
@@ -146,38 +163,41 @@ export default function CircleDetailModal({
             options={userOptions}
             value={selectedUsers}
             onChange={(value) => setSelectedUsers(value as UserOption[])}
-            placeholder="Select members to add..."
+            onInputChange={(value) => {
+              setSearchTerm(value);
+              fetchUserOptions(value);
+            }}
+            placeholder="Search and select members..."
             className="react-select-container"
             classNamePrefix="react-select"
-            noOptionsMessage={() => "No users available"}
+            noOptionsMessage={() =>
+              searchTerm.length < 2 ? "Type at least 2 characters" : "No users found"
+            } 
+            filterOption={(option, inputValue) => {
+              const label = option.label.toLowerCase();
+              const email = (option.data as UserOption).email.toLowerCase();
+              const search = inputValue.toLowerCase();
+
+              return label.includes(search) || email.includes(search);
+            }}
           />
         </div>
 
-        {/* <button
-          onClick={handleAddMembers}
-          disabled={selectedUsers.length === 0}
-          className={`px-4 py-2 rounded w-full mb-6 text-white ${
-            selectedUsers.length === 0
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-        >
-          Add Selected Members
-        </button> */}
-
-             <div className="flex justify-between gap-4">
-                <Button
-                onClick={closeDetailsModal}
-                className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                  Close
-                </Button>
-                <Button
-                  onClick={handleAddMembers}
-                  disabled={selectedUsers.length === 0}
-                  className="w-full h-14 bg-gradient-to-r from-blue-400 to-purple-600 hover:from-blue-500 hover:to-purple-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                                        Add Selected Members
-                </Button>
-            </div>
+        <div className="flex justify-between gap-4">
+          <Button
+            onClick={onClose}
+            className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            Close
+          </Button>
+          <Button
+            onClick={handleAddMembers}
+            disabled={selectedUsers.length === 0}
+            className="w-full h-14 bg-gradient-to-r from-blue-400 to-purple-600 hover:from-blue-500 hover:to-purple-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Add Selected Members
+          </Button>
+        </div>
 
         <ul className="space-y-3 mt-5">
           {members.map((member) => (

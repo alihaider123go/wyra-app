@@ -165,10 +165,11 @@ export const getUnifiedHomeWyras = async (
   }
 
   // 6. Fetch Wyras
-  let query = supabase
-    .from("wyra")
-    .select(
-      `
+// Assume userId is the currently logged-in user's ID
+let query = supabase
+  .from("wyra")
+  .select(
+    `
       id,
       title,
       created_at,
@@ -195,12 +196,18 @@ export const getUnifiedHomeWyras = async (
           media_url,
           media_type
         )
+      ),
+      wyra_selected_option (
+        id,
+        selected_option_id,
+        why,
+        user_id
       )
-      `
-    )
-    .order("created_at", { ascending: false });
-
-  // Uncomment if you want to filter by authors/circles
+    `
+  )
+  .order("created_at", { ascending: false })
+  .eq("wyra_selected_option.user_id", userId);
+    // Uncomment if you want to filter by authors/circles
   // if (orFilters.length > 0) {
   //   query = query.or(orFilters.join(","));
   // }
@@ -337,11 +344,19 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
             media_url,
             media_type
           )
-        )
+        ),
+         wyra_selected_option (
+        id,
+        selected_option_id,
+        why,
+        user_id
+      )
       )
       `
     )
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .eq("wyra_selected_option.user_id", userId);
+;
 
   if (error) {
     console.error("Favorite Wyras fetch error:", error);

@@ -29,6 +29,7 @@ import {
 import Link from "next/link";
 import { ExtendedUser, UserProfile } from "@/actions/types";
 import { useNotifications } from "./notifications/useNotifications";
+import UserOnlineStatus from "./ui/userOnlineStatus";
 
 interface HeaderProps {
   user: ExtendedUser | null;
@@ -209,17 +210,21 @@ export default function Header({
                         onClick={() => isProfileCompleted ? onHandlePageClick("profile") : ""}
                       >
                         {userProfile?.avatar ? (
+                          <div className="w-12 h-12 rounded-full relative mr-3">
                           <img
                             src={userProfile.avatar}
                             alt="Avatar"
-                            className="w-12 h-12 rounded-full object-cover mr-3"
+                            className="h-full w-full rounded-full object-cover mr-3"
                           />
+                          <UserOnlineStatus userId={userProfile?.id}/>
+                          </div>
                         ) : (
-                          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                          <div className="w-12 h-12 bg-gray-200 relative rounded-full flex items-center justify-center mr-3">
                             <span className="text-lg font-semibold text-gray-600">
                               {userProfile?.firstname?.[0]?.toUpperCase() ||
                                 userProfile?.email?.[0]?.toUpperCase()}
                             </span>
+                            <UserOnlineStatus userId={userProfile?.id}/>
                           </div>
                         )}
                         <div>

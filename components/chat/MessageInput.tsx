@@ -36,9 +36,9 @@ export default function MessageInput({
 }
 
   const checkUserSettings = async () => {
-    let isAllowedEveryone = await isSettingAllowed(senderId, "allow_dm_everyone")
-    let isAllowedFollower = await isSettingAllowed(senderId, "allow_dm_followers")
-    let isNotAllowed = await isSettingAllowed(senderId, "no_dm")
+    const isAllowedEveryone = await isSettingAllowed(senderId, "allow_dm_everyone")
+    const isAllowedFollower = await isSettingAllowed(senderId, "allow_dm_followers")
+    const isNotAllowed = await isSettingAllowed(senderId, "no_dm")
     const isFollowing = await isUserFollowing(currentUserId, senderId)
 
     if (isNotAllowed) {

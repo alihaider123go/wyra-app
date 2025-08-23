@@ -41,6 +41,7 @@ import { Wyra } from "@/actions/types";
 import { relativeTime } from "@/utils/helper";
 import ShareButton from "./ShareBtn";
 import FavouriteButton from "./FavouriteBtn";
+import UserOnlineStatus from "../ui/userOnlineStatus";
 
 export default function FavoritesWyra({searchTerm}:any) {
   const [wyraList, setWyraList] = useState<Wyra[]>([]);
@@ -207,6 +208,7 @@ export default function FavoritesWyra({searchTerm}:any) {
                         alt="avatar preview"
                         className="w-full h-full shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover"
                       />
+                      <UserOnlineStatus userId={wyra.creator?.id}/>
                     </div>
                     <div>
                       <h2 className="text-lg font-bold text-black">

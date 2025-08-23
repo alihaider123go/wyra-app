@@ -1,5 +1,6 @@
 import { Chat } from "@/actions/types";
 import { formatDateTime } from "@/utils/helper";
+import UserOnlineStatus from "../ui/userOnlineStatus";
 export default function ChatListItem({
   chat,
   isSelected,
@@ -18,11 +19,14 @@ export default function ChatListItem({
     >
       {/* Avatar or initial */}
       {chat.avatar ? (
+        <div className="relative w-12 h-12 rounded-full">
         <img
           src={chat.avatar}
           alt={chat.name || ""}
-          className="w-10 h-10 rounded-full object-cover"
+          className="w-full h-full rounded-full object-cover"
         />
+        <UserOnlineStatus userId={chat.sender_id}/>
+        </div>
       ) : (
         <div className="w-10 h-10 rounded-full bg-gray-300 text-gray-700 flex items-center justify-center font-semibold text-sm uppercase">
           {chat.name?.[0] || "?"}

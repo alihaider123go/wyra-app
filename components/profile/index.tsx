@@ -10,9 +10,10 @@ import Loader from "@/components/common/loader";
 import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Plus, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
+import AddedCircles from "../circle/AddedCircleList";
 
 interface ProfileProps {
-  userId: string|undefined;
+  userId: string | undefined;
 }
 
 interface UserProfile {
@@ -22,6 +23,7 @@ interface UserProfile {
   username: string;
   avatar: string | null;
   bio: string | null;
+  account_settings?:any;
 }
 
 export default function Profile({ userId }: ProfileProps) {
@@ -33,6 +35,7 @@ export default function Profile({ userId }: ProfileProps) {
   const [followingCount, setFollowingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"myCircles" | "addedCircles">("myCircles")
 
   useEffect(() => {
     async function fetchAllProfileData() {
@@ -42,8 +45,10 @@ export default function Profile({ userId }: ProfileProps) {
       try {
         // Fetch profile data
         const { data: profileData, error: profileError } = await supabase
-          .from("user_profiles")
-          .select("*")
+          .from(`user_profiles`)
+          .select(`*,account_settings(
+              show_circles_on_profile
+            )`)
           .eq("id", userId)
           .single();
 
@@ -93,67 +98,100 @@ export default function Profile({ userId }: ProfileProps) {
 
   return (
     <>
-     {/* Personal Information Card */}
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-2xl font-bold text-gray-800">Profile</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <UserProfileHeader
-              user={{
-                avatar: profile.avatar || "",
-                fullName: `${profile.firstname ?? ""} ${
-                  profile.lastname ?? ""
+      {/* Personal Information Card */}
+      <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+        <CardHeader className="text-center pb-6">
+          <CardTitle className="text-2xl font-bold text-gray-800">Profile</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <UserProfileHeader
+            user={{
+              avatar: profile.avatar || "",
+              fullName: `${profile.firstname ?? ""} ${profile.lastname ?? ""
                 }`.trim(),
-                username: profile.username,
-                bio: profile.bio ?? "",
-                stats: {
-                  wyras: wyrasCount,
-                  followers: followersCount,
-                  following: followingCount,
-                },
-              }}
-              onEditProfile={() => {
-                window.location.href = "/settings/profile";
-              }}
-              onShareProfile={() => {
-                navigator.clipboard.writeText(window.location.href);
-                // alert("Profile link copied!");
-              }}
-            />
-          </CardContent>
-        </Card>
+              username: profile.username,
+              bio: profile.bio ?? "",
+              stats: {
+                wyras: wyrasCount,
+                followers: followersCount,
+                following: followingCount,
+              },
+            }}
+            onEditProfile={() => {
+              window.location.href = "/settings/profile";
+            }}
+            onShareProfile={() => {
+              navigator.clipboard.writeText(window.location.href);
+              // alert("Profile link copied!");
+            }}
+          />
+        </CardContent>
+      </Card>
 
 
-       {/* Circles Card */}
-        <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+      {/* Circles Card */}
+      {/* <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-2xl font-bold text-gray-800">Circles</CardTitle>
           </CardHeader>
           <CardContent>
             <CircleList userId={userId} />
           </CardContent>
-        </Card>
+        </Card> */}
 
-       {/* My Wyras Card */}
-        <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-2xl font-bold text-gray-800 flex justify-between">
-              <span>
-                My Wyras
-              </span>
-              <Link href="/create-wyra" passHref>
-                <Button className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium rounded-lg transition">
-                  <Plus size={18} /> Create Wyra
-                </Button>
-              </Link>
+      <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+        <CardHeader className="text-center pb-6">
+          <CardTitle className="text-2xl font-bold text-gray-800">Circles</CardTitle>
+        </CardHeader>
 
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <MyWyras userId={userId} />
-          </CardContent>
-        </Card>
+        {
+          profile?.account_settings?.show_circles_on_profile &&
+
+          <div className="flex justify-center gap-4 border-b pb-2">
+            <Button
+              variant={activeTab === "myCircles" ? "default" : "ghost"}
+              onClick={() => setActiveTab("myCircles")}
+            >
+              My Circles
+            </Button>
+            <Button
+              variant={activeTab === "addedCircles" ? "default" : "ghost"}
+              onClick={() => setActiveTab("addedCircles")}
+            >
+              Added Circles
+            </Button>
+          </div>
+        }
+
+        <CardContent className="pt-6">
+          {activeTab === "myCircles" && <CircleList userId={userId} />}
+          {
+            profile?.account_settings?.show_circles_on_profile &&
+
+
+            activeTab === "addedCircles" && <AddedCircles userId={userId} />}
+        </CardContent>
+      </Card>
+
+      {/* My Wyras Card */}
+      <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+        <CardHeader className="text-center pb-6">
+          <CardTitle className="text-2xl font-bold text-gray-800 flex justify-between">
+            <span>
+              My Wyras
+            </span>
+            <Link href="/create-wyra" passHref>
+              <Button className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium rounded-lg transition">
+                <Plus size={18} /> Create Wyra
+              </Button>
+            </Link>
+
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <MyWyras userId={userId} />
+        </CardContent>
+      </Card>
 
 
     </>
