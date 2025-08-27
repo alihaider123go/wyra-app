@@ -46,57 +46,109 @@ export default function MyWyras({ userId }: MyWyrasProps) {
       setLoading(true);
       const supabase = createClient();
 
-      // Query wyras where created_by = userId, including options and media
-      const { data, error } = await supabase
+      // 1. Fetch wyras where created_by = userId
+      const { data: wyras, error: wyraError } = await supabase
         .from("wyra")
         .select(`
-      id,
-      title,
-      created_at,
-      created_by,
-      wyra_option (
         id,
-        option_text,
-        position,
-        wyra_media (
+        title,
+        created_at,
+        created_by,
+        wyra_option (
           id,
-          media_url,
-          media_type
+          option_text,
+          position,
+          wyra_media (
+            id,
+            media_url,
+            media_type
+          )
+        ),
+        wyra_selected_option:wyra_selected_option!left (
+          id,
+          selected_option_id,
+          why,
+          user_id,
+          wyra_option (
+            id,
+            option_text
+          ),
+          user_profiles (
+            id,
+            firstname,
+            lastname,
+            username,
+            avatar
+          )
         )
-      ),
-      wyra_selected_option:wyra_selected_option!left (
-      id,
-      selected_option_id,
-      why,
-      user_id,
-      wyra_option (
-        id,
-        option_text
-      ),
-      user_profiles (
-        id,
-        firstname,
-        lastname,
-        username,
-        avatar
-      )
-      )
-    `)
+      `)
         .eq("created_by", userId)
         .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Error fetching wyras:", error.message);
+      if (wyraError) {
+        console.error("Error fetching wyras:", wyraError.message);
         setWyraList([]);
-      } else {
-        setWyraList(data || []);
+        setLoading(false);
+        return;
       }
+
+      const wyraIds = wyras?.map((w) => w.id) ?? [];
+
+      // 2. Fetch reactions (likes & dislikes)
+      const { data: reactions, error: reactionError } = await supabase
+        .from("wyra_reaction")
+        .select("wyra_id, type")
+        .in("wyra_id", wyraIds);
+
+      if (reactionError) {
+        console.error("Error fetching reactions:", reactionError.message);
+      }
+
+      const reactionCounts: Record<string, { like: number; dislike: number }> = {};
+      if (reactions) {
+        for (const { wyra_id, type } of reactions) {
+          if (!reactionCounts[wyra_id]) {
+            reactionCounts[wyra_id] = { like: 0, dislike: 0 };
+          }
+          if (type === "like") {
+            reactionCounts[wyra_id].like++;
+          } else if (type === "dislike") {
+            reactionCounts[wyra_id].dislike++;
+          }
+        }
+      }
+
+      // 3. Fetch comments count
+      const { data: comments, error: commentError } = await supabase
+        .from("wyra_comment")
+        .select("wyra_id")
+        .in("wyra_id", wyraIds);
+
+      if (commentError) {
+        console.error("Error fetching comments:", commentError.message);
+      }
+
+      const commentCounts: Record<string, number> = {};
+      if (comments) {
+        for (const { wyra_id } of comments) {
+          commentCounts[wyra_id] = (commentCounts[wyra_id] || 0) + 1;
+        }
+      }
+
+      // 4. Merge counts into wyras
+      const formattedWyras = (wyras ?? []).map((wyra) => ({
+        ...wyra,
+        likeCount: reactionCounts[wyra.id]?.like || 0,
+        dislikeCount: reactionCounts[wyra.id]?.dislike || 0,
+        commentCount: commentCounts[wyra.id] || 0,
+      }));
+
+      setWyraList(formattedWyras);
       setLoading(false);
     }
 
     fetchWyras();
   }, [userId]);
-
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
 
@@ -212,13 +264,13 @@ export default function MyWyras({ userId }: MyWyrasProps) {
 
               <div className="mt-4 text-sm text-gray-500 flex gap-4">
                 <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-green-200 text-gray-800 hover:bg-green-300">
-                  <ThumbsUp className="w-4 h-4 mr-1" size={18} /> 0{" "}
+                  <ThumbsUp className="w-4 h-4 mr-1" size={18} /> {wyra?.likeCount ?? 0}{" "}
                 </span>
                 <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-red-200 text-gray-800 hover:bg-red-300">
-                  <ThumbsDown className="w-4 h-4 mr-1" size={18} /> 0
+                  <ThumbsDown className="w-4 h-4 mr-1" size={18} /> {wyra?.disLikeCount ?? 0}
                 </span>
                 <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-blue-200 text-gray-800 hover:bg-blue-300">
-                  <MessageCircle className="w-4 h-4 mr-1" size={18} /> 0
+                  <MessageCircle className="w-4 h-4 mr-1" size={18} /> {wyra?.commentCount ?? 0}
                 </span>
               </div>
             </div>

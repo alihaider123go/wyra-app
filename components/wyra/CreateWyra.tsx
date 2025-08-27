@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { FaRegImage, FaSmile } from "react-icons/fa";
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/client";
 import { uploadFiles } from "@/actions/common";
@@ -11,35 +11,28 @@ import { insertWyra } from "@/actions/wyra";
 import { WyraInsertInput, Circle } from "@/actions/types";
 import Button from "@/components/ui/btn";
 import CircleMultiSelectModal from "@/components/wyra/CircleMultiSelectModal";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Loader from "@/components/common/loader";
-import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 
 const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
-interface CreateWyraProps {
-  onTabChange?: (tab: string) => void;
-  
-}
-
-export default function CreateWyra({onTabChange}:CreateWyraProps) {
+export default function CreateWyra({ onTabChange }: { onTabChange?: (tab: string) => void }) {
   const [optionOne, setOptionOne] = useState("");
   const [optionTwo, setOptionTwo] = useState("");
   const [filesOne, setFilesOne] = useState<File[]>([]);
   const [filesTwo, setFilesTwo] = useState<File[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [showCircleModal, setShowCircleModal] = useState(false);
   const [availableCircles, setAvailableCircles] = useState<Circle[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
-  const [createdWyraId, setCreatedWyraId] = useState<string | null>(null);
+
+  // NEW: Emoji picker state
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [activeOption, setActiveOption] = useState<1 | 2 | null>(null);
 
   const supabase = createClient();
   const router = useRouter();
 
-  const handleFileChange = (
-    option: 1 | 2,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileChange = (option: 1 | 2, e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
     const array = Array.from(files);
@@ -54,15 +47,20 @@ export default function CreateWyra({onTabChange}:CreateWyraProps) {
       const isVideo = file.type.startsWith("video");
       return (
         <div key={idx} className="mt-3">
-          {isImage && (
-            <img src={url} alt="preview" className="max-h-40 rounded-md" />
-          )}
-          {isVideo && (
-            <video src={url} controls className="max-h-40 rounded-md" />
-          )}
+          {isImage && <img src={url} alt="preview" className="max-h-40 rounded-md" />}
+          {isVideo && <video src={url} controls className="max-h-40 rounded-md" />}
         </div>
       );
     });
+
+  const handleEmojiClick = (emojiData: any) => {
+    if (activeOption === 1) {
+      setOptionOne((prev) => prev + emojiData.emoji);
+    } else if (activeOption === 2) {
+      setOptionTwo((prev) => prev + emojiData.emoji);
+    }
+    setShowEmojiPicker(false); // Close after selection
+  };
 
   const prepareToSubmit = async () => {
     if (!optionOne.trim() || !optionTwo.trim()) {
@@ -161,94 +159,98 @@ export default function CreateWyra({onTabChange}:CreateWyraProps) {
     }
 
   };
+  
 
   return (
-      <div className="w-full flex justify-center">
-        <section className="flex flex-col max-w-md">
-          <Card className="border-0 animate-slide-in-right">
-            {/* <CardHeader className="text-center pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-800">Welcome Back</CardTitle>
-              <CardDescription className="text-gray-600 text-lg">Sign in to start making choices</CardDescription>
-            </CardHeader> */}
-            <CardContent>
+    <div className="w-full flex justify-center relative">
+      <section className="flex flex-col max-w-md">
+        <Card className="border-0 animate-slide-in-right">
+          <CardContent>
+            <div className="max-w-2xl mx-auto p-6">
+              <h1 className="text-center text-3xl font-bold mb-10 text-black">Would you rather...</h1>
 
-        {/* <h1 className="text-3xl w-full text-center font-bold mb-6 font-semibold text-xl text-gray-700 mb-8">
-          Create Wyra
-        </h1> */}
-        <div className="max-w-2xl mx-auto p-6">
-          <h1 className="text-center text-3xl font-bold mb-10 text-black">
-            Would you rather...
-          </h1>
-
-          {/* Option One */}
-          <div className="bg-white border rounded-2xl shadow p-5 mb-8 relative">
-            <textarea
-              maxLength={150}
-              rows={4}
-              placeholder="Type option one..."
-              className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
-              value={optionOne}
-              onChange={(e) => setOptionOne(e.target.value)}
-            />
-            <div className="text-xs text-gray-400 absolute bottom-3 right-6">
-              {150 - optionOne.length} Max
-            </div>
-            <div className="flex items-center mt-4 gap-4 relative">
-              <label className="cursor-pointer">
-                <FaRegImage
-                  size={22}
-                  className="text-gray-600 hover:text-gray-800"
+              {/* Option One */}
+              <div className="bg-white border rounded-2xl shadow p-5 mb-8 relative">
+                <textarea
+                  maxLength={150}
+                  rows={4}
+                  placeholder="Type option one..."
+                  className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                  value={optionOne}
+                  onChange={(e) => setOptionOne(e.target.value)}
                 />
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  hidden
-                  onChange={(e) => handleFileChange(1, e)}
-                />
-              </label>
-              <FaSmile size={22} className="text-gray-600" />
-            </div>
-            {renderPreviews(filesOne)}
-          </div>
+                <div className="text-xs text-gray-400 absolute bottom-3 right-6">
+                  {150 - optionOne.length} Max
+                </div>
+                <div className="flex items-center mt-4 gap-4 relative">
+                  <label className="cursor-pointer">
+                    <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      hidden
+                      onChange={(e) => handleFileChange(1, e)}
+                    />
+                  </label>
+                  <FaSmile
+                    size={22}
+                    className="text-gray-600 cursor-pointer"
+                    onClick={() => {
+                      setActiveOption(1);
+                      setShowEmojiPicker((prev) => !prev);
+                    }}
+                  />
+                </div>
+                {renderPreviews(filesOne)}
+              </div>
 
-          <div className="text-center font-semibold text-xl text-gray-700 mb-8">
-            OR
-          </div>
+              <div className="text-center font-semibold text-xl text-gray-700 mb-8">OR</div>
 
-          {/* Option Two */}
-          <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
-            <textarea
-              maxLength={150}
-              rows={4}
-              placeholder="Type option two..."
-              className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
-              value={optionTwo}
-              onChange={(e) => setOptionTwo(e.target.value)}
-            />
-            <div className="text-xs text-gray-400 absolute bottom-3 right-6">
-              {150 - optionTwo.length} Max
-            </div>
-            <div className="flex items-center mt-4 gap-4 relative">
-              <label className="cursor-pointer">
-                <FaRegImage
-                  size={22}
-                  className="text-gray-600 hover:text-gray-800"
+              {/* Option Two */}
+              <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
+                <textarea
+                  maxLength={150}
+                  rows={4}
+                  placeholder="Type option two..."
+                  className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                  value={optionTwo}
+                  onChange={(e) => setOptionTwo(e.target.value)}
                 />
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  hidden
-                  onChange={(e) => handleFileChange(2, e)}
-                />
-              </label>
-              <FaSmile size={22} className="text-gray-600" />
-            </div>
-            {renderPreviews(filesTwo)}
-          </div>
+                <div className="text-xs text-gray-400 absolute bottom-3 right-6">
+                  {150 - optionTwo.length} Max
+                </div>
+                <div className="flex items-center mt-4 gap-4 relative">
+                  <label className="cursor-pointer">
+                    <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      hidden
+                      onChange={(e) => handleFileChange(2, e)}
+                    />
+                  </label>
+                  <FaSmile
+                    size={22}
+                    className="text-gray-600 cursor-pointer"
+                    onClick={() => {
+                      setActiveOption(2);
+                      setShowEmojiPicker((prev) => !prev);
+                    }}
+                  />
+                </div>
+                {renderPreviews(filesTwo)}
+              </div>
 
-          <div className="text-center mt-10">
+              {/* Emoji Picker */}
+              {showEmojiPicker && (
+                <div className="absolute z-50 bottom-20">
+                  <EmojiPicker onEmojiClick={handleEmojiClick} />
+                </div>
+              )}
+
+               <div className="text-center mt-10">
             <Button
               btnText="Create Wyra"
               loading={loading}
@@ -270,8 +272,8 @@ export default function CreateWyra({onTabChange}:CreateWyraProps) {
               }}
             />
           )}
-        </div>
-        </CardContent>
+            </div>
+          </CardContent>
         </Card>
       </section>
     </div>

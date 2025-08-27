@@ -165,11 +165,11 @@ export const getUnifiedHomeWyras = async (
   }
 
   // 6. Fetch Wyras
-// Assume userId is the currently logged-in user's ID
-let query = supabase
-  .from("wyra")
-  .select(
-    `
+  // Assume userId is the currently logged-in user's ID
+  let query = supabase
+    .from("wyra")
+    .select(
+      `
       id,
       title,
       created_at,
@@ -204,10 +204,10 @@ let query = supabase
         user_id
       )
     `
-  )
-  .order("created_at", { ascending: false })
-  .eq("wyra_selected_option.user_id", userId);
-    // Uncomment if you want to filter by authors/circles
+    )
+    .order("created_at", { ascending: false })
+    .eq("wyra_selected_option.user_id", userId);
+  // Uncomment if you want to filter by authors/circles
   // if (orFilters.length > 0) {
   //   query = query.or(orFilters.join(","));
   // }
@@ -253,23 +253,31 @@ let query = supabase
       creator: Array.isArray(user_profiles)
         ? {
             id: user_profiles[0]?.id,
-            firstname: user_profiles[0]?.account_settings?.show_real_name
-              ? user_profiles[0]?.firstname
-              : "Anonymous",
-            lastname: user_profiles[0]?.account_settings?.show_real_name
-              ? user_profiles[0]?.lastname
-              : "",
+            firstname:
+              user_profiles[0]?.account_settings?.show_real_name ||
+              userId === wyra.created_by
+                ? user_profiles[0]?.firstname
+                : "Anonymous",
+            lastname:
+              user_profiles[0]?.account_settings?.show_real_name ||
+              userId === wyra.created_by
+                ? user_profiles[0]?.lastname
+                : "",
             username: user_profiles[0]?.username,
             avatar: user_profiles[0]?.avatar,
           }
         : {
             id: user_profiles?.id,
-            firstname: user_profiles?.account_settings?.show_real_name
-              ? user_profiles?.firstname
-              : "Anonymous",
-            lastname: user_profiles?.account_settings?.show_real_name
-              ? user_profiles?.lastname
-              : "",
+            firstname:
+              user_profiles?.account_settings?.show_real_name ||
+              userId === wyra.created_by
+                ? user_profiles?.firstname
+                : "Anonymous",
+            lastname:
+              user_profiles?.account_settings?.show_real_name ||
+              userId === wyra.created_by
+                ? user_profiles?.lastname
+                : "",
             username: user_profiles?.username,
             avatar: user_profiles?.avatar,
           },
@@ -299,14 +307,132 @@ let query = supabase
     });
   }
 
-  formattedData = formattedData.filter((wyra:any) => {
-    if (wyra.created_by === userId && wyra.settings?.show_posts_public_feed === false) {
+  formattedData = formattedData.filter((wyra: any) => {
+    if (
+      wyra.created_by === userId &&
+      wyra.settings?.show_posts_public_feed === false
+    ) {
       return false;
     }
     return true;
   });
 
   return formattedData;
+};
+
+export const getAllWyras = async () => {
+  const supabase = createClient();
+
+  // 1. Fetch all Wyras
+  const { data: wyras, error: wyraError } = await supabase
+    .from("wyra")
+    .select(
+      `
+        id,
+        title,
+        created_at,
+        created_by,
+        user_profiles (
+          id,
+          firstname,
+          lastname,
+          username,
+          avatar,
+          account_settings (
+            show_real_name
+          )
+        ),
+        wyra_option (
+          id,
+          option_text,
+          position,
+          wyra_media (
+            id,
+            media_url,
+            media_type
+          )
+        )
+      `
+    )
+    .order("created_at", { ascending: false });
+
+  if (wyraError) {
+    console.error("Error fetching wyras:", wyraError);
+    return [];
+  }
+
+  const wyraIds = wyras?.map((w) => w.id) ?? [];
+
+  // 2. Fetch reactions (likes & dislikes)
+  const { data: reactions, error: reactionError } = await supabase
+    .from("wyra_reaction")
+    .select("wyra_id, type")
+    .in("wyra_id", wyraIds);
+
+  if (reactionError) {
+    console.error("Error fetching reactions:", reactionError);
+  }
+
+  // 3. Count likes & dislikes
+  const reactionCounts: Record<string, { like: number; dislike: number }> = {};
+  if (reactions) {
+    for (const { wyra_id, type } of reactions) {
+      if (!reactionCounts[wyra_id]) {
+        reactionCounts[wyra_id] = { like: 0, dislike: 0 };
+      }
+      if (type === "like") {
+        reactionCounts[wyra_id].like++;
+      } else if (type === "dislike") {
+        reactionCounts[wyra_id].dislike++;
+      }
+    }
+  }
+
+  // 4. Fetch comments count
+  const { data: comments, error: commentError } = await supabase
+    .from("wyra_comment")
+    .select("wyra_id")
+    .in("wyra_id", wyraIds);
+
+  if (commentError) {
+    console.error("Error fetching comments:", commentError);
+  }
+
+  const commentCounts: Record<string, number> = {};
+  if (comments) {
+    for (const { wyra_id } of comments) {
+      commentCounts[wyra_id] = (commentCounts[wyra_id] || 0) + 1;
+    }
+  }
+
+  // 5. Format result
+  const formattedWyras = (wyras ?? []).map((wyra) => {
+    const { user_profiles, ...rest }: any = wyra;
+    const creator =
+      Array.isArray(user_profiles) && user_profiles.length > 0
+        ? user_profiles[0]
+        : user_profiles;
+
+    return {
+      ...rest,
+      creator: {
+        id: creator?.id,
+        firstname: creator?.account_settings?.show_real_name
+          ? creator?.firstname
+          : "Anonymous",
+        lastname: creator?.account_settings?.show_real_name
+          ? creator?.lastname
+          : "",
+        username: creator?.username,
+        avatar: creator?.avatar,
+      },
+      likeCount: reactionCounts[wyra.id]?.like || 0,
+      dislikeCount: reactionCounts[wyra.id]?.dislike || 0,
+      commentCount: commentCounts[wyra.id] || 0,
+    };
+  });
+
+  return formattedWyras;
 };
 
 export const getFavoriteWyras = async (userId: string, search: string = "") => {
@@ -356,8 +482,6 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
     )
     .eq("user_id", userId)
     .eq("wyra_selected_option.user_id", userId);
-;
-
   if (error) {
     console.error("Favorite Wyras fetch error:", error);
     return [];
@@ -375,23 +499,31 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
         creator: Array.isArray(user_profiles)
           ? {
               id: user_profiles[0]?.id,
-              firstname: user_profiles[0]?.account_settings?.show_real_name
-                ? user_profiles[0]?.firstname
-                : "Anonymous",
-              lastname: user_profiles[0]?.account_settings?.show_real_name
-                ? user_profiles[0]?.lastname
-                : "",
+              firstname:
+                user_profiles[0]?.account_settings?.show_real_name ||
+                userId === wyra.created_by
+                  ? user_profiles[0]?.firstname
+                  : "Anonymous",
+              lastname:
+                user_profiles[0]?.account_settings?.show_real_name ||
+                userId === wyra.created_by
+                  ? user_profiles[0]?.lastname
+                  : "",
               username: user_profiles[0]?.username,
               avatar: user_profiles[0]?.avatar,
             }
           : {
               id: user_profiles?.id,
-              firstname: user_profiles?.account_settings?.show_real_name
-                ? user_profiles?.firstname
-                : "Anonymous",
-              lastname: user_profiles?.account_settings?.show_real_name
-                ? user_profiles?.lastname
-                : "",
+              firstname:
+                user_profiles?.account_settings?.show_real_name ||
+                userId === wyra.created_by
+                  ? user_profiles?.firstname
+                  : "Anonymous",
+              lastname:
+                user_profiles?.account_settings?.show_real_name ||
+                userId === wyra.created_by
+                  ? user_profiles?.lastname
+                  : "",
               username: user_profiles?.username,
               avatar: user_profiles?.avatar,
             },
@@ -432,7 +564,10 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
   return formattedData;
 };
 
-export const getWyrasWithCircles = async (search: string = "") => {
+export const getWyrasWithCircles = async (
+  userId: string,
+  search: string = ""
+) => {
   const supabase = createClient();
 
   // ✅ Fetch wyras with circles
@@ -492,23 +627,31 @@ export const getWyrasWithCircles = async (search: string = "") => {
           creator: Array.isArray(user_profiles)
             ? {
                 id: user_profiles[0]?.id,
-                firstname: user_profiles[0]?.account_settings?.show_real_name
-                  ? user_profiles[0]?.firstname
-                  : "Anonymous",
-                lastname: user_profiles[0]?.account_settings?.show_real_name
-                  ? user_profiles[0]?.lastname
-                  : "",
+                firstname:
+                  user_profiles[0]?.account_settings?.show_real_name ||
+                  userId === wyra.created_by
+                    ? user_profiles[0]?.firstname
+                    : "Anonymous",
+                lastname:
+                  user_profiles[0]?.account_settings?.show_real_name ||
+                  userId === wyra.created_by
+                    ? user_profiles[0]?.lastname
+                    : "",
                 username: user_profiles[0]?.username,
                 avatar: user_profiles[0]?.avatar,
               }
             : {
                 id: user_profiles?.id,
-                firstname: user_profiles?.account_settings?.show_real_name
-                  ? user_profiles?.firstname
-                  : "Anonymous",
-                lastname: user_profiles?.account_settings?.show_real_name
-                  ? user_profiles?.lastname
-                  : "",
+                firstname:
+                  user_profiles?.account_settings?.show_real_name ||
+                  userId === wyra.created_by
+                    ? user_profiles?.firstname
+                    : "Anonymous",
+                lastname:
+                  user_profiles?.account_settings?.show_real_name ||
+                  userId === wyra.created_by
+                    ? user_profiles?.lastname
+                    : "",
                 username: user_profiles?.username,
                 avatar: user_profiles?.avatar,
               },
@@ -552,3 +695,20 @@ export const getWyrasWithCircles = async (search: string = "") => {
 
   return formattedData;
 };
+
+export async function deleteWyra(wyraId: string) {
+  const supabase = createClient();
+
+  try {
+    const { error } = await supabase.from("wyra").delete().eq("id", wyraId);
+
+    if (error) {
+      throw error;
+    }
+
+    return { success: true, message: "Wyra deleted successfully." };
+  } catch (error: any) {
+    console.error("Error deleting Wyra:", error.message);
+    return { success: false, message: error.message };
+  }
+}

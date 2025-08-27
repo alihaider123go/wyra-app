@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getUnifiedHomeWyras, getWyrasWithCircles } from "@/actions/wyra";
+import { deleteWyra, getUnifiedHomeWyras, getWyrasWithCircles } from "@/actions/wyra";
 import { createClient } from "@/utils/supabase/client";
 import LikeButton from "./LikeBtn";
 import DislikeButton from "./DislikeBtn";
@@ -44,11 +44,13 @@ import { isNotificationAllowed, isSettingAllowed, relativeTime } from "@/utils/h
 import ShareButton from "./ShareBtn";
 import FavouriteButton from "./FavouriteBtn";
 import UserOnlineStatus from "../ui/userOnlineStatus";
+import EditWyra from "./EditWyra";
 
 export default function WyraTimeline({ searchTerm, postId }: any) {
   const [wyraList, setWyraList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateWyraModal, setShowCreateWyraModal] = useState(false);
+  const [showEditWyraModal, setShowEditWyraModal] = useState({isShow:false,id:""});
   const [user, setUser] = useState<User | null>(null);
   const [wyrasWithCircles, setWyrasWithCircles] = useState<any[]>([]);
   const [selectedWyraOption, setSelectedWyraOption] = useState<any>();
@@ -97,7 +99,8 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
 
     if (error || !user) {
       console.error("User not logged in");
-      setLoading(false);
+      
+      setTimeout(() => setLoading(false), 1000);
       return;
     } else {
       setUser(user);
@@ -109,7 +112,7 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
     } catch (err) {
       console.error("Failed to fetch wyras", err);
     } finally {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 1000);
     }
   }
 
@@ -126,19 +129,19 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
 
     if (error || !user) {
       console.error("User not logged in");
-      setLoading(false);
+      setTimeout(() => setLoading(false), 1000);
       return;
     } else {
       setUser(user);
     }
 
     try {
-      const result = await getWyrasWithCircles(debouncedSearch);
+      const result = await getWyrasWithCircles(user.id,debouncedSearch);
       setWyrasWithCircles(result || []);
     } catch (err) {
       console.error("Failed to fetch wyras", err);
     } finally {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 1000);
     }
   }
 
@@ -335,15 +338,23 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
     }
   }
 
+  const handleDeleteWyra = async (id:any) => {
+    const isDelete = await deleteWyra(id);
+    if(isDelete.success){
+      fetchWyras()
+      fetchCircleWyras()
+    }
+  }
+
   if (loading) return <div className="text-center py-10">Loading...</div>;
-  if (!wyraList.length)
-    return <div className="text-center py-10">No Wyras yet.</div>;
+  // if (!wyraList.length)
+  //   return <div className="text-center py-10">No Wyras yet.</div>;
 
   const tabs = [
-    { id: "recent", icon: Clock, label: "Recent" },
-    { id: "trending", icon: TrendingUp, label: "Trending" },
-    { id: "circles", icon: Clock, label: "Circles" },
-    { id: "following", icon: Sparkles, label: "Following" },
+    { id: "recent", icon: Clock, label: "Recent",isImage:false },
+    { id: "trending", icon: TrendingUp, label: "Trending",isImage:false },
+    { id: "circles", icon: "/team.png", label: "Circles" , isImage:true },
+    { id: "following", icon: Sparkles, label: "Following",isImage:false },
   ];
 
   return (
@@ -362,7 +373,7 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
       </Tooltip>
 
       <div className="max-w-3xl flex items-center justify-around gap-4 py-2 px-2">
-        {tabs.map((tab) => {
+        {tabs.map((tab:any) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
 
@@ -375,9 +386,18 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                 : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
                 }`}
             >
-              <Icon
+            {
+              tab.isImage 
+              ?
+              <img src={tab.icon} 
                 className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
               />
+              :
+             <Icon
+                className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
+              />
+            }
+             
               <span
                 className={`text-xs mt-1 font-semibold ${isActive ? "text-white" : ""
                   }`}
@@ -455,11 +475,11 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                             >
                               {user?.id === wyra.created_by ? (
                                 <>
-                                  <DropdownMenuItem className="cursor-pointer hover:bg-gray-50">
+                                  <DropdownMenuItem onClick={()=>{setShowEditWyraModal({isShow:true,id:wyra.id})}} className="cursor-pointer hover:bg-gray-50">
                                     <Edit className="w-4 h-4 mr-2" />
                                     Edit Wyra
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50">
+                                  <DropdownMenuItem onClick={()=>{handleDeleteWyra(wyra.id)}} className="text-red-600 cursor-pointer hover:bg-red-50">
                                     <Trash2 className="w-4 h-4 mr-2" />
                                     Delete Wyra
                                   </DropdownMenuItem>
@@ -709,11 +729,11 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                         >
                           {user?.id === wyra.created_by ? (
                             <>
-                              <DropdownMenuItem className="cursor-pointer hover:bg-gray-50">
+                              <DropdownMenuItem onClick={()=>{setShowEditWyraModal({isShow:true,id:wyra.id})}} className="cursor-pointer hover:bg-gray-50">
                                 <Edit className="w-4 h-4 mr-2" />
                                 Edit Wyra
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50">
+                              <DropdownMenuItem onClick={()=>{handleDeleteWyra(wyra.id)}} className="text-red-600 cursor-pointer hover:bg-red-50">
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete Wyra
                               </DropdownMenuItem>
@@ -922,7 +942,7 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                   <div className="flex md:gap-2">
                     {/* user info */}
                     <div className="flex items-center gap-3 w-full">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
+                      <div className="w-12 h-12 relative rounded-full bg-gray-200">
                         <img
                           src={wyra.creator.avatar}
                           alt="avatar preview"
@@ -970,11 +990,11 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                         >
                           {user?.id === wyra.created_by ? (
                             <>
-                              <DropdownMenuItem className="cursor-pointer hover:bg-gray-50">
+                              <DropdownMenuItem onClick={()=>{setShowEditWyraModal({isShow:true,id:wyra.id})}} className="cursor-pointer hover:bg-gray-50">
                                 <Edit className="w-4 h-4 mr-2" />
                                 Edit Wyra
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50">
+                              <DropdownMenuItem onClick={()=>{handleDeleteWyra(wyra.id)}} className="text-red-600 cursor-pointer hover:bg-red-50">
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete Wyra
                               </DropdownMenuItem>
@@ -1185,14 +1205,24 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
           <ModalBody>
             <CreateWyra />
           </ModalBody>
-          {/* <ModalFooter className="flex justify-between">
-                  <Button className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => setShowCreateWyraModal(false)}>
-                  No
-                  </Button>
-                  <Button className="w-full h-14 bg-gradient-to-r from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => setShowCreateWyraModal(false)}>
-                  Yes
-                  </Button>
-              </ModalFooter> */}
+        </ModalContent>
+      </Modal>
+       <Modal isOpen={showEditWyraModal.isShow} hideCloseButton={true}>
+        <ModalContent>
+          <ModalHeader className="flex flex-col justify-center items-center gap-1">
+            Edit Wyra
+            <button
+              onClick={()=>{setShowEditWyraModal({isShow:false,id:""})}}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
+              aria-label="Close comment modal"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </ModalHeader>
+
+          <ModalBody>
+            <EditWyra wyraId={showEditWyraModal.id} fetchWyras={fetchWyras} setShowEditWyraModal={setShowEditWyraModal}/>
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>

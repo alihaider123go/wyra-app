@@ -65,7 +65,7 @@ export async function signUp(formData: FormData) {
     .limit(1)
     .single();
   if (!existingUser) {
-    const {data: insertedData, error: insertError, }: any = await supabase
+    const { data: insertedData, error: insertError }: any = await supabase
       .from("user_profiles")
       .insert({
         email: data?.user?.email,
@@ -75,8 +75,8 @@ export async function signUp(formData: FormData) {
         gender: data?.user?.user_metadata.gender || "",
         username: data?.user?.user_metadata.username || "",
       })
-       .select() 
-      .single(); 
+      .select()
+      .single();
     if (insertError) {
       return { status: insertError?.message, user: null };
     } else {
@@ -90,35 +90,61 @@ export async function signUp(formData: FormData) {
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
 
-  const email = formData.get("email")?.toString() || "";
+  // const email = formData.get("email")?.toString() || "";
+  let identifier = formData.get("email")?.toString() || "";
   const password = formData.get("password")?.toString() || "";
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+  let emailToUse = identifier;
 
-  if (!email || !password) {
-    return { status: "Email and password are required", user: null };
+  if (!isEmail) {
+    // Identifier is a username — fetch the corresponding email
+    const { data: userByUsername, error: usernameError } = await supabase
+      .from("user_profiles")
+      .select("email, status")
+      .eq("username", identifier)
+      .limit(1)
+      .maybeSingle();
+
+    if (usernameError) {
+      return { status: usernameError.message, user: null };
+    }
+
+    if (!userByUsername) {
+      return { status: "Invalid username.", user: null };
+    }
+
+    if (userByUsername.status === "deactivate") {
+      return {
+        status: "Your account is deactivated. Please contact support.",
+        user: null,
+      };
+    }
+
+    emailToUse = userByUsername.email;
+  } else {
+    // If it's email, check status
+    const { data: userProfile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("status")
+      .eq("email", identifier)
+      .limit(1)
+      .maybeSingle();
+
+    if (profileError) {
+      return { status: profileError.message, user: null };
+    }
+
+    if (userProfile && userProfile.status === "deactivate") {
+      return {
+        status: "Your account is deactivated. Please contact support.",
+        user: null,
+      };
+    }
   }
 
-  // ✅ First, check if the user exists and is active before login
-  const { data: userProfile, error: profileError } = await supabase
-    .from("user_profiles")
-    .select("status")
-    .eq("email", email)
-    .limit(1)
-    .maybeSingle();
-
-  if (profileError) {
-    return { status: profileError.message, user: null };
-  }
-
-  if (userProfile && userProfile.status === "deactivate") {
-    return {
-      status: "Your account is deactivated. Please contact support.",
-      user: null,
-    };
-  }
-
-  // ✅ Proceed with login
+  // Proceed with login using email
   const { data, error } = await supabase.auth.signInWithPassword({
-    email,
+    email: emailToUse,
     password,
   });
 
@@ -126,11 +152,13 @@ export async function signIn(formData: FormData) {
     return { status: error.message, user: null };
   }
 
+  // return { status: "success", user: data.user };
+
   // ✅ If no profile exists, create one
   const { data: existingUser } = await supabase
     .from("user_profiles")
     .select("*")
-    .eq("email", email)
+    .eq("email", emailToUse)
     .limit(1)
     .single();
 

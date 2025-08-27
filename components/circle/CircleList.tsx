@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Plus, Users, X } from "lucide-react";
+import { Paperclip, Plus, Users, X } from "lucide-react";
 import CircleDetailModal from "./CircleDetailModal";
 import { uploadFiles } from "@/actions/common";
 import { Button } from "@/components/ui/button"
@@ -37,11 +37,22 @@ export default function CircleList({ userId }: CircleListProps) {
       return;
     }
 
+    // const { data, error } = await supabase
+    //   .from("circles")
+    //   .select("id, name, icon, circle_members(count)")
+    //   .eq("created_by", userId)
+    //   .order("created_at", { ascending: false });
     const { data, error } = await supabase
-      .from("circles")
-      .select("id, name, icon, circle_members(count)")
-      .eq("created_by", userId)
-      .order("created_at", { ascending: false });
+  .from("circles")
+  .select(`
+    id,
+    name,
+    icon,
+    circle_members(count),
+    wyra_circles(count)
+  `)
+  .eq("created_by", userId)
+  .order("created_at", { ascending: false });
 
     if (error) console.error(error);
     else setCircles(data || []);
@@ -150,6 +161,11 @@ export default function CircleList({ userId }: CircleListProps) {
                 <Users size={14} /> {circle.circle_members[0]?.count || 0}{" "}
                 members
               </p>
+              <p className="text-sm text-gray-500 flex items-center gap-1">
+                <Paperclip size={14} /> {circle.wyra_circles[0]?.count || 0}{" "}
+                {circle.wyra_circles[0]?.count > 1 ? "wyras":"wyra" }
+              </p>
+              
             </div>
             <button
               onClick={(e) => {
