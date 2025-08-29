@@ -30,6 +30,7 @@ import NotificationsList from "@/components/notifications/notificationList";
 import { NotificationsProvider } from "@/components/notifications/useNotifications";
 import { isNotificationAllowed } from "@/utils/helper";
 import { checkUserOnlineStatus, updateLastSeen } from "@/actions/common";
+import '@ant-design/v5-patch-for-react-19';
 
 export default function Home() {
   const supabase = createClient();

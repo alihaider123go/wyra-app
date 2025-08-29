@@ -45,12 +45,13 @@ import ShareButton from "./ShareBtn";
 import FavouriteButton from "./FavouriteBtn";
 import UserOnlineStatus from "../ui/userOnlineStatus";
 import EditWyra from "./EditWyra";
+import CirclesWyras from "./CirclesWyra";
 
 export default function WyraTimeline({ searchTerm, postId }: any) {
   const [wyraList, setWyraList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateWyraModal, setShowCreateWyraModal] = useState(false);
-  const [showEditWyraModal, setShowEditWyraModal] = useState({isShow:false,id:""});
+  const [showEditWyraModal, setShowEditWyraModal] = useState({ isShow: false, id: "" });
   const [user, setUser] = useState<User | null>(null);
   const [wyrasWithCircles, setWyrasWithCircles] = useState<any[]>([]);
   const [selectedWyraOption, setSelectedWyraOption] = useState<any>();
@@ -99,7 +100,7 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
 
     if (error || !user) {
       console.error("User not logged in");
-      
+
       setTimeout(() => setLoading(false), 1000);
       return;
     } else {
@@ -136,7 +137,7 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
     }
 
     try {
-      const result = await getWyrasWithCircles(user.id,debouncedSearch);
+      const result = await getWyrasWithCircles(user.id, debouncedSearch);
       setWyrasWithCircles(result || []);
     } catch (err) {
       console.error("Failed to fetch wyras", err);
@@ -338,9 +339,9 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
     }
   }
 
-  const handleDeleteWyra = async (id:any) => {
+  const handleDeleteWyra = async (id: any) => {
     const isDelete = await deleteWyra(id);
-    if(isDelete.success){
+    if (isDelete.success) {
       fetchWyras()
       fetchCircleWyras()
     }
@@ -351,10 +352,10 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
   //   return <div className="text-center py-10">No Wyras yet.</div>;
 
   const tabs = [
-    { id: "recent", icon: Clock, label: "Recent",isImage:false },
-    { id: "trending", icon: TrendingUp, label: "Trending",isImage:false },
-    { id: "circles", icon: "/team.png", label: "Circles" , isImage:true },
-    { id: "following", icon: Sparkles, label: "Following",isImage:false },
+    { id: "recent", icon: Clock, label: "Recent", isImage: false },
+    { id: "trending", icon: TrendingUp, label: "Trending", isImage: false },
+    { id: "circles", icon: "/team.png", label: "Circles", isImage: true },
+    { id: "following", icon: Sparkles, label: "Following", isImage: false },
   ];
 
   return (
@@ -373,7 +374,7 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
       </Tooltip>
 
       <div className="max-w-3xl flex items-center justify-around gap-4 py-2 px-2">
-        {tabs.map((tab:any) => {
+        {tabs.map((tab: any) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
 
@@ -386,18 +387,23 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                 : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
                 }`}
             >
-            {
-              tab.isImage 
-              ?
-              <img src={tab.icon} 
-                className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
-              />
-              :
-             <Icon
-                className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
-              />
-            }
-             
+              {
+                tab.isImage
+                  ?
+                  isActive ?
+                  <img src={"/team_active.png"}
+                    className={`w-10 h-10 animate-bounce-slow`}
+                  />
+                  :
+                  <img src={tab.icon}
+                    className={`w-10 h-10`}
+                  />
+                  :
+                  <Icon
+                    className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
+                  />
+              }
+
               <span
                 className={`text-xs mt-1 font-semibold ${isActive ? "text-white" : ""
                   }`}
@@ -447,6 +453,9 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                                 <small className="text-gray-500">
                                   {relativeTime(wyra.created_at)}
                                 </small>
+                                <small className="text-gray-500 ml-2">
+                                  edited
+                                </small>
                               </span>
                             </h2>
                             <p className="text-gray-600 text-sm">
@@ -475,11 +484,11 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                             >
                               {user?.id === wyra.created_by ? (
                                 <>
-                                  <DropdownMenuItem onClick={()=>{setShowEditWyraModal({isShow:true,id:wyra.id})}} className="cursor-pointer hover:bg-gray-50">
+                                  <DropdownMenuItem onClick={() => { setShowEditWyraModal({ isShow: true, id: wyra.id }) }} className="cursor-pointer hover:bg-gray-50">
                                     <Edit className="w-4 h-4 mr-2" />
                                     Edit Wyra
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={()=>{handleDeleteWyra(wyra.id)}} className="text-red-600 cursor-pointer hover:bg-red-50">
+                                  <DropdownMenuItem onClick={() => { handleDeleteWyra(wyra.id) }} className="text-red-600 cursor-pointer hover:bg-red-50">
                                     <Trash2 className="w-4 h-4 mr-2" />
                                     Delete Wyra
                                   </DropdownMenuItem>
@@ -701,6 +710,15 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                             <small className="text-gray-500">
                               {relativeTime(wyra.created_at)}
                             </small>
+                            {
+                              wyra.is_edit &&
+                             
+                              <small
+                        className={`ml-2 px-1 py-1 rounded text-white font-semibold bg-blue-500`}
+                      >
+                        edited
+                      </small>
+                            }
                           </span>
                         </h2>
                         <p className="text-gray-600 text-sm">
@@ -729,11 +747,11 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
                         >
                           {user?.id === wyra.created_by ? (
                             <>
-                              <DropdownMenuItem onClick={()=>{setShowEditWyraModal({isShow:true,id:wyra.id})}} className="cursor-pointer hover:bg-gray-50">
+                              <DropdownMenuItem onClick={() => { setShowEditWyraModal({ isShow: true, id: wyra.id }) }} className="cursor-pointer hover:bg-gray-50">
                                 <Edit className="w-4 h-4 mr-2" />
                                 Edit Wyra
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={()=>{handleDeleteWyra(wyra.id)}} className="text-red-600 cursor-pointer hover:bg-red-50">
+                              <DropdownMenuItem onClick={() => { handleDeleteWyra(wyra.id) }} className="text-red-600 cursor-pointer hover:bg-red-50">
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete Wyra
                               </DropdownMenuItem>
@@ -916,263 +934,274 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
 
         </div>
       ) : activeTab === "circles" ? (
-        <div className="max-w-3xl space-y-6">
-          {
-            wyrasWithCircles.map((wyra: any) => (
-              <Card
-                key={wyra.id}
-                className={`shadow-md hover:shadow-2xl border-0 bg-white/80 backdrop-blur-lg transition-all pt-4 animate-slide-in-right`}              >
-                <CardContent>
-                  <div className="flex items-center gap-3 w-full mb-3">
-                    <h2 className="text-lg font-bold text-black">Circles:</h2>
-                    {wyra?.circles?.map((circle: any, index: any) => (
-                      <div
-                        key={circle.id || index}
-                        className={`px-4 py-2 rounded-full text-white font-semibold ${index % 3 === 0
-                          ? 'bg-blue-500'
-                          : index % 3 === 1
-                            ? 'bg-green-500'
-                            : 'bg-purple-500'
-                          }`}
-                      >
-                        {circle.name}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex md:gap-2">
-                    {/* user info */}
-                    <div className="flex items-center gap-3 w-full">
-                      <div className="w-12 h-12 relative rounded-full bg-gray-200">
-                        <img
-                          src={wyra.creator.avatar}
-                          alt="avatar preview"
-                          className="w-full h-full shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover"
-                        />
-                        <UserOnlineStatus userId={wyra.creator?.id} />
-
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-bold text-black">
-                          {wyra.creator.firstname} {wyra.creator.lastname}
-                          <span>
-                            <span className="font-bold text-md mt-6">
-                              {" "}
-                              Asked,{" "}
-                            </span>
-                            <small className="text-gray-500">
-                              {relativeTime(wyra.created_at)}
-                            </small>
-                          </span>
-                        </h2>
-                        <p className="text-gray-600 text-sm">
-                          @{wyra.creator.username}
-                        </p>
-                      </div>
-                      {/* <span className="font-bold text-lg mt-6">Asks,</span> */}
-                    </div>
-
-                    {/* dropdown menu */}
-                    <div className="flex justify-end">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="hover:bg-gray-100 rounded-full"
-                          >
-                            <MoreHorizontal className="w-5 h-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent
-                          align="end"
-                          className="w-48 bg-white mt-1"
-                        >
-                          {user?.id === wyra.created_by ? (
-                            <>
-                              <DropdownMenuItem onClick={()=>{setShowEditWyraModal({isShow:true,id:wyra.id})}} className="cursor-pointer hover:bg-gray-50">
-                                <Edit className="w-4 h-4 mr-2" />
-                                Edit Wyra
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={()=>{handleDeleteWyra(wyra.id)}} className="text-red-600 cursor-pointer hover:bg-red-50">
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Delete Wyra
-                              </DropdownMenuItem>
-                            </>
-                          ) : (
-                            <>
-                              <DropdownMenuItem className="cursor-pointer hover:bg-gray-50">
-                                <FollowButton
-                                  isFollowing={
-                                    followStatus[wyra.created_by] ?? false
-                                  }
-                                  loading={
-                                    loadingStatus[wyra.created_by] ?? false
-                                  }
-                                  toggleFollow={() =>
-                                    toggleFollow(wyra.created_by)
-                                  }
-                                />
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50" onClick={() => { blockWyra(wyra?.created_by) }}>
-                                <CircleOff className="w-4 h-4 mr-2" />
-
-                                Block User
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50">
-                                <Flag className="w-4 h-4 mr-2" />
-                                Report Wyra
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <p className="my-3 font-bold text-xl text-center">
-                      Would you rather:
-                    </p>
-                  </div>
-                  <div className="flex flex-col md:flex-row items-center justify-center md:gap-4 gap-2">
-                    {wyra.wyra_option
-                      .sort((a: any, b: any) => a.position - b.position)
-                      .map((opt: any, index: number) => {
-                        const isSelected =  selectedOptions[wyra.id] === opt.id === opt.id;
-                        const isDisabled =
-                          selectedOptions[wyra.id] != null &&
-                          selectedOptions[wyra.id] !== opt.id;
-
-                        return (
-                          <React.Fragment key={opt.id}>
-                            {index === 1 && (
-                              <span className="w-12 h-12 px-4 text-white rounded-full flex justify-center items-center text-sm font-semibold  bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900">
-                                OR
-                              </span>
-                            )}
-
-                            <div
-                              className={`
-            my-3 relative overflow-hidden border shadow p-4 rounded-lg cursor-pointer w-full md:w-1/2 transition-all duration-300 transform hover:scale-[1.02]
-            ${isSelected
-                                  ? "bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-600 hover:to-blue-700"
-                                  : "hover:bg-gray-100"
-                                }
-            ${isDisabled
-                                  ? "cursor-not-allowed pointer-events-none opacity-70"
-                                  : ""
-                                }
-          `}
-                              // onClick={() => {
-                              //   if (!selectedOptionId) {
-                              //     setSelectedOptionId(opt.id);
-                              //   }
-                              // }}
-                              onClick={() => {
-                                // setSelectedOptions((prev: any) => ({
-                                //   ...prev,
-                                //   [wyra.id]:
-                                //     prev[wyra.id] === opt.id ? null : opt.id, // toggle selection per wyra
-                                // }));
-
-                                // setIsShowWhyReasonContainer((prev) => ({
-                                //   ...prev,
-                                //   [wyra.id]: prev[wyra.id] ? false : true, // toggle open/close per wyra
-                                // }));
-                                // setWhyText("")
-
-                              }}
-                            >
-                              {isSelected && (
-                                <small className="absolute top-0 right-0 rounded-l-lg bg-white px-1">
-                                  Selected
-                                </small>
-                              )}
-
-                              <p
-                                className={`text-sm font-medium mb-1 ${isSelected ? "text-white" : "text-gray-500"
-                                  }`}
-                              >
-                                Option {index + 1}:
-                              </p>
-                              <p
-                                className={`font-bold text-lg mb-1 ${isSelected ? "text-white" : "text-gray-800"
-                                  }`}
-                              >
-                                {opt.option_text}
-                              </p>
-
-                              <div className="flex flex-wrap gap-3">
-                                {opt.wyra_media.map((media: any) => (
-                                  <div key={media.id} className="w-32">
-                                    {media.media_type === "image" ? (
-                                      <img
-                                        src={media.media_url}
-                                        alt="Option media"
-                                        className="rounded-md object-cover max-h-28 w-full"
-                                      />
-                                    ) : (
-                                      <video
-                                        src={media.media_url}
-                                        controls
-                                        className="rounded-md max-h-28 w-full"
-                                      />
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </React.Fragment>
-                        );
-                      })}
-                  </div>
-                  {isShowWhyReasonContainer[wyra.id] && (
-                    <div className="my-3 p-2 border shadow rounded-md ">
-                      <p className={`font-bold text-lg mb-1`}>Why? <span className="italic font-normal text-md">(Optional):</span></p>
-                      <div className="flex items-end">
-                        {/* <Input
-                          id={`why-${wyra.id}`}
-                          name={`why-${wyra.id}`}
-                          type={"text"}
-                          value={whyText}
-                          onChange={(e) => { setWhyText(e.target.value) }}
-                          placeholder="Enter"
-                          className="h-12 mr-2 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
-                          disabled={isWhyReasonSet[wyra.id] === true}
-                        /> */}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsWhyReasonSet((prev) => ({
-                              ...prev,
-                              [wyra.id]: true,
-                            }));
-                          }}
-                          className="h-8 px-2 rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition"
-                        >
-                          Submit
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  <hr />
-                  <div className="flex justify-between">
-                    <div className="flex items-center gap-2 mt-5">
-                      <LikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} />
-                      <DislikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} />
-                      <CommentButton wyraId={wyra.id} userId={user?.id} />
-                      <FavouriteButton wyraId={wyra.id} userId={user?.id} />
-                    </div>
-                    <div className="flex items-center gap-2 mt-5">
-                      <ShareButton wyraId={wyra.id} userId={user?.id} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          }
-
+        <div>
+          <CirclesWyras 
+            wyras={wyrasWithCircles}
+            showEditWyraModal={showEditWyraModal}
+            setShowEditWyraModal={setShowEditWyraModal}
+            handleDeleteWyra={handleDeleteWyra}
+            toggleFollow={toggleFollow}
+            blockWyra={blockWyra}
+            fetchWyras={fetchWyras}
+          />
         </div>
+        // <div className="max-w-3xl space-y-6">
+        //   {
+        //     wyrasWithCircles.map((wyra: any) => (
+        //       <Card
+        //         key={wyra.id}
+        //         className={`shadow-md hover:shadow-2xl border-0 bg-white/80 backdrop-blur-lg transition-all pt-4 animate-slide-in-right`}              >
+        //         <CardContent>
+        //           <div className="flex items-center gap-3 w-full mb-3">
+        //             <h2 className="text-lg font-bold text-black">Circles:</h2>
+        //             {wyra?.circles?.map((circle: any, index: any) => (
+        //               <div
+        //                 key={circle.id || index}
+        //                 className={`px-4 py-2 rounded-full text-white font-semibold ${index % 3 === 0
+        //                   ? 'bg-blue-500'
+        //                   : index % 3 === 1
+        //                     ? 'bg-green-500'
+        //                     : 'bg-purple-500'
+        //                   }`}
+        //               >
+        //                 {circle.name}
+        //               </div>
+        //             ))}
+        //           </div>
+        //           <div className="flex md:gap-2">
+        //             {/* user info */}
+        //             <div className="flex items-center gap-3 w-full">
+        //               <div className="w-12 h-12 relative rounded-full bg-gray-200">
+        //                 <img
+        //                   src={wyra.creator.avatar}
+        //                   alt="avatar preview"
+        //                   className="w-full h-full shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover"
+        //                 />
+        //                 <UserOnlineStatus userId={wyra.creator?.id} />
+
+        //               </div>
+        //               <div>
+        //                 <h2 className="text-lg font-bold text-black">
+        //                   {wyra.creator.firstname} {wyra.creator.lastname}
+        //                   <span>
+        //                     <span className="font-bold text-md mt-6">
+        //                       {" "}
+        //                       Asked,{" "}
+        //                     </span>
+        //                     <small className="text-gray-500">
+        //                       {relativeTime(wyra.created_at)}
+        //                     </small>
+        //                   </span>
+        //                 </h2>
+        //                 <p className="text-gray-600 text-sm">
+        //                   @{wyra.creator.username}
+        //                 </p>
+        //               </div>
+        //               {/* <span className="font-bold text-lg mt-6">Asks,</span> */}
+        //             </div>
+
+        //             {/* dropdown menu */}
+        //             <div className="flex justify-end">
+        //               <DropdownMenu>
+        //                 <DropdownMenuTrigger asChild>
+        //                   <Button
+        //                     variant="ghost"
+        //                     size="sm"
+        //                     className="hover:bg-gray-100 rounded-full"
+        //                   >
+        //                     <MoreHorizontal className="w-5 h-5" />
+        //                   </Button>
+        //                 </DropdownMenuTrigger>
+
+        //                 <DropdownMenuContent
+        //                   align="end"
+        //                   className="w-48 bg-white mt-1"
+        //                 >
+        //                   {user?.id === wyra.created_by ? (
+        //                     <>
+        //                       <DropdownMenuItem onClick={() => { setShowEditWyraModal({ isShow: true, id: wyra.id }) }} className="cursor-pointer hover:bg-gray-50">
+        //                         <Edit className="w-4 h-4 mr-2" />
+        //                         Edit Wyra
+        //                       </DropdownMenuItem>
+        //                       <DropdownMenuItem onClick={() => { handleDeleteWyra(wyra.id) }} className="text-red-600 cursor-pointer hover:bg-red-50">
+        //                         <Trash2 className="w-4 h-4 mr-2" />
+        //                         Delete Wyra
+        //                       </DropdownMenuItem>
+        //                     </>
+        //                   ) : (
+        //                     <>
+        //                       <DropdownMenuItem className="cursor-pointer hover:bg-gray-50">
+        //                         <FollowButton
+        //                           isFollowing={
+        //                             followStatus[wyra.created_by] ?? false
+        //                           }
+        //                           loading={
+        //                             loadingStatus[wyra.created_by] ?? false
+        //                           }
+        //                           toggleFollow={() =>
+        //                             toggleFollow(wyra.created_by)
+        //                           }
+        //                         />
+        //                       </DropdownMenuItem>
+        //                       <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50" onClick={() => { blockWyra(wyra?.created_by) }}>
+        //                         <CircleOff className="w-4 h-4 mr-2" />
+
+        //                         Block User
+        //                       </DropdownMenuItem>
+        //                       <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50">
+        //                         <Flag className="w-4 h-4 mr-2" />
+        //                         Report Wyra
+        //                       </DropdownMenuItem>
+        //                     </>
+        //                   )}
+        //                 </DropdownMenuContent>
+        //               </DropdownMenu>
+        //             </div>
+        //           </div>
+        //           <div className="mt-3">
+        //             <p className="my-3 font-bold text-xl text-center">
+        //               Would you rather:
+        //             </p>
+        //           </div>
+        //           <div className="flex flex-col md:flex-row items-center justify-center md:gap-4 gap-2">
+        //             {wyra.wyra_option
+        //               .sort((a: any, b: any) => a.position - b.position)
+        //               .map((opt: any, index: number) => {
+        //                 const isSelected = selectedOptions[wyra.id] === opt.id === opt.id;
+        //                 const isDisabled =
+        //                   selectedOptions[wyra.id] != null &&
+        //                   selectedOptions[wyra.id] !== opt.id;
+
+        //                 return (
+        //                   <React.Fragment key={opt.id}>
+        //                     {index === 1 && (
+        //                       <span className="w-12 h-12 px-4 text-white rounded-full flex justify-center items-center text-sm font-semibold  bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900">
+        //                         OR
+        //                       </span>
+        //                     )}
+
+        //                     <div
+        //                       className={`
+        //     my-3 relative overflow-hidden border shadow p-4 rounded-lg cursor-pointer w-full md:w-1/2 transition-all duration-300 transform hover:scale-[1.02]
+        //     ${isSelected
+        //                           ? "bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-600 hover:to-blue-700"
+        //                           : "hover:bg-gray-100"
+        //                         }
+        //     ${isDisabled
+        //                           ? "cursor-not-allowed pointer-events-none opacity-70"
+        //                           : ""
+        //                         }
+        //   `}
+        //                       // onClick={() => {
+        //                       //   if (!selectedOptionId) {
+        //                       //     setSelectedOptionId(opt.id);
+        //                       //   }
+        //                       // }}
+        //                       onClick={() => {
+        //                         // setSelectedOptions((prev: any) => ({
+        //                         //   ...prev,
+        //                         //   [wyra.id]:
+        //                         //     prev[wyra.id] === opt.id ? null : opt.id, // toggle selection per wyra
+        //                         // }));
+
+        //                         // setIsShowWhyReasonContainer((prev) => ({
+        //                         //   ...prev,
+        //                         //   [wyra.id]: prev[wyra.id] ? false : true, // toggle open/close per wyra
+        //                         // }));
+        //                         // setWhyText("")
+
+        //                       }}
+        //                     >
+        //                       {isSelected && (
+        //                         <small className="absolute top-0 right-0 rounded-l-lg bg-white px-1">
+        //                           Selected
+        //                         </small>
+        //                       )}
+
+        //                       <p
+        //                         className={`text-sm font-medium mb-1 ${isSelected ? "text-white" : "text-gray-500"
+        //                           }`}
+        //                       >
+        //                         Option {index + 1}:
+        //                       </p>
+        //                       <p
+        //                         className={`font-bold text-lg mb-1 ${isSelected ? "text-white" : "text-gray-800"
+        //                           }`}
+        //                       >
+        //                         {opt.option_text}
+        //                       </p>
+
+        //                       <div className="flex flex-wrap gap-3">
+        //                         {opt.wyra_media.map((media: any) => (
+        //                           <div key={media.id} className="w-32">
+        //                             {media.media_type === "image" ? (
+        //                               <img
+        //                                 src={media.media_url}
+        //                                 alt="Option media"
+        //                                 className="rounded-md object-cover max-h-28 w-full"
+        //                               />
+        //                             ) : (
+        //                               <video
+        //                                 src={media.media_url}
+        //                                 controls
+        //                                 className="rounded-md max-h-28 w-full"
+        //                               />
+        //                             )}
+        //                           </div>
+        //                         ))}
+        //                       </div>
+        //                     </div>
+        //                   </React.Fragment>
+        //                 );
+        //               })}
+        //           </div>
+        //           {isShowWhyReasonContainer[wyra.id] && (
+        //             <div className="my-3 p-2 border shadow rounded-md ">
+        //               <p className={`font-bold text-lg mb-1`}>Why? <span className="italic font-normal text-md">(Optional):</span></p>
+        //               <div className="flex items-end">
+        //                 {/* <Input
+        //                   id={`why-${wyra.id}`}
+        //                   name={`why-${wyra.id}`}
+        //                   type={"text"}
+        //                   value={whyText}
+        //                   onChange={(e) => { setWhyText(e.target.value) }}
+        //                   placeholder="Enter"
+        //                   className="h-12 mr-2 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+        //                   disabled={isWhyReasonSet[wyra.id] === true}
+        //                 /> */}
+        //                 <button
+        //                   type="button"
+        //                   onClick={() => {
+        //                     setIsWhyReasonSet((prev) => ({
+        //                       ...prev,
+        //                       [wyra.id]: true,
+        //                     }));
+        //                   }}
+        //                   className="h-8 px-2 rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition"
+        //                 >
+        //                   Submit
+        //                 </button>
+        //               </div>
+        //             </div>
+        //           )}
+        //           <hr />
+        //           <div className="flex justify-between">
+        //             <div className="flex items-center gap-2 mt-5">
+        //               <LikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} />
+        //               <DislikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} />
+        //               <CommentButton wyraId={wyra.id} userId={user?.id} />
+        //               <FavouriteButton wyraId={wyra.id} userId={user?.id} />
+        //             </div>
+        //             <div className="flex items-center gap-2 mt-5">
+        //               <ShareButton wyraId={wyra.id} userId={user?.id} />
+        //             </div>
+        //           </div>
+        //         </CardContent>
+        //       </Card>
+        //     ))
+        //   }
+
+        // </div>
 
 
 
@@ -1207,12 +1236,12 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
           </ModalBody>
         </ModalContent>
       </Modal>
-       <Modal isOpen={showEditWyraModal.isShow} hideCloseButton={true}>
+      <Modal isOpen={showEditWyraModal.isShow} hideCloseButton={true}>
         <ModalContent>
           <ModalHeader className="flex flex-col justify-center items-center gap-1">
             Edit Wyra
             <button
-              onClick={()=>{setShowEditWyraModal({isShow:false,id:""})}}
+              onClick={() => { setShowEditWyraModal({ isShow: false, id: "" }) }}
               className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
               aria-label="Close comment modal"
             >
@@ -1221,7 +1250,7 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
           </ModalHeader>
 
           <ModalBody>
-            <EditWyra wyraId={showEditWyraModal.id} fetchWyras={fetchWyras} setShowEditWyraModal={setShowEditWyraModal}/>
+            <EditWyra wyraId={showEditWyraModal.id} fetchWyras={fetchWyras} setShowEditWyraModal={setShowEditWyraModal} />
           </ModalBody>
         </ModalContent>
       </Modal>

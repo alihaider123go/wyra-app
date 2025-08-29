@@ -192,7 +192,7 @@ export default function AccountPrivacySettings({ userId }: SettingsProps) {
         .upsert(
           {
             user_id: userId,
-            ...dmSettings.reduce((acc:any, key:any) => {
+            ...dmSettings.reduce((acc: any, key: any) => {
               acc[key] = updated[key] ?? false;
               return acc;
             }, {}),
@@ -209,42 +209,57 @@ export default function AccountPrivacySettings({ userId }: SettingsProps) {
   };
   // ✅ Fetch settings on mount
   useEffect(() => {
-    async function fetchAllAccountSettings() {
+    async function fetchOrCreateAccountSettings() {
       try {
-        const { data: settingsData, error }: any = await supabase
+        // Step 1: Try fetching existing data
+        const { data: settingsData, error: fetchError }: any = await supabase
           .from("account_settings")
           .select("*")
           .eq("user_id", userId)
           .limit(1);
 
-        if (error && error.code !== "PGRST116") {
-          console.error("Fetch error:", error);
+        if (fetchError && fetchError.code !== "PGRST116") {
+          console.error("Fetch error:", fetchError);
           return;
         }
 
-        if (settingsData && settingsData.length > 0) {
-          const row = settingsData[0]; // ✅ extract first row
+        let row = settingsData?.[0];
 
-          const initialToggles: { [key: string]: boolean } = {};
-          settings.forEach(({ id }) => {
-            initialToggles[id] = row[id] ?? false; // ✅ now correctly maps
-          });
+        // Step 2: If no row, create one with only dark_mode defaulted
+        if (!row) {
+          const { data: upsertedData, error: upsertError } = await supabase
+            .from("account_settings")
+            .upsert(
+              {
+                user_id: userId,
+                dark_mode: false, // only set dark_mode initially
+              },
+              { onConflict: "user_id" }
+            )
+            .select()
+            .single();
 
-          setToggles(initialToggles);
-        } else {
-          // ✅ No row exists → default to false
-          const defaultToggles: { [key: string]: boolean } = {};
-          settings.forEach(({ id }) => {
-            defaultToggles[id] = false;
-          });
-          setToggles(defaultToggles);
+          if (upsertError) {
+            console.error("Upsert error:", upsertError);
+            return;
+          }
+
+          row = upsertedData;
         }
+
+        // Step 3: Map row data to toggle state
+        const initialToggles: { [key: string]: boolean } = {};
+        settings.forEach(({ id }) => {
+          initialToggles[id] = row[id] ?? false;
+        });
+
+        setToggles(initialToggles);
       } catch (err: any) {
-        console.error("Error fetching account settings:", err.message);
+        console.error("Error fetching or creating account settings:", err.message);
       }
     }
 
-    if (userId) fetchAllAccountSettings();
+    if (userId) fetchOrCreateAccountSettings();
   }, [userId]);
 
   return (

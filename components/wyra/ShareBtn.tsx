@@ -27,6 +27,7 @@ P.s there are tons more of these on the Wyra app!
 
 Download here:
 Play Store: https://play.google.com/store/apps/details?id=com.example.app
+
 App Store: https://apps.apple.com/app/id000000000
 `;
 
@@ -36,7 +37,7 @@ App Store: https://apps.apple.com/app/id000000000
         await navigator.share({
           title: "Check this out!",
           text: shareMessage,
-          url: shareUrl, // optional here since included in message
+          // url: shareUrl, // optional here since included in message
         });
       } catch (err) {
         console.log("Sharing canceled", err);

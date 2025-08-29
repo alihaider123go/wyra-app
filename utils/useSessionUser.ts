@@ -35,7 +35,7 @@ export function useSessionUser() {
       profileData = fetchedProfile;
     }
 
-    const isProfileCompleted = !!(profileData?.bio && profileData?.avatar);
+    const isProfileCompleted = !!(profileData?.bio);
     const isVerified = profileData?.is_email_verified;
 
     if (authUser) {

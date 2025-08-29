@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Heart, Sparkles, Zap, Users } from "lucide-react";
 import { getAvatarInitials } from "@/utils/helper";
+import { message } from "antd";
 
 interface ProfileInformationProps {
   userId: string;
@@ -89,7 +90,9 @@ export default function ProfileInformation({
 
         setOriginalUsername(data.username || "");
       } catch (error: any) {
-        setErrorMsg(error.message || "Failed to load profile");
+        // setErrorMsg(error.message || "Failed to load profile");
+        message.error(error.message || "Failed to load profile")
+
       } finally {
         setLoading(false);
       }
@@ -182,7 +185,8 @@ export default function ProfileInformation({
 
       if (error) throw error;
 
-      setSuccessMsg("Profile updated successfully!");
+      // setSuccessMsg("Profile updated successfully!");
+      message.success("Profile updated successfully!")
       refetch();
       setOriginalUsername(profile.username); // reset original
     } catch (error: any) {

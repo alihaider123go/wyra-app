@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FaSmile, FaTrash, FaPlus,FaRegImage } from "react-icons/fa";
+import { FaSmile, FaTrash, FaPlus, FaRegImage } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
@@ -12,11 +12,11 @@ const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
 interface EditWyraProps {
   wyraId: string;
-  fetchWyras:any
-  setShowEditWyraModal:any
+  fetchWyras: any
+  setShowEditWyraModal: any
 }
 
-export default function EditWyra({ wyraId,fetchWyras,setShowEditWyraModal }: EditWyraProps) {
+export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: EditWyraProps) {
   const [optionOne, setOptionOne] = useState("");
   const [optionTwo, setOptionTwo] = useState("");
   const [optionOneId, setOptionOneId] = useState<string | null>(null);
@@ -155,17 +155,32 @@ export default function EditWyra({ wyraId,fetchWyras,setShowEditWyraModal }: Edi
 
     setLoading(true);
 
+    // Update the two options if their IDs exist
     if (optionOneId) {
-      await supabase.from("wyra_option").update({ option_text: optionOne }).eq("id", optionOneId);
+      await supabase
+        .from("wyra_option")
+        .update({ option_text: optionOne })
+        .eq("id", optionOneId);
     }
 
     if (optionTwoId) {
-      await supabase.from("wyra_option").update({ option_text: optionTwo }).eq("id", optionTwoId);
+      await supabase
+        .from("wyra_option")
+        .update({ option_text: optionTwo })
+        .eq("id", optionTwoId);
+    }
+
+    // Update is_edit column in wyra table
+    if (wyraId) {
+      await supabase
+        .from("wyra")
+        .update({ is_edit: true })
+        .eq("id", wyraId);
     }
 
     setLoading(false);
-    fetchWyras()
-    setShowEditWyraModal({isShow:false,id:""})
+    fetchWyras();
+    setShowEditWyraModal({ isShow: false, id: "" });
   };
 
   return (
@@ -199,8 +214,8 @@ export default function EditWyra({ wyraId,fetchWyras,setShowEditWyraModal }: Edi
                     }}
                   />
                   <label className="cursor-pointer">
-                  <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
-                    
+                    <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+
                     <input
                       type="file"
                       className="hidden"

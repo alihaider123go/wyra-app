@@ -174,6 +174,7 @@ export const getUnifiedHomeWyras = async (
       title,
       created_at,
       created_by,
+      is_edit,
       user_profiles (
         id,
         firstname,
@@ -332,6 +333,7 @@ export const getAllWyras = async () => {
         title,
         created_at,
         created_by,
+        is_edit,
         user_profiles (
           id,
           firstname,
@@ -448,6 +450,7 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
         title,
         created_at,
         created_by,
+        is_edit,
         user_profiles (
           id,
           firstname,
@@ -470,18 +473,11 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
             media_url,
             media_type
           )
-        ),
-         wyra_selected_option (
-        id,
-        selected_option_id,
-        why,
-        user_id
-      )
+        )
       )
       `
     )
     .eq("user_id", userId)
-    .eq("wyra_selected_option.user_id", userId);
   if (error) {
     console.error("Favorite Wyras fetch error:", error);
     return [];
@@ -576,6 +572,7 @@ export const getWyrasWithCircles = async (
       title,
       created_at,
       created_by,
+      is_edit,
       user_profiles (
         id,
         firstname,

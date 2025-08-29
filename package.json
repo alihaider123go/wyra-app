@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@headlessui/react": "^2.2.4",
     "@heroui/modal": "^2.2.19",
     "@heroui/system": "^2.4.18",
