@@ -52,9 +52,11 @@ interface Wyra {
 
 interface MyWyrasProps {
   userId: string | undefined;
+  setActiveTab?:any
+  setSelectedUserId?:any
 }
 
-export default function MyWyras({ userId }: MyWyrasProps) {
+export default function MyWyras({ userId ,setActiveTab,setSelectedUserId}: MyWyrasProps) {
   const [wyraList, setWyraList] = useState<Wyra[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -80,6 +82,12 @@ export default function MyWyras({ userId }: MyWyrasProps) {
         account_settings (
           show_real_name,
           multi_color_why_boxes
+        )
+      ),
+      wyra_circles (
+        circle:circles (
+          id,
+          name
         )
       ),
       wyra_option (
@@ -204,12 +212,12 @@ export default function MyWyras({ userId }: MyWyrasProps) {
     return <div className="text-center py-10">No Wyras yet.</div>;
 
   return (
-
     <WyraSection
       wyras={wyraList}
       fetchWyras={fetchWyras}
+      setActiveTab={setActiveTab}
+      setSelectedUserId={setSelectedUserId}
     />
-
   );
 }
 

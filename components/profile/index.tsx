@@ -14,6 +14,8 @@ import AddedCircles from "../circle/AddedCircleList";
 
 interface ProfileProps {
   userId: string | undefined;
+  setActiveTab?:any
+  setSelectedUserId?:any
 }
 
 interface UserProfile {
@@ -26,7 +28,7 @@ interface UserProfile {
   account_settings?:any;
 }
 
-export default function Profile({ userId }: ProfileProps) {
+export default function Profile({ userId,setActiveTab,setSelectedUserId }: ProfileProps) {
   const supabase = createClient();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -35,7 +37,7 @@ export default function Profile({ userId }: ProfileProps) {
   const [followingCount, setFollowingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"myCircles" | "addedCircles">("myCircles")
+  const [activeCircleTab, setActiveCircleTab] = useState<"myCircles" | "addedCircles">("myCircles")
 
   useEffect(() => {
     async function fetchAllProfileData() {
@@ -149,14 +151,14 @@ export default function Profile({ userId }: ProfileProps) {
 
           <div className="flex justify-center gap-4 border-b pb-2">
             <Button
-              variant={activeTab === "myCircles" ? "default" : "ghost"}
-              onClick={() => setActiveTab("myCircles")}
+              variant={activeCircleTab === "myCircles" ? "default" : "ghost"}
+              onClick={() => setActiveCircleTab("myCircles")}
             >
               My Circles
             </Button>
             <Button
-              variant={activeTab === "addedCircles" ? "default" : "ghost"}
-              onClick={() => setActiveTab("addedCircles")}
+              variant={activeCircleTab === "addedCircles" ? "default" : "ghost"}
+              onClick={() => setActiveCircleTab("addedCircles")}
             >
               Added Circles
             </Button>
@@ -164,12 +166,12 @@ export default function Profile({ userId }: ProfileProps) {
         }
 
         <CardContent className="pt-6">
-          {activeTab === "myCircles" && <CircleList userId={userId} />}
+          {activeCircleTab === "myCircles" && <CircleList userId={userId} />}
           {
             profile?.account_settings?.show_circles_on_profile &&
 
 
-            activeTab === "addedCircles" && <AddedCircles userId={userId} />}
+            activeCircleTab === "addedCircles" && <AddedCircles userId={userId} />}
         </CardContent>
       </Card>
 
@@ -189,7 +191,7 @@ export default function Profile({ userId }: ProfileProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <MyWyras userId={userId} />
+          <MyWyras userId={userId} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId}/>
         </CardContent>
       </Card>
 

@@ -52,7 +52,9 @@ export default function WyraSection({
     wyras,
     fetchWyras,
     searchTerm,
-    postId
+    postId,
+    setActiveTab,
+    setSelectedUserId
 }: any) {
     const [loading, setLoading] = useState(true);
     const [showCreateWyraModal, setShowCreateWyraModal] = useState(false);
@@ -64,7 +66,6 @@ export default function WyraSection({
     const router = useRouter();
     const [expandedWyras, setExpandedWyras] = useState<{ [key: string]: boolean }>({});
 
-    const [activeTab, setActiveTab] = useState<string>("recent");
     const [selectedOptions, setSelectedOptions] = useState<{
         [wyraId: number]: number | null;
     }>({});
@@ -299,7 +300,7 @@ export default function WyraSection({
 
     return (
         <>
-            <div className="max-w-3xl space-y-6">
+            <div className="w-full space-y-6">
                 {
                     wyras.map((wyra: any) => (
                         <Card
@@ -310,7 +311,7 @@ export default function WyraSection({
                             <CardContent>
                                 <div className="flex md:gap-2">
                                     {/* user info */}
-                                    <div onClick={() => { router.push(`/user-profile?userId=${wyra.creator?.id}`) }} className="flex items-center cursor-pointer gap-3 w-full">
+                                    <div onClick={() => { setActiveTab("user-profile"), setSelectedUserId(wyra.creator?.id) }} className="flex items-center cursor-pointer gap-3 w-full">
                                         <div className="w-12 h-12 rounded-full bg-gray-200  relative">
                                             <img
                                                 src={wyra.creator.avatar}
@@ -325,7 +326,16 @@ export default function WyraSection({
                                                 <span>
                                                     <span className="font-bold text-md mt-6">
                                                         {" "}
-                                                        Asked,{" "}
+                                                        Asked {wyra?.wyra_circles?.length > 0 && wyra?.wyra_circles[0]?.circle?.name && "in"}{wyra?.wyra_circles?.length > 0 && wyra?.wyra_circles?.map((item: any, index: any) => {
+                                                            return (
+                                                                <span key={index}>
+                                                                    {item?.circle?.name &&
+                                                                        <span className="text-sm italic"> {item?.circle?.name} </span>
+
+                                                                    }
+                                                                </span>
+                                                            )
+                                                        })},{" "}
                                                     </span>
                                                     <small className="text-gray-500">
                                                         {relativeTime(wyra.created_at)}
@@ -514,7 +524,7 @@ export default function WyraSection({
                                                 : wyra.wyra_selected_option.slice(0, 3)
                                             ).map((item: any) => (
                                                 <div className={`my-2 ml-4 ${user?.id === item?.user_profiles?.id && wyra?.settings?.multi_color_why_boxes ? "border rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg p-2" : "border-b"}`} key={item?.id}>
-                                                    <div className="flex items-center">
+                                                    <div onClick={() => { setActiveTab("user-profile"), setSelectedUserId(item?.user_profiles?.id) }} className="flex cursor-pointer items-center">
                                                         <div className="relative w-12 h-12 rounded-full mr-2">
                                                             <img
                                                                 src={item?.user_profiles?.avatar}
@@ -587,8 +597,8 @@ export default function WyraSection({
                                 <hr />
                                 <div className="flex justify-between">
                                     <div className="flex items-center gap-2 mt-5">
-                                        <LikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} count={wyra?.likeCount}/>
-                                        <DislikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} count={wyra?.dislikeCount}/>
+                                        <LikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} count={wyra?.likeCount} />
+                                        <DislikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} count={wyra?.dislikeCount} />
                                         <CommentButton wyraId={wyra.id} userId={user?.id} />
                                         <FavouriteButton wyraId={wyra.id} userId={user?.id} />
                                     </div>

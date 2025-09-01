@@ -49,7 +49,7 @@ import CirclesWyras from "./CirclesWyra";
 import { useRouter } from "next/navigation";
 import WyraSection from "./Wyra";
 
-export default function WyraTimeline({ searchTerm, postId }: any) {
+export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSelectedUserId }: any) {
   const [wyraList, setWyraList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateWyraModal, setShowCreateWyraModal] = useState(false);
@@ -61,7 +61,7 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
   const router = useRouter();
   const [expandedWyras, setExpandedWyras] = useState<{ [key: string]: boolean }>({});
 
-  const [activeTab, setActiveTab] = useState<string>("recent");
+  const [activeFeatureTab, setActiveFeatureTab] = useState<string>("recent");
   const [selectedOptions, setSelectedOptions] = useState<{
     [wyraId: number]: number | null;
   }>({});
@@ -337,13 +337,13 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
 
       <div className="max-w-3xl flex items-center justify-around gap-4 py-2 px-2">
         {tabs.map((tab: any) => {
-          const isActive = activeTab === tab.id;
+          const isActive = activeFeatureTab === tab.id;
           const Icon = tab.icon;
 
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => setActiveFeatureTab(tab.id)}
               className={`flex flex-col items-center justify-center p-3 min-w-0 flex-1 rounded-2xl transition-all duration-300 transform ${isActive
                 ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-110"
                 : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
@@ -377,42 +377,51 @@ export default function WyraTimeline({ searchTerm, postId }: any) {
         })}
       </div>
 
-      {activeTab === "trending" ? (
-        <WyraSection
-          wyras={wyraList.filter((wyra: any) => wyra.likeCount > 20)}
-          fetchWyras={fetchWyras}
-          searchTerm={searchTerm}
-          postId={postId}
-        />
+      <div className="max-w-3xl">
 
-      ) : activeTab === "recent" ? (
-        <WyraSection
-          wyras={wyraList}
-          fetchWyras={fetchWyras}
-          searchTerm={searchTerm}
-          postId={postId}
-        />
-      ) : activeTab === "circles" ? (
-        <div>
-          <CirclesWyras
-            wyras={wyrasWithCircles}
-            fetchWyras={fetchCircleWyras}
+        {activeFeatureTab === "trending" ? (
+          <WyraSection
+            wyras={wyraList.filter((wyra: any) => wyra.likeCount > 20)}
+            fetchWyras={fetchWyras}
             searchTerm={searchTerm}
             postId={postId}
+            setActiveTab={setActiveTab}
+            setSelectedUserId={setSelectedUserId}
           />
-        </div>
-      ) : (
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-2xl font-bold text-gray-800">
-              Following
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Feeds from people you follow will be shown here.</p>
-          </CardContent>
-        </Card>
-      )}
+
+        ) : activeFeatureTab === "recent" ? (
+          <WyraSection
+            wyras={wyraList}
+            fetchWyras={fetchWyras}
+            searchTerm={searchTerm}
+            postId={postId}
+            setActiveTab={setActiveTab}
+            setSelectedUserId={setSelectedUserId}
+          />
+        ) : activeFeatureTab === "circles" ? (
+          <div>
+            <CirclesWyras
+              wyras={wyrasWithCircles}
+              fetchWyras={fetchCircleWyras}
+              searchTerm={searchTerm}
+              postId={postId}
+              setActiveTab={setActiveTab}
+              setSelectedUserId={setSelectedUserId}
+            />
+          </div>
+        ) : (
+          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-2xl font-bold text-gray-800">
+                Following
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Feeds from people you follow will be shown here.</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
       <Modal isOpen={showCreateWyraModal} hideCloseButton={true}>
         <ModalContent>
           <ModalHeader className="flex flex-col justify-center items-center gap-1">

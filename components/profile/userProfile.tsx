@@ -14,7 +14,7 @@ import AddedCircles from "../circle/AddedCircleList";
 import { User } from "@supabase/supabase-js";
 
 interface ProfileProps {
-    userId: string | undefined;
+    userId: any;
 }
 
 interface UserProfile {
@@ -208,7 +208,7 @@ export default function UserProfile({ userId }: ProfileProps) {
                                 </>
                                 :
                                 <span>
-                                    {profile.firstname + " " + profile.lastname}'s Wyras
+                                    {profile.firstname + " " + profile.lastname}&apos;s Wyras
                                 </span>
                         }
                     </CardTitle>

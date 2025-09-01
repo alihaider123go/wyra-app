@@ -45,7 +45,7 @@ import UserOnlineStatus from "../ui/userOnlineStatus";
 import { useRouter } from "next/navigation";
 import WyraSection from "./Wyra";
 
-export default function FavoritesWyra({ searchTerm }: any) {
+export default function FavoritesWyra({ searchTerm,setActiveTab,setSelectedUserId }: any) {
   const [wyraList, setWyraList] = useState<Wyra[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -183,6 +183,8 @@ export default function FavoritesWyra({ searchTerm }: any) {
         wyras={wyraList}
         fetchWyras={fetchWyras}
         searchTerm={searchTerm}
+        setActiveTab={setActiveTab}
+        setSelectedUserId={setSelectedUserId}
       />
     </>
   );

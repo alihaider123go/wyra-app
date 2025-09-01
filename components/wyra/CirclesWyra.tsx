@@ -8,7 +8,9 @@ export default function CirclesWyras({
     wyras,
     fetchWyras,
     searchTerm,
-    postId
+    postId,
+    setActiveTab,
+setSelectedUserId
 }: any) {
     const [selectedCircleId, setSelectedCircleId] = useState<string | null>(null);
 
@@ -64,12 +66,16 @@ export default function CirclesWyras({
                 </div>
             )}
 
+            <div className="max-w-3xl">
             <WyraSection 
                       wyras={wyrasByCircle[selectedCircleId!]}
                       fetchWyras={fetchWyras}
                       searchTerm={searchTerm}
                       postId={postId}
+                      setActiveTab={setActiveTab}
+                      setSelectedUserId={setSelectedUserId}
             />
+            </div>
         </>
     );
 }

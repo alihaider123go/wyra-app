@@ -31,6 +31,7 @@ import { NotificationsProvider } from "@/components/notifications/useNotificatio
 import { isNotificationAllowed } from "@/utils/helper";
 import { checkUserOnlineStatus, updateLastSeen } from "@/actions/common";
 import '@ant-design/v5-patch-for-react-19';
+import UserProfile from "@/components/profile/userProfile";
 
 export default function Home() {
   const supabase = createClient();
@@ -48,6 +49,7 @@ export default function Home() {
 
   const [activeTab, setActiveTab] = useState("home");
   const [postId, setPostId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState(null);
   // useEffect(() => {
   //   const fetchUser = async () => {
   //     const {
@@ -85,13 +87,15 @@ export default function Home() {
   const renderCurrentTab = () => {
     switch (activeTab) {
       case "home":
-        return <WyraTimeLine searchTerm={searchTerm} setPostId={setPostId} postId={postId} />;
+        return <WyraTimeLine searchTerm={searchTerm} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} setPostId={setPostId} postId={postId} />;
       case "create":
         return <CreateWyra onTabChange={handleTabClick} />;
       case "chat":
         return <Chat userId={sessionUser?.id} />;
       case "profile":
-        return <Profile userId={sessionUser?.id} />;
+        return <Profile userId={sessionUser?.id} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId}/>;
+      case "user-profile":
+        return <UserProfile userId={selectedUserId} />;  
       case "profile-settings":
         return <Settings user={sessionUser} isVerified={isVerified} refetch={refetch} />;
       case "account-settings":
@@ -121,7 +125,7 @@ export default function Home() {
       case "csae":
         return <CSAEPolicy />;
       case "favorites":
-        return <FavoritesWyra searchTerm={searchTerm} />;
+        return <FavoritesWyra searchTerm={searchTerm} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId}/>;
       default:
         return null;
     }
