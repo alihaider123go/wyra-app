@@ -4,13 +4,14 @@ import React from "react";
 import { formatNumber } from "@/utils/helper"; // Assuming you have a utility function for formatting numbers
 import { Button } from "@/components/ui/button"
 
-import { Trash2,
-UserCog,
-Settings,
-ExternalLink,
-Settings2
+import {
+  Trash2,
+  UserCog,
+  Settings,
+  ExternalLink,
+  Settings2
 
- } from "lucide-react"
+} from "lucide-react"
 
 interface UserProfileHeaderProps {
   user: {
@@ -26,12 +27,14 @@ interface UserProfileHeaderProps {
   };
   onEditProfile: () => void;
   onShareProfile: () => void;
+  showEditButton?: any
 }
 
 export default function UserProfileHeader({
   user,
   onEditProfile,
   onShareProfile,
+  showEditButton,
 }: UserProfileHeaderProps) {
   return (
     <>
@@ -40,7 +43,7 @@ export default function UserProfileHeader({
         {/* Avatar */}
         <div className="md:w-32 md:h-32 w-20 h-20 rounded-full bg-gray-200 overflow-hidden">
           {user.avatar ? (
-            <img src={user.avatar} alt="Avatar" className="w-full h-full shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover"/>
+            <img src={user.avatar} alt="Avatar" className="w-full h-full shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
               No Avatar
@@ -68,22 +71,25 @@ export default function UserProfileHeader({
               <div className="text-gray-500">Following</div>
             </div>
           </div>
-        <div className="flex flex-row gap-2 mt-2 sm:mt-2">
-          <Button
-            onClick={onEditProfile}
-            className="md:w-[40%] w-[60%] px-4 py-2 text-md font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded hover:bg-blue-50"
-          >
-            <Settings className="w-12 h-12 mr-2" />
-            Edit Profile
-          </Button>
-          <Button
-            onClick={onShareProfile}
-            className="px-4 py-2 text-md text-black font-medium bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-400 hover:to-gray-500 border-gray-700 rounded hover:bg-blue-50"
-          >
-            <ExternalLink className="w-12 h-12"/>
-            {/* Share Profile */}
-          </Button>
-        </div>
+          <div className="flex flex-row gap-2 mt-2 sm:mt-2">
+            {
+              showEditButton &&
+              <Button
+                onClick={onEditProfile}
+                className="md:w-[40%] w-[60%] px-4 py-2 text-md font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded hover:bg-blue-50"
+              >
+                <Settings className="w-12 h-12 mr-2" />
+                Edit Profile
+              </Button>
+            }
+            <Button
+              onClick={onShareProfile}
+              className="px-4 py-2 text-md text-black font-medium bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-400 hover:to-gray-500 border-gray-700 rounded hover:bg-blue-50"
+            >
+              <ExternalLink className="w-12 h-12" />
+              {/* Share Profile */}
+            </Button>
+          </div>
 
         </div>
 

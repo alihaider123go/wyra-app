@@ -185,29 +185,42 @@ export const getUnifiedHomeWyras = async (
           show_real_name,
           animate_floating_effects,
           show_edited_tag,
-          show_posts_public_feed
+          show_posts_public_feed,
+          multi_color_why_boxes
         )
       ),
-      wyra_option (
-        id,
-        option_text,
-        position,
-        wyra_media (
+       wyra_option (
           id,
-          media_url,
-          media_type
+          option_text,
+          position,
+          wyra_media (
+            id,
+            media_url,
+            media_type
+          )
+        ),
+        wyra_selected_option:wyra_selected_option!left (
+          id,
+          selected_option_id,
+          why,
+          user_id,
+          wyra_option (
+            id,
+            option_text,
+            position
+          ),
+          user_profiles (
+            id,
+            firstname,
+            lastname,
+            username,
+            avatar
+          )
         )
-      ),
-      wyra_selected_option (
-        id,
-        selected_option_id,
-        why,
-        user_id
-      )
     `
     )
-    .order("created_at", { ascending: false })
-    .eq("wyra_selected_option.user_id", userId);
+    .order("created_at", { ascending: false });
+  // .eq("wyra_selected_option.user_id", userId);
   // Uncomment if you want to filter by authors/circles
   // if (orFilters.length > 0) {
   //   query = query.or(orFilters.join(","));
@@ -461,10 +474,11 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
           show_real_name,
           animate_floating_effects,
           show_edited_tag,
-          show_posts_public_feed
+          show_posts_public_feed,
+          multi_color_why_boxes
         )
         ),
-        wyra_option (
+         wyra_option (
           id,
           option_text,
           position,
@@ -473,11 +487,29 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
             media_url,
             media_type
           )
+        ),
+        wyra_selected_option:wyra_selected_option!left (
+          id,
+          selected_option_id,
+          why,
+          user_id,
+          wyra_option (
+            id,
+            option_text,
+            position
+          ),
+          user_profiles (
+            id,
+            firstname,
+            lastname,
+            username,
+            avatar
+          )
         )
       )
       `
     )
-    .eq("user_id", userId)
+    .eq("user_id", userId);
   if (error) {
     console.error("Favorite Wyras fetch error:", error);
     return [];
@@ -583,19 +615,37 @@ export const getWyrasWithCircles = async (
           show_real_name,
           animate_floating_effects,
           show_edited_tag,
-          show_posts_public_feed
+          show_posts_public_feed,
+          multi_color_why_boxes
         )
       ),
       wyra_option (
-        id,
-        option_text,
-        position,
-        wyra_media (
           id,
-          media_url,
-          media_type
-        )
-      ),
+          option_text,
+          position,
+          wyra_media (
+            id,
+            media_url,
+            media_type
+          )
+        ),
+        wyra_selected_option:wyra_selected_option!left (
+          id,
+          selected_option_id,
+          why,
+          user_id,
+          wyra_option (
+            id,
+            option_text
+          ),
+          user_profiles (
+            id,
+            firstname,
+            lastname,
+            username,
+            avatar
+          )
+        ),
       wyra_circles (
         circle:circles (
           id,

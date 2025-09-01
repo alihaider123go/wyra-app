@@ -9,10 +9,11 @@ import { isNotificationAllowed } from "@/utils/helper";
 interface LikeButtonProps {
   wyraId: string;
   userId: string | undefined;
-  isFloatAllow?:any
+  isFloatAllow?: any
+  count?: any
 }
 
-const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId,isFloatAllow }) => {
+const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId, isFloatAllow, count }) => {
   const [liked, setLiked] = useState(false);
   const [showAgree, setShowAgree] = useState(false);
   const supabase = createClient();
@@ -119,8 +120,10 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId,isFloatAllow }) 
         ${liked ? "bg-green-600 text-white" : "bg-gray-200 text-gray-800"}`}
       >
         <ThumbsUp className="w-4 h-4 mr-1" />
-        <span className="md:block hidden">Like</span>
-      </button>
+        <span>{count}</span>
+        <span className="hidden md:inline ml-1">
+          {count > 0 ? count > 1 ? "Likes" : "Like" : "Like"}
+        </span>      </button>
 
       {isFloatAllow && showAgree && (
         <span className="absolute left-1/2 -translate-x-1/2 -top-6 animate-float text-green-600 font-bold">

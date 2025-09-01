@@ -9,10 +9,11 @@ import { isNotificationAllowed } from "@/utils/helper";
 interface DislikeButtonProps {
   wyraId: string;
   userId: string | undefined;
-  isFloatAllow?:any
+  isFloatAllow?: any
+  count?: any
 }
 
-const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId,isFloatAllow }) => {
+const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAllow, count }) => {
   const [disliked, setDisliked] = useState(false);
   const [showDisagree, setShowDisagree] = useState(false); // ✅ for floating text
   const supabase = createClient();
@@ -110,8 +111,10 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId,isFloatAll
         ${disliked ? "bg-red-600 text-white" : "bg-gray-200 text-gray-800"}`}
       >
         <ThumbsDown className="w-4 h-4 mr-1" />
-        <span className="md:block hidden">Dislike</span>
-      </button>
+        <span>{count}</span>
+        <span className="hidden md:inline ml-1">
+                    {count > 0 ? count > 1 ? "Dislikes" : "Dislike" : "Dislike"}
+        </span>      </button>
 
       {/* ✅ Floating "Disagree" Text */}
       {isFloatAllow && showDisagree && (
