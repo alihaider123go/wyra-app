@@ -180,7 +180,6 @@ export const getUnifiedHomeWyras = async (
         firstname,
         lastname,
         username,
-        avatar,
         account_settings (
           show_real_name,
           animate_floating_effects,
@@ -219,8 +218,12 @@ export const getUnifiedHomeWyras = async (
             id,
             firstname,
             lastname,
-            username,
-            avatar
+            username
+          ),
+          wyra_selected_option_reaction:wyra_selected_option_reaction!left (
+            id,
+            user_id,
+            type
           )
         )
     `
@@ -241,7 +244,7 @@ export const getUnifiedHomeWyras = async (
 
   // 7. Filter out blocked users' wyras
   const filteredWyras = (data ?? []).filter(
-    (wyra) => !blockedIds.includes(wyra.created_by)
+    (wyra:any) => !blockedIds.includes(wyra.created_by)
   );
 
   // 8. Extract Wyra IDs
@@ -284,7 +287,6 @@ export const getUnifiedHomeWyras = async (
                 ? user_profiles[0]?.lastname
                 : "",
             username: user_profiles[0]?.username,
-            avatar: user_profiles[0]?.avatar,
           }
         : {
             id: user_profiles?.id,
@@ -299,7 +301,6 @@ export const getUnifiedHomeWyras = async (
                 ? user_profiles?.lastname
                 : "",
             username: user_profiles?.username,
-            avatar: user_profiles?.avatar,
           },
       settings: Array.isArray(user_profiles)
         ? user_profiles[0]?.account_settings
@@ -358,7 +359,6 @@ export const getAllWyras = async () => {
           firstname,
           lastname,
           username,
-          avatar,
           account_settings (
             show_real_name
           )
@@ -451,7 +451,6 @@ export const getAllWyras = async () => {
           ? creator?.lastname
           : "",
         username: creator?.username,
-        avatar: creator?.avatar,
       },
       likeCount: reactionCounts[wyra.id]?.like || 0,
       dislikeCount: reactionCounts[wyra.id]?.dislike || 0,
@@ -481,7 +480,6 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
           firstname,
           lastname,
           username,
-          avatar,
             account_settings (
           show_real_name,
           animate_floating_effects,
@@ -520,8 +518,12 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
             id,
             firstname,
             lastname,
-            username,
-            avatar
+            username
+          ),
+          wyra_selected_option_reaction:wyra_selected_option_reaction!left (
+            id,
+            user_id,
+            type
           )
         )
       )
@@ -556,7 +558,6 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
                   ? user_profiles[0]?.lastname
                   : "",
               username: user_profiles[0]?.username,
-              avatar: user_profiles[0]?.avatar,
             }
           : {
               id: user_profiles?.id,
@@ -571,7 +572,6 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
                   ? user_profiles?.lastname
                   : "",
               username: user_profiles?.username,
-              avatar: user_profiles?.avatar,
             },
         settings: Array.isArray(user_profiles)
           ? user_profiles[0]?.account_settings
@@ -627,7 +627,6 @@ export const getWyrasWithCircles = async (
         firstname,
         lastname,
         username,
-        avatar,
           account_settings (
           show_real_name,
           animate_floating_effects,
@@ -659,8 +658,12 @@ export const getWyrasWithCircles = async (
             id,
             firstname,
             lastname,
-            username,
-            avatar
+            username
+          ),
+          wyra_selected_option_reaction:wyra_selected_option_reaction!left (
+            id,
+            user_id,
+            type
           )
         ),
       wyra_circles (
@@ -702,7 +705,6 @@ export const getWyrasWithCircles = async (
                     ? user_profiles[0]?.lastname
                     : "",
                 username: user_profiles[0]?.username,
-                avatar: user_profiles[0]?.avatar,
               }
             : {
                 id: user_profiles?.id,
@@ -717,7 +719,6 @@ export const getWyrasWithCircles = async (
                     ? user_profiles?.lastname
                     : "",
                 username: user_profiles?.username,
-                avatar: user_profiles?.avatar,
               },
           settings: Array.isArray(user_profiles)
             ? user_profiles[0]?.account_settings

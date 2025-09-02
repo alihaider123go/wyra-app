@@ -17,6 +17,7 @@ import React, { useEffect, useState } from "react";
 import { relativeTime } from "@/utils/helper";
 import { getAllWyras } from "@/actions/wyra";
 import { Plus, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
+import CustomAvatar from "@/components/ui/custom-avatar";
 
 
 export default function LoginPage() {
@@ -161,11 +162,9 @@ export default function LoginPage() {
                             {/* user info */}
                             <div className="flex items-center gap-3 w-full">
                               <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
-                                <img
-                                  src={wyra.creator.avatar}
-                                  alt="avatar preview"
-                                  className="w-full h-full shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover"
-                                />
+
+                                <CustomAvatar userId={wyra.creator?.id} firstName={wyra.creator.firstname} lastName={wyra.creator.lastname}/>
+                                
                               </div>
                               <div>
                                 <h2 className="text-lg font-bold text-black">

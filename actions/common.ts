@@ -98,3 +98,22 @@ export function checkUserOnlineStatus(userId: any) {
   }, [userId]);
   return isOnline && userData?.account_settings?.show_online_status;
 }
+
+
+export async function getUserAvatar(userId:any) {
+  if (!userId) return null;
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("avatar")
+    .eq("id", userId)
+    .single(); // Ensures only one row is returned
+
+  if (error) {
+    console.error("Error fetching user avatar:", error.message);
+    return null;
+  }
+
+  return data?.avatar || null;
+}

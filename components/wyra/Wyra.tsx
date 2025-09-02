@@ -47,6 +47,7 @@ import UserOnlineStatus from "../ui/userOnlineStatus";
 import EditWyra from "./EditWyra";
 import CirclesWyras from "./CirclesWyra";
 import { useRouter } from "next/navigation";
+import CustomAvatar from "../ui/custom-avatar";
 
 export default function WyraSection({
     wyras,
@@ -293,6 +294,48 @@ export default function WyraSection({
         }
     }
 
+    const toggleReaction = async (
+        wyraSelectedOptionId: string,
+        type: 'like' | 'dislike'
+    ) => {
+        if (!user?.id) return;
+
+        // 1. Fetch existing reaction for this option by the user
+        const { data: existingReaction } = await supabase
+            .from('wyra_selected_option_reaction')
+            .select('id, type')
+            .eq('wyra_selected_option_id', wyraSelectedOptionId)
+            .eq('user_id', user.id)
+            .single();
+
+        if (existingReaction) {
+            if (existingReaction.type === type) {
+                // 2. Same reaction clicked again → remove it
+                await supabase
+                    .from('wyra_selected_option_reaction')
+                    .delete()
+                    .eq('id', existingReaction.id);
+            } else {
+                // 3. Different reaction → update type
+                await supabase
+                    .from('wyra_selected_option_reaction')
+                    .update({ type: type })
+                    .eq('id', existingReaction.id);
+            }
+        } else {
+            // 4. No reaction yet → insert new
+            await supabase
+                .from('wyra_selected_option_reaction')
+                .insert({
+                    wyra_selected_option_id: wyraSelectedOptionId,
+                    user_id: user.id,
+                    type: type,
+                });
+        }
+
+        fetchWyras(); // Or optimistically update state
+    };
+
     if (loading) return <div className="text-center py-10">Loading...</div>;
     if (!wyras.length)
         return <div className="text-center py-10">No Wyras yet.</div>;
@@ -313,11 +356,7 @@ export default function WyraSection({
                                     {/* user info */}
                                     <div onClick={() => { setActiveTab("user-profile"), setSelectedUserId(wyra.creator?.id) }} className="flex items-center cursor-pointer gap-3 w-full">
                                         <div className="w-12 h-12 rounded-full bg-gray-200  relative">
-                                            <img
-                                                src={wyra.creator.avatar}
-                                                alt="avatar preview"
-                                                className="w-full h-full shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover"
-                                            />
+                                            <CustomAvatar userId={wyra.creator?.id} firstName={wyra.creator.firstname} lastName={wyra.creator.lastname}/>
                                             <UserOnlineStatus userId={wyra.creator?.id} />
                                         </div>
                                         <div>
@@ -526,11 +565,7 @@ export default function WyraSection({
                                                 <div className={`my-2 ml-4 ${user?.id === item?.user_profiles?.id && wyra?.settings?.multi_color_why_boxes ? "border rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg p-2" : "border-b"}`} key={item?.id}>
                                                     <div onClick={() => { setActiveTab("user-profile"), setSelectedUserId(item?.user_profiles?.id) }} className="flex cursor-pointer items-center">
                                                         <div className="relative w-12 h-12 rounded-full mr-2">
-                                                            <img
-                                                                src={item?.user_profiles?.avatar}
-                                                                alt=""
-                                                                className="mr-2 h-full w-full rounded-full object-cover"
-                                                            />
+                                                            <CustomAvatar userId={item?.user_profiles?.id} firstName={item?.user_profiles.firstname} lastName={item?.user_profiles.lastname}/>
                                                         </div>
                                                         <p className="font-medium text-left">
                                                             {`${item?.user_profiles.firstname} ${item?.user_profiles.lastname}`} Would rather say:
@@ -545,6 +580,31 @@ export default function WyraSection({
                                                             <div className="flex items-center">
                                                                 <p className="italic ml-2">{item?.why}</p>
                                                             </div>
+                                                        </div>
+                                                        <div className="my-2">
+                                                            <button
+                                                                onClick={() => toggleReaction(item.id, 'like')}
+                                                                className={`px-2 py-1 rounded-full mr-2 ${item.wyra_selected_option_reaction?.some(
+                                                                    (r: any) => r.user_id === user?.id && r.type === 'like'
+                                                                )
+                                                                        ? 'bg-green-500 text-white'
+                                                                        : 'bg-gray-200 text-gray-800'
+                                                                    }`}
+                                                            >
+                                                                👍 {item.wyra_selected_option_reaction?.filter((r: any) => r.type === 'like').length || 0}
+                                                            </button>
+
+                                                            <button
+                                                                onClick={() => toggleReaction(item.id, 'dislike')}
+                                                                className={`px-2 py-1 rounded-full ${item.wyra_selected_option_reaction?.some(
+                                                                    (r: any) => r.user_id === user?.id && r.type === 'dislike'
+                                                                )
+                                                                        ? 'bg-red-500 text-white'
+                                                                        : 'bg-gray-200 text-gray-800'
+                                                                    }`}
+                                                            >
+                                                                👎 {item.wyra_selected_option_reaction?.filter((r: any) => r.type === 'dislike').length || 0}
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
