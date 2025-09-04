@@ -48,10 +48,13 @@ import EditWyra from "./EditWyra";
 import CirclesWyras from "./CirclesWyra";
 import { useRouter } from "next/navigation";
 import WyraSection from "./Wyra";
+import Loader from "../common/loader";
+import { FaUsers } from "react-icons/fa";
 
 export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSelectedUserId }: any) {
   const [wyraList, setWyraList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [wyraLoading, setWyraLoading] = useState(true);
   const [showCreateWyraModal, setShowCreateWyraModal] = useState(false);
   const [showEditWyraModal, setShowEditWyraModal] = useState({ isShow: false, id: "" });
   const [user, setUser] = useState<User | null>(null);
@@ -112,12 +115,19 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
     }
 
     try {
+      setWyraLoading(true)
       const result = await getUnifiedHomeWyras(user.id, debouncedSearch);
       setWyraList(result || []);
+      setTimeout(() => setWyraLoading(false), 1000);
+
     } catch (err) {
       console.error("Failed to fetch wyras", err);
+      setTimeout(() => setWyraLoading(false), 1000);
+
     } finally {
       setTimeout(() => setLoading(false), 1000);
+      setTimeout(() => setWyraLoading(false), 1000);
+
     }
   }
 
@@ -141,12 +151,17 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
     }
 
     try {
+      setWyraLoading(true)
       const result = await getWyrasWithCircles(user.id, debouncedSearch);
       setWyrasWithCircles(result || []);
+
     } catch (err) {
       console.error("Failed to fetch wyras", err);
+
     } finally {
       setTimeout(() => setLoading(false), 1000);
+      setTimeout(() => setWyraLoading(false), 1000);
+
     }
   }
 
@@ -192,77 +207,6 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
     fetchFollowStatusForAll();
   }, [user, wyraList, supabase]);
 
-  // Handler to toggle follow/unfollow for a given profileUserId
-  const toggleFollow = async (profileUserId: string) => {
-    if (!user) return;
-    setLoadingStatus((prev) => ({ ...prev, [profileUserId]: true }));
-
-    try {
-      if (followStatus[profileUserId]) {
-        // Unfollow
-        const { error } = await supabase
-          .from("user_followers")
-          .delete()
-          .eq("follower_id", user.id)
-          .eq("following_id", profileUserId);
-
-        if (!error) {
-          setFollowStatus((prev) => ({ ...prev, [profileUserId]: false }));
-        }
-      } else {
-        // Follow
-        const { error } = await supabase
-          .from("user_followers")
-          .upsert([{ follower_id: user.id, following_id: profileUserId }], {
-            onConflict: "follower_id,following_id",
-          });
-
-        if (!error) {
-          const isAllowed = await isNotificationAllowed(profileUserId, "follow_me")
-          if (isAllowed) {
-            await supabase.from("notifications").insert([
-              {
-                type: "follow",
-                sender_id: user.id,
-                recipient_id: profileUserId,
-                post_id: null,
-                message: "follow you",
-              },
-            ]);
-          }
-          setFollowStatus((prev) => ({ ...prev, [profileUserId]: true }));
-        }
-      }
-    } catch (err) {
-      console.error("Error toggling follow", err);
-    } finally {
-      setLoadingStatus((prev) => ({ ...prev, [profileUserId]: false }));
-    }
-  };
-
-
-  const blockWyra = async (profileUserId: string) => {
-    if (!user) return;
-    setLoadingStatus((prev) => ({ ...prev, [profileUserId]: true }));
-
-    try {
-      const { error } = await supabase
-        .from("user_blocks")
-        .upsert([{ blocker_id: user.id, blocked_id: profileUserId }], {
-          onConflict: "blocker_id,blocked_id",
-        });
-
-      if (!error) {
-        fetchWyras()
-      }
-
-    } catch (err) {
-      console.error("Error toggling follow", err);
-    } finally {
-      setLoadingStatus((prev) => ({ ...prev, [profileUserId]: false }));
-    }
-  };
-
   useEffect(() => {
     if (postId) {
       const element = document.getElementById(postId);
@@ -271,43 +215,6 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
       }
     }
   }, [postId, wyraList]);
-
-  const handleSubmitWyraOption = async (wyraId: any) => {
-    //    e.preventDefault();
-    // if (!selectedOption) {
-    //   setMessage("Please select an option");
-    //   return;
-    // }
-    if (!user?.id) return;
-
-    // setLoading(true);
-    const { data, error } = await supabase
-      .from("wyra_selected_option")
-      .insert([
-        {
-          wyra_id: wyraId,
-          user_id: user.id,
-          selected_option_id: selectedOptions[wyraId],
-          why: whyText,
-        },
-      ])
-      .select();
-
-    if (error) {
-    } else {
-      fetchWyras()
-      setWhyText("")
-      setIsShowWhyReasonContainer([])
-    }
-  }
-
-  const handleDeleteWyra = async (id: any) => {
-    const isDelete = await deleteWyra(id);
-    if (isDelete.success) {
-      fetchWyras()
-      fetchCircleWyras()
-    }
-  }
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
   // if (!wyraList.length)
@@ -352,13 +259,8 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
               {
                 tab.isImage
                   ?
-                  isActive ?
-                    <img src={"/team_active.png"}
-                      className={`w-10 h-10 animate-bounce-slow`}
-                    />
-                    :
-                    <img src={tab.icon}
-                      className={`w-10 h-10`}
+                    <FaUsers 
+                      className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
                     />
                   :
                   <Icon
@@ -378,49 +280,62 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
       </div>
 
       <div className="max-w-3xl">
+        {
+          !wyraLoading
+            ?
+            <>
 
-        {activeFeatureTab === "trending" ? (
-          <WyraSection
-            wyras={wyraList.filter((wyra: any) => wyra.likeCount > 20)}
-            fetchWyras={fetchWyras}
-            searchTerm={searchTerm}
-            postId={postId}
-            setActiveTab={setActiveTab}
-            setSelectedUserId={setSelectedUserId}
-          />
+              {activeFeatureTab === "trending" ? (
+                <WyraSection
+                  wyras={wyraList.filter((wyra: any) => wyra.likeCount > 20)}
+                  fetchWyras={fetchWyras}
+                  searchTerm={searchTerm}
+                  postId={postId}
+                  setActiveTab={setActiveTab}
+                  setSelectedUserId={setSelectedUserId}
+                />
 
-        ) : activeFeatureTab === "recent" ? (
-          <WyraSection
-            wyras={wyraList}
-            fetchWyras={fetchWyras}
-            searchTerm={searchTerm}
-            postId={postId}
-            setActiveTab={setActiveTab}
-            setSelectedUserId={setSelectedUserId}
-          />
-        ) : activeFeatureTab === "circles" ? (
-          <div>
-            <CirclesWyras
-              wyras={wyrasWithCircles}
-              fetchWyras={fetchCircleWyras}
-              searchTerm={searchTerm}
-              postId={postId}
-              setActiveTab={setActiveTab}
-              setSelectedUserId={setSelectedUserId}
-            />
-          </div>
-        ) : (
-          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
-            <CardHeader className="text-center pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-800">
-                Following
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Feeds from people you follow will be shown here.</p>
-            </CardContent>
-          </Card>
-        )}
+              ) : activeFeatureTab === "recent" ? (
+                <WyraSection
+                  wyras={wyraList}
+                  fetchWyras={fetchWyras}
+                  searchTerm={searchTerm}
+                  postId={postId}
+                  setActiveTab={setActiveTab}
+                  setSelectedUserId={setSelectedUserId}
+                />
+              ) : activeFeatureTab === "circles" ? (
+                <div>
+                  <CirclesWyras
+                    wyras={wyrasWithCircles}
+                    fetchWyras={fetchCircleWyras}
+                    searchTerm={searchTerm}
+                    postId={postId}
+                    setActiveTab={setActiveTab}
+                    setSelectedUserId={setSelectedUserId}
+                  />
+                </div>
+              ) : (
+                <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+                  <CardHeader className="text-center pb-6">
+                    <CardTitle className="text-2xl font-bold text-gray-800">
+                      Following
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>Feeds from people you follow will be shown here.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+            :
+            <div className="flex justify-center mt-10">
+              <Loader
+                height={16}
+                width={16}
+              />
+            </div>
+        }
       </div>
       <Modal isOpen={showCreateWyraModal} hideCloseButton={true}>
         <ModalContent>

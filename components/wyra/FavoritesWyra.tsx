@@ -46,7 +46,7 @@ import { useRouter } from "next/navigation";
 import WyraSection from "./Wyra";
 
 export default function FavoritesWyra({ searchTerm,setActiveTab,setSelectedUserId }: any) {
-  const [wyraList, setWyraList] = useState<Wyra[]>([]);
+  const [wyraList, setWyraList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   // Map to track follow status per profileUserId

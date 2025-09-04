@@ -37,6 +37,7 @@ interface WyraMedia {
 interface WyraOption {
   id: string;
   option_text: string;
+  is_edit: boolean;
   position: number;
   wyra_media: WyraMedia[];
 }
@@ -93,6 +94,7 @@ export default function MyWyras({ userId ,setActiveTab,setSelectedUserId}: MyWyr
       wyra_option (
         id,
         option_text,
+        is_edit,
         position,
         wyra_media (
           id,

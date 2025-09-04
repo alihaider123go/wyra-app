@@ -68,6 +68,7 @@ export async function getMyWyras(userId: string) {
       wyra_option (
         id,
         option_text,
+        is_edit,
         position,
         wyra_media (
           id,
@@ -197,6 +198,7 @@ export const getUnifiedHomeWyras = async (
        wyra_option (
           id,
           option_text,
+          is_edit,
           position,
           wyra_media (
             id,
@@ -372,6 +374,7 @@ export const getAllWyras = async () => {
         wyra_option (
           id,
           option_text,
+          is_edit,
           position,
           wyra_media (
             id,
@@ -497,6 +500,7 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
          wyra_option (
           id,
           option_text,
+          is_edit,
           position,
           wyra_media (
             id,
@@ -638,6 +642,7 @@ export const getWyrasWithCircles = async (
       wyra_option (
           id,
           option_text,
+          is_edit,
           position,
           wyra_media (
             id,

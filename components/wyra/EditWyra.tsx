@@ -18,6 +18,8 @@ interface EditWyraProps {
 
 export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: EditWyraProps) {
   const [optionOne, setOptionOne] = useState("");
+  const [originalOptionOne, setOriginalOptionOne] = useState("");
+  const [originalOptionTwo, setOriginalOptionTwo] = useState("");
   const [optionTwo, setOptionTwo] = useState("");
   const [optionOneId, setOptionOneId] = useState<string | null>(null);
   const [optionTwoId, setOptionTwoId] = useState<string | null>(null);
@@ -49,10 +51,12 @@ export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: E
       optionsData?.forEach((option) => {
         if (option.position === 1) {
           setOptionOne(option.option_text || "");
+          setOriginalOptionOne(option.option_text || "");
           setOptionOneId(option.id);
           optionOneID = option.id;
         } else if (option.position === 2) {
           setOptionTwo(option.option_text || "");
+          setOriginalOptionTwo(option.option_text || "");
           setOptionTwoId(option.id);
           optionTwoID = option.id;
         }
@@ -148,51 +152,64 @@ export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: E
   };
 
   const handleSubmit = async () => {
-    if (!optionOne.trim() || !optionTwo.trim()) {
-      alert("Both options must be filled.");
-      return;
-    }
+  if (!optionOne.trim() || !optionTwo.trim()) {
+    alert("Both options must be filled.");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    // Update the two options if their IDs exist
-    if (optionOneId) {
-      await supabase
+  const updates = [];
+
+  // Update the first option only if the value has changed
+  if (optionOneId && optionOne.trim() !== originalOptionOne.trim()) {
+    updates.push(
+      supabase
         .from("wyra_option")
-        .update({ option_text: optionOne })
-        .eq("id", optionOneId);
-    }
+        .update({ option_text: optionOne, is_edit: true })
+        .eq("id", optionOneId)
+    );
+  }
 
-    if (optionTwoId) {
-      await supabase
+  // Update the second option only if the value has changed
+  if (optionTwoId && optionTwo.trim() !== originalOptionTwo.trim()) {
+    updates.push(
+      supabase
         .from("wyra_option")
-        .update({ option_text: optionTwo })
-        .eq("id", optionTwoId);
-    }
+        .update({ option_text: optionTwo, is_edit: true })
+        .eq("id", optionTwoId)
+    );
+  }
 
-    // Update is_edit column in wyra table
-    if (wyraId) {
-      await supabase
+  // Update is_edit column in wyra table only if any option was updated
+  if (updates.length > 0 && wyraId) {
+    updates.push(
+      supabase
         .from("wyra")
         .update({ is_edit: true })
-        .eq("id", wyraId);
-    }
+        .eq("id", wyraId)
+    );
+  }
 
-    setLoading(false);
-    fetchWyras();
-    setShowEditWyraModal({ isShow: false, id: "" });
-  };
+  if (updates.length > 0) {
+    await Promise.all(updates);
+  }
+
+  setLoading(false);
+  fetchWyras();
+  setShowEditWyraModal({ isShow: false, id: "" });
+};
 
   return (
     <div className="w-full flex justify-center relative">
       <section className="flex flex-col max-w-md">
         <Card className="border-0 animate-slide-in-right">
           <CardContent>
-            <div className="max-w-2xl mx-auto p-6">
-              <h1 className="text-center text-3xl font-bold mb-10 text-black">Edit Wyra</h1>
+            <div className="max-w-2xl mx-auto">
+              {/* <h1 className="text-center text-3xl font-bold mb-3 md:mb-10 text-black">Edit Wyra</h1> */}
 
               {/* Option One */}
-              <div className="bg-white border rounded-2xl shadow p-5 mb-8 relative">
+              <div className="bg-white border rounded-2xl shadow p-5 mb-3 md:mb-8 relative">
                 <textarea
                   maxLength={150}
                   rows={4}
@@ -245,7 +262,7 @@ export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: E
                 </div>
               </div>
 
-              <div className="text-center font-semibold text-xl text-gray-700 mb-8">OR</div>
+              <div className="text-center font-semibold text-xl text-gray-700 mb-3 md:mb-8">OR</div>
 
               {/* Option Two */}
               <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">

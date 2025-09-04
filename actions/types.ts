@@ -63,6 +63,7 @@ export interface WyraMedia {
 export interface WyraOption {
   id: string;
   option_text: string;
+  is_edit: boolean;
   position: number;
   wyra_media: WyraMedia[];
 }
