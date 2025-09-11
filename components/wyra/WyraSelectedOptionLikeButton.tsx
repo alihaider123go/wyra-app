@@ -19,22 +19,33 @@ const WyraSelectedOptionLikeButton: React.FC<SelectedOptionLikeButtonProps> = ({
 }) => {
   const [liked, setLiked] = useState(false);
   const supabase = createClient();
+  const [likesCount, setLikesCount] = useState(0);
+
+  const fetchReaction = async () => {
+    if (!userId) return;
+
+    const { data } = await supabase
+      .from("wyra_selected_option_reaction")
+      .select("type")
+      .eq("wyra_selected_option_id", wyraSelectedOptionId)
+      .eq("user_id", userId)
+      .eq("type", "like")
+      .maybeSingle();
+
+    setLiked(data?.type === "like");
+
+    const { count } = await supabase
+      .from("wyra_selected_option_reaction")
+      .select("*", { count: "exact", head: true })
+      .eq("wyra_selected_option_id", wyraSelectedOptionId)
+      .eq("type", "like");
+
+    setLikesCount(count || 0);
+  };
 
   // ✅ Fetch initial like status
   useEffect(() => {
-    const fetchReaction = async () => {
-      if (!userId) return;
 
-      const { data } = await supabase
-        .from("wyra_selected_option_reaction")
-        .select("type")
-        .eq("wyra_selected_option_id", wyraSelectedOptionId)
-        .eq("user_id", userId)
-        .eq("type", "like")
-        .maybeSingle();
-
-      setLiked(data?.type === "like");
-    };
 
     fetchReaction();
   }, [wyraSelectedOptionId, userId]);
@@ -45,6 +56,7 @@ const WyraSelectedOptionLikeButton: React.FC<SelectedOptionLikeButtonProps> = ({
       const detail = (e as CustomEvent).detail;
       if (detail?.wyraSelectedOptionId === wyraSelectedOptionId && detail.type === "dislike") {
         setLiked(false);
+        fetchReaction()
       }
     };
 
@@ -97,6 +109,7 @@ const WyraSelectedOptionLikeButton: React.FC<SelectedOptionLikeButtonProps> = ({
         .eq("wyra_selected_option_id", wyraSelectedOptionId)
         .eq("user_id", userId);
     }
+    fetchReaction()
   };
 
   return (
@@ -107,13 +120,13 @@ const WyraSelectedOptionLikeButton: React.FC<SelectedOptionLikeButtonProps> = ({
         ${liked ? "bg-green-600 text-white" : "bg-gray-200 text-gray-800"}`}
       >
         <ThumbsUp className="w-4 h-4 mr-1" />
-        <span>{count}</span>
+        <span>{likesCount}</span>
         <span className="hidden md:inline ml-1">
-          {count > 0 ? (count > 1 ? "Likes" : "Like") : "Like"}
+          {likesCount > 0 ? (likesCount > 1 ? "Likes" : "Like") : "Like"}
         </span>
       </button>
 
-     
+
     </div>
   );
 };

@@ -22,6 +22,8 @@ import {
     CircleOff,
     ThumbsUp,
     ThumbsDown,
+    Circle,
+    ShieldMinus,
 } from "lucide-react";
 import { Sparkles, TrendingUp, Clock } from "lucide-react";
 import {
@@ -243,6 +245,21 @@ export default function WyraSection({
         }
     };
 
+    const unblockWyra = async (id: string) => {
+        if (!user) return;
+
+        const { error } = await supabase
+            .from("user_blocks")
+            .delete()
+            .match({ blocker_id: user.id, blocked_id: id });
+
+        if (error) {
+            console.error("Failed to unblock user", error);
+        } else {
+            fetchWyras()
+        }
+    };
+
     useEffect(() => {
         if (postId) {
             const element = document.getElementById(postId);
@@ -385,11 +402,21 @@ export default function WyraSection({
                                                                 }
                                                             />
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50" onClick={() => { blockWyra(wyra?.created_by) }}>
-                                                            <CircleOff className="w-4 h-4 mr-2" />
+                                                        {
+                                                            wyra?.is_blocked
+                                                                ?
 
-                                                            Block User
-                                                        </DropdownMenuItem>
+                                                                <DropdownMenuItem className="cursor-pointer hover:bg-gray-50" onClick={() => { unblockWyra(wyra?.created_by) }}>
+                                                                <ShieldMinus className="w-4 h-4 mr-2" />
+                                                                    Unblock User
+                                                                </DropdownMenuItem>
+                                                                :
+                                                                <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50" onClick={() => { blockWyra(wyra?.created_by) }}>
+                                                                    <CircleOff className="w-4 h-4 mr-2" />
+                                                                    Block User
+                                                                </DropdownMenuItem>
+                                                        }
+
                                                         <DropdownMenuItem className="text-red-600 cursor-pointer hover:bg-red-50">
                                                             <Flag className="w-4 h-4 mr-2" />
                                                             Report Wyra
@@ -530,7 +557,7 @@ export default function WyraSection({
                                                         <p className="font-medium text-left">
                                                             {`${item?.user_profiles.firstname} ${item?.user_profiles.lastname}`} Would rather say:
                                                             <span className="italic font-normal">
-                                                                Option {item?.wyra_option?.position}
+                                                                {item?.wyra_option?.option_text}
                                                             </span>
                                                         </p>
                                                     </div>
@@ -607,7 +634,7 @@ export default function WyraSection({
                                         <LikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} count={wyra?.likeCount} />
                                         <DislikeButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} count={wyra?.dislikeCount} />
                                         <CommentButton wyraId={wyra.id} userId={user?.id} />
-                                        <FavouriteButton wyraId={wyra.id} userId={user?.id} />
+                                        <FavouriteButton wyraId={wyra.id} isFloatAllow={wyra.settings?.animate_floating_effects} userId={user?.id} />
                                     </div>
                                     <div className="flex items-center gap-2 mt-5">
                                         <ShareButton wyraId={wyra.id} userId={user?.id} />

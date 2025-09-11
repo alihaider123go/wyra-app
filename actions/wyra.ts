@@ -340,7 +340,10 @@ if (search.trim()) {
     return true;
   });
 
-  return formattedData;
+  return formattedData.map((wyra) => ({
+  ...wyra,
+  source: "wyra", // ✅ add marker
+}));
 };
 
 export const getAllWyras = async () => {
@@ -782,3 +785,38 @@ export async function deleteWyra(wyraId: string) {
     return { success: false, message: error.message };
   }
 }
+
+export const searchUsers = async (search: string, userProfileId: string) => {
+  if (!search.trim()) return [];
+
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("id, firstname, lastname, username, email")
+    .or(
+      `firstname.ilike.%${search}%,lastname.ilike.%${search}%,username.ilike.%${search}%,email.ilike.%${search}%`
+    )
+    .neq("id", userProfileId) // exclude current user
+    .limit(5);
+
+  if (error) {
+    console.error("User search error:", error);
+    return [];
+  }
+
+  return (data || []).map((user) => ({
+    ...user,
+    source: "user", // ✅ add marker
+  }));
+};
+
+
+export const unifiedSearch = async (userId: any, search: string) => {
+  const [userResults, wyraResults] = await Promise.all([
+    searchUsers(search, userId),
+    getUnifiedHomeWyras(userId, search),
+  ]);
+
+  return [...userResults, ...wyraResults];
+};

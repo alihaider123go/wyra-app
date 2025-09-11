@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 
-export default function BlockUserInfo() {
+export default function BlockUserInfo({setActiveTab,setSelectedUserId}:any) {
   const supabase = createClient();
   const [blockedUsers, setBlockedUsers] = useState<any[]>([]);
   const [userID, setUserID] = useState("");
@@ -179,7 +179,7 @@ const dropdownRef = useRef<HTMLDivElement>(null);
               key={item?.blocked_id}
               className="flex justify-between items-center border p-3 rounded shadow-sm"
             >
-              <div className="flex items-center space-x-3">
+              <div onClick={() => { setActiveTab("user-profile"), setSelectedUserId(item?.user_profiles?.id)}} className="flex items-center cursor-pointer space-x-3">
                 {item?.user_profiles?.avatar ? (
                   <img
                     src={item?.user_profiles?.avatar}

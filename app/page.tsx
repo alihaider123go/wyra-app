@@ -107,7 +107,7 @@ export default function Home() {
       case "invite":
         return <InviteFriends />;
       case "block-unblock":
-        return <BlockUserInfo />;
+        return <BlockUserInfo setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId}/>;
       case "help-faqs":
         return <HelpCenter />;
       case "about-us":
@@ -156,6 +156,9 @@ export default function Home() {
           isProfileCompleted={isProfileCompleted}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
+          setActiveTab={setActiveTab}
+          setPostId={setPostId}
+          setSelectedUserId={setSelectedUserId}
         />
 
         <main className="pb-20 md:pb-4">

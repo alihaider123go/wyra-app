@@ -15,21 +15,34 @@ interface DislikeButtonProps {
 
 const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAllow, count }) => {
   const [disliked, setDisliked] = useState(false);
+  const [dislikesCount, setDislikesCount] = useState(0);
+
   const [showDisagree, setShowDisagree] = useState(false); // ✅ for floating text
   const supabase = createClient();
+  const fetchReaction = async () => {
+    const { data } = await supabase
+      .from("wyra_reaction")
+      .select("type")
+      .eq("wyra_id", wyraId)
+      .eq("user_id", userId)
+      .eq("type", "dislike")
+      .maybeSingle();
+
+    setDisliked(data?.type === "dislike");
+
+    const { count } = await supabase
+      .from("wyra_reaction")
+      .select("*", { count: "exact", head: true })
+      .eq("wyra_id", wyraId)
+      .eq("type", "dislike");
+
+    setDislikesCount(count || 0);
+
+  };
+
 
   useEffect(() => {
-    const fetchReaction = async () => {
-      const { data } = await supabase
-        .from("wyra_reaction")
-        .select("type")
-        .eq("wyra_id", wyraId)
-        .eq("user_id", userId)
-        .eq("type", "dislike")
-        .maybeSingle();
 
-      setDisliked(data?.type === "dislike");
-    };
 
     if (userId) fetchReaction();
   }, [wyraId, userId]);
@@ -39,6 +52,7 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAl
       const detail = (e as CustomEvent).detail;
       if (detail?.wyraId === wyraId && detail.type === "like") {
         setDisliked(false); // someone clicked like, clear dislike
+        fetchReaction()
       }
     };
 
@@ -101,6 +115,7 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAl
         .eq("wyra_id", wyraId)
         .eq("user_id", userId);
     }
+    fetchReaction()
   };
 
   return (
@@ -111,9 +126,9 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAl
         ${disliked ? "bg-red-600 text-white" : "bg-gray-200 text-gray-800"}`}
       >
         <ThumbsDown className="w-4 h-4 mr-1" />
-        <span>{count}</span>
+        <span>{dislikesCount}</span>
         <span className="hidden md:inline ml-1">
-                    {count > 0 ? count > 1 ? "Dislikes" : "Dislike" : "Dislike"}
+          {dislikesCount > 0 ? dislikesCount > 1 ? "Dislikes" : "Dislike" : "Dislike"}
         </span>      </button>
 
       {/* ✅ Floating "Disagree" Text */}

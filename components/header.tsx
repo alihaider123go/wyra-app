@@ -30,15 +30,20 @@ import Link from "next/link";
 import { ExtendedUser, UserProfile } from "@/actions/types";
 import { useNotifications } from "./notifications/useNotifications";
 import UserOnlineStatus from "./ui/userOnlineStatus";
+import { unifiedSearch } from "@/actions/wyra";
+import { relativeTime } from "@/utils/helper";
 
 interface HeaderProps {
   user: ExtendedUser | null;
   onTabChange: (tab: string) => void;
   activeTab: string;
   isVerified: boolean;
-  isProfileCompleted:boolean
-  searchTerm?:string;
-  setSearchTerm?:any
+  isProfileCompleted: boolean
+  searchTerm?: string;
+  setSearchTerm?: any
+  setActiveTab?: any
+  setSelectedUserId?: any
+  setPostId?: any
 }
 
 export default function Header({
@@ -49,12 +54,18 @@ export default function Header({
   isProfileCompleted,
   searchTerm,
   setSearchTerm,
+  setActiveTab,
+  setSelectedUserId,
+  setPostId
+
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const { unreadCount,unreadMessagesCount } = useNotifications();
+  const { unreadCount, unreadMessagesCount } = useNotifications();
   const supabase = createClient();
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState<any[]>([]);
 
   const handleLogout = async () => {
     await signOut();
@@ -135,6 +146,33 @@ export default function Header({
     { icon: Mail, label: "Contact Us", slug: "contact", disable: !isProfileCompleted },
   ];
 
+  useEffect(() => {
+    if (!search) return;
+
+    const fetchResults = async () => {
+      const results = await unifiedSearch(userProfile?.id, search);
+      setResults(results);
+    };
+
+    const delayDebounce = setTimeout(fetchResults, 300);
+    return () => clearTimeout(delayDebounce);
+  }, [search]);
+
+  function highlightText(text: string, search: string) {
+    if (!search.trim()) return text;
+
+    const regex = new RegExp(`(${search})`, "gi");
+    return text.split(regex).map((part, i) =>
+      regex.test(part) ? (
+        <mark key={i} className="bg-yellow-200">
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  }
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -181,7 +219,7 @@ export default function Header({
                       <div className="flex items-center p-6 border-b border-gray-200">
                         <Link
                           href="/"
-                          onClick={() => {isProfileCompleted ? onHandlePageClick("home"): ""}}
+                          onClick={() => { isProfileCompleted ? onHandlePageClick("home") : "" }}
                         >
                           <div className="flex items-center">
                             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
@@ -211,12 +249,12 @@ export default function Header({
                       >
                         {userProfile?.avatar ? (
                           <div className="w-12 h-12 rounded-full relative mr-3">
-                          <img
-                            src={userProfile.avatar}
-                            alt="Avatar"
-                            className="h-full w-full rounded-full object-cover mr-3"
-                          />
-                          <UserOnlineStatus userId={userProfile?.id}/>
+                            <img
+                              src={userProfile.avatar}
+                              alt="Avatar"
+                              className="h-full w-full rounded-full object-cover mr-3"
+                            />
+                            <UserOnlineStatus userId={userProfile?.id} />
                           </div>
                         ) : (
                           <div className="w-12 h-12 bg-gray-200 relative rounded-full flex items-center justify-center mr-3">
@@ -224,7 +262,7 @@ export default function Header({
                               {userProfile?.firstname?.[0]?.toUpperCase() ||
                                 userProfile?.email?.[0]?.toUpperCase()}
                             </span>
-                            <UserOnlineStatus userId={userProfile?.id}/>
+                            <UserOnlineStatus userId={userProfile?.id} />
                           </div>
                         )}
                         <div>
@@ -245,13 +283,12 @@ export default function Header({
                             key={index}
                             onClick={() => onHandlePageClick(item.slug)}
                             className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors
-                            ${
-                              activeTab === item.slug
+                            ${activeTab === item.slug
                                 ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-105"
                                 : item.disable
-                                ? "text-gray-400 cursor-not-allowed bg-gray-50"
-                                : "text-gray-700 hover:bg-gray-100"
-                            }`}
+                                  ? "text-gray-400 cursor-not-allowed bg-gray-50"
+                                  : "text-gray-700 hover:bg-gray-100"
+                              }`}
                           >
                             <item.icon className="w-5 h-5 mr-3" />
                             <span className="font-medium">{item.label}</span>
@@ -310,21 +347,91 @@ export default function Header({
               <Input
                 type="text"
                 placeholder="Search users or Wyras..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+
                 className="pl-10 pr-4 py-2 w-28 md:w-64 bg-gray-50 border-gray-200 focus:bg-white"
               />
+              {search && results.length > 0 && (
+                <div className="absolute top-full left-0 w-full bg-white border rounded mt-1 shadow-lg z-10 max-h-60 overflow-y-auto p-2 space-y-4">
+                  {/* Users Section */}
+                  {results.some((r) => r.source === "user") && (
+                    <div>
+                      <h3 className="text-gray-700 text-sm font-bold mb-2">Users</h3>
+                      {results
+                        .filter((item) => item.source === "user")
+                        .map((user) => (
+                          <div
+                            key={`user-${user.id}`}
+                            onClick={() => { setActiveTab("user-profile"), setSelectedUserId(user?.id), setSearch("") }}
+                            className="flex justify-between items-center p-2 hover:bg-gray-100 rounded"
+                          >
+                            <div>
+                              <div className="font-medium">
+                                {highlightText(`${user.firstname} ${user.lastname}`, search)}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                @{highlightText(user.username, search)}
+                              </div>
+                              <div className="text-xs text-gray-400">
+                                {highlightText(user.email, search)}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+
+                  {/* Wyras Section */}
+                  {results.some((r) => r.source === "wyra") && (
+                    <div>
+                      <h3 className="text-gray-700 text-sm font-bold mb-2">Wyras</h3>
+                      {results
+                        .filter((item) => item.source === "wyra")
+                        .map((wyra) => {
+                          // ✅ find first matching option
+                          const matchedOption = wyra.wyra_option?.find((opt: any) =>
+                            opt.option_text.toLowerCase().includes(search.toLowerCase())
+                          );
+
+                          return (
+                            <div
+                              key={`wyra-${wyra.id}`}
+                              onClick={() => { setActiveTab("home"), setPostId(wyra.id), setSearch("") }}
+
+                              className="p-2 hover:bg-gray-100 rounded"
+                            >
+                              <h2 className="text-md font-bold text-black">
+                                {highlightText(
+                                  `${wyra.creator?.firstname || "Anonymous"} ${wyra.creator?.lastname || ""}`,
+                                  search
+                                )}
+                              </h2>
+
+                              {matchedOption && (
+                                <p className="text-sm text-gray-600 mt-1">
+                                  <span className="font-semibold">
+                                    Option {matchedOption.position}:
+                                  </span>{" "}
+                                  {highlightText(matchedOption.option_text, search)}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <button
               disabled={!isProfileCompleted}
               onClick={() => onTabChange("home")}
               className={`relative p-2 rounded-full transition-colors  md:block hidden
-              ${
-                !isProfileCompleted
+              ${!isProfileCompleted
                   ? "text-gray-400 bg-gray-100 cursor-not-allowed"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              }`}
+                }`}
             >
               <Home
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
@@ -336,16 +443,15 @@ export default function Header({
               onClick={() => onTabChange("chat")}
               className={`relative p-2 rounded-full transition-colors
                 md:block hidden
-              ${
-                !isProfileCompleted
+              ${!isProfileCompleted
                   ? "text-gray-400 bg-gray-100 cursor-not-allowed"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              }`}
+                }`}
             >
               <MessageCircle
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
-               {unreadMessagesCount > 0 && isProfileCompleted && (
+              {unreadMessagesCount > 0 && isProfileCompleted && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
                 </span>
@@ -353,16 +459,15 @@ export default function Header({
               <span className="sr-only">Chat</span>
             </button>
 
-                        <button
+            <button
               disabled={!isProfileCompleted}
               onClick={() => onTabChange("favorites")}
               className={`relative p-2 rounded-full transition-colors
                 md:block hidden
-              ${
-                !isProfileCompleted
+              ${!isProfileCompleted
                   ? "text-gray-400 bg-gray-100 cursor-not-allowed"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              }`}
+                }`}
             >
               <Heart
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
@@ -374,11 +479,10 @@ export default function Header({
               disabled={!isProfileCompleted}
               onClick={() => onTabChange("notifications")}
               className={`relative p-2 rounded-full transition-colors
-              ${
-                !isProfileCompleted
+              ${!isProfileCompleted
                   ? "text-gray-400 bg-gray-100 cursor-not-allowed"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              }`}
+                }`}
             >
               <Bell
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}

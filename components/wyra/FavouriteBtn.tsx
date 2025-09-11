@@ -7,10 +7,14 @@ import { createClient } from "@/utils/supabase/client";
 interface FavouriteButtonProps {
   wyraId: string;
   userId: string | undefined;
+  isFloatAllow?: any
 }
 
-const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId }) => {
+const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId, isFloatAllow }) => {
   const [favourited, setFavourited] = useState(false);
+  const [showFavourite, setShowFavourite] = useState(false); // ✅ for floating text
+  const [showUnFavourite, setShowUnFavourite] = useState(false); // ✅ for floating text
+
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
@@ -51,9 +55,14 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId }) => 
           .eq("user_id", userId);
 
         setFavourited(false);
+        setShowUnFavourite(true); // ✅ show floating text
+        setTimeout(() => setShowUnFavourite(false), 1000);
 
       } else {
         // ✅ Favorite (Insert)
+        setShowFavourite(true); // ✅ show floating text
+        setTimeout(() => setShowFavourite(false), 1000);
+
         await supabase.from("wyra_favorites").insert([
           {
             wyra_id: wyraId,
@@ -88,20 +97,33 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId }) => 
   };
 
   return (
-    <button
-      onClick={toggleFavourite}
-      disabled={loading}
-      className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer ${favourited ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800"
-        }`}
-    >
-      <Heart
-        className={`w-4 h-4 mr-1 transition ${favourited ? "fill-current text-white" : ""
+    <div className="relative inline-block">
+      <button
+        onClick={toggleFavourite}
+        disabled={loading}
+        className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer ${favourited ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" : "bg-gray-200 text-gray-800"
           }`}
-      />
-      <span className="md:block hidden">
-        {favourited ? "Favourited" : "Favourite"}
-      </span>
-    </button>
+      >
+        <Heart
+          className={`w-4 h-4 mr-1 transition ${favourited ? "fill-current text-white" : ""
+            }`}
+        />
+        <span className="md:block hidden">
+          {favourited ? "Favourited" : "Favourite"}
+        </span>
+
+      </button>
+      {isFloatAllow && showFavourite && (
+        <span className="absolute left-1/2 -translate-x-1/2 -top-6 animate-float text-red-600 font-bold">
+          Favourite
+        </span>
+      )}
+      {isFloatAllow && showUnFavourite && (
+        <span className="absolute left-1/2 -translate-x-1/2 -top-6 animate-float text-red-600 font-bold">
+          UnFavourite
+        </span>
+      )}
+    </div>
   );
 };
 

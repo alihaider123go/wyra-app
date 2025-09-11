@@ -19,22 +19,35 @@ const WyraSelectedOptionDislikeButton: React.FC<SelectedOptionDislikeButtonProps
 }) => {
   const [disliked, setDisliked] = useState(false);
   const supabase = createClient();
+  const [dislikesCount, setDislikesCount] = useState(0);
+
+  const fetchReaction = async () => {
+    const { data } = await supabase
+      .from("wyra_selected_option_reaction")
+      .select("type")
+      .eq("wyra_selected_option_id", wyraSelectedOptionId)
+      .eq("user_id", userId)
+      .eq("type", "dislike")
+      .maybeSingle();
+
+    setDisliked(data?.type === "dislike");
+
+    const { count } = await supabase
+      .from("wyra_selected_option_reaction")
+      .select("*", { count: "exact", head: true })
+      .eq("wyra_selected_option_id", wyraSelectedOptionId)
+      .eq("type", "dislike");
+
+    setDislikesCount(count || 0);
+
+  };
+
 
   // ✅ Fetch initial dislike status
   useEffect(() => {
     if (!userId) return;
 
-    const fetchReaction = async () => {
-      const { data } = await supabase
-        .from("wyra_selected_option_reaction")
-        .select("type")
-        .eq("wyra_selected_option_id", wyraSelectedOptionId)
-        .eq("user_id", userId)
-        .eq("type", "dislike")
-        .maybeSingle();
 
-      setDisliked(data?.type === "dislike");
-    };
 
     fetchReaction();
   }, [wyraSelectedOptionId, userId]);
@@ -45,6 +58,7 @@ const WyraSelectedOptionDislikeButton: React.FC<SelectedOptionDislikeButtonProps
       const detail = (e as CustomEvent).detail;
       if (detail?.wyraSelectedOptionId === wyraSelectedOptionId && detail.type === "like") {
         setDisliked(false); // clear dislike if like is set
+        fetchReaction()
       }
     };
 
@@ -62,7 +76,7 @@ const WyraSelectedOptionDislikeButton: React.FC<SelectedOptionDislikeButtonProps
     setDisliked(newDisliked);
 
     if (newDisliked) {
-    
+
       // Upsert dislike reaction
       const { data: existingReaction } = await supabase
         .from("wyra_selected_option_reaction")
@@ -98,6 +112,7 @@ const WyraSelectedOptionDislikeButton: React.FC<SelectedOptionDislikeButtonProps
         .eq("wyra_selected_option_id", wyraSelectedOptionId)
         .eq("user_id", userId);
     }
+    fetchReaction()
   };
 
   return (
@@ -108,9 +123,9 @@ const WyraSelectedOptionDislikeButton: React.FC<SelectedOptionDislikeButtonProps
         ${disliked ? "bg-red-600 text-white" : "bg-gray-200 text-gray-800"}`}
       >
         <ThumbsDown className="w-4 h-4 mr-1" />
-        <span>{count}</span>
+        <span>{dislikesCount}</span>
         <span className="hidden md:inline ml-1">
-          {count > 0 ? (count > 1 ? "Dislikes" : "Dislike") : "Dislike"}
+          {dislikesCount > 0 ? (dislikesCount > 1 ? "Dislikes" : "Dislike") : "Dislike"}
         </span>
       </button>
     </div>

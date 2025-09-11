@@ -55,10 +55,11 @@ interface MyWyrasProps {
   userId: string | undefined;
   setActiveTab?:any
   setSelectedUserId?:any
+  loggedInUserId?:any
 }
 
-export default function MyWyras({ userId ,setActiveTab,setSelectedUserId}: MyWyrasProps) {
-  const [wyraList, setWyraList] = useState<Wyra[]>([]);
+export default function MyWyras({ userId ,setActiveTab,setSelectedUserId,loggedInUserId}: MyWyrasProps) {
+  const [wyraList, setWyraList] = useState<any>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchWyras = async () => {
@@ -83,7 +84,11 @@ export default function MyWyras({ userId ,setActiveTab,setSelectedUserId}: MyWyr
         account_settings (
           show_real_name,
           multi_color_why_boxes
-        )
+        ),
+          user_blocks!blocked_id (
+    blocker_id,
+    blocked_id
+  )
       ),
       wyra_circles (
         circle:circles (
@@ -187,6 +192,11 @@ export default function MyWyras({ userId ,setActiveTab,setSelectedUserId}: MyWyr
           username: profile?.username,
           avatar: profile?.avatar,
         },
+         is_blocked: profile?.user_blocks?.some(
+          (block:any) =>
+            block.blocker_id === loggedInUserId &&
+            block.blocked_id === profile.id
+        ) || false,
         settings: profile?.account_settings,
         likeCount: reactionCounts[wyra.id]?.like || 0,
         dislikeCount: reactionCounts[wyra.id]?.dislike || 0,
@@ -197,7 +207,6 @@ export default function MyWyras({ userId ,setActiveTab,setSelectedUserId}: MyWyr
     setWyraList(formattedWyras);
     setLoading(false);
   };
-
 
   useEffect(() => {
     if (!userId) {

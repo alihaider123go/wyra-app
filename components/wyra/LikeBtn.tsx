@@ -16,21 +16,30 @@ interface LikeButtonProps {
 const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId, isFloatAllow, count }) => {
   const [liked, setLiked] = useState(false);
   const [showAgree, setShowAgree] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
   const supabase = createClient();
 
+  const fetchReaction = async () => {
+    const { data } = await supabase
+      .from("wyra_reaction")
+      .select("type")
+      .eq("wyra_id", wyraId)
+      .eq("user_id", userId)
+      .eq("type", "like")
+      .maybeSingle();
+    setLiked(data?.type === "like");
+
+    const { count } = await supabase
+      .from("wyra_reaction")
+      .select("*", { count: "exact", head: true })
+      .eq("wyra_id", wyraId)
+      .eq("type", "like");
+
+    setLikesCount(count || 0);
+
+  }
   // ✅ Fetch initial like status
   useEffect(() => {
-    const fetchReaction = async () => {
-      const { data } = await supabase
-        .from("wyra_reaction")
-        .select("type")
-        .eq("wyra_id", wyraId)
-        .eq("user_id", userId)
-        .eq("type", "like")
-        .maybeSingle();
-      setLiked(data?.type === "like");
-    };
-
     if (userId) fetchReaction();
   }, [wyraId, userId]);
 
@@ -40,6 +49,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId, isFloatAllow, c
       const detail = (e as CustomEvent).detail;
       if (detail?.wyraId === wyraId && detail.type === "dislike") {
         setLiked(false);
+        fetchReaction()
       }
     };
 
@@ -110,6 +120,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId, isFloatAllow, c
         .eq("wyra_id", wyraId)
         .eq("user_id", userId);
     }
+    fetchReaction()
   };
 
   return (
@@ -120,9 +131,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({ wyraId, userId, isFloatAllow, c
         ${liked ? "bg-green-600 text-white" : "bg-gray-200 text-gray-800"}`}
       >
         <ThumbsUp className="w-4 h-4 mr-1" />
-        <span>{count}</span>
+        <span>{likesCount}</span>
         <span className="hidden md:inline ml-1">
-          {count > 0 ? count > 1 ? "Likes" : "Like" : "Like"}
+          {likesCount > 0 ? likesCount > 1 ? "Likes" : "Like" : "Like"}
         </span>      </button>
 
       {isFloatAllow && showAgree && (

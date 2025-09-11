@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FaSmile, FaTrash, FaPlus, FaRegImage } from "react-icons/fa";
+import { FaSmile, FaTrash, FaRegImage } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
@@ -12,23 +12,32 @@ const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
 interface EditWyraProps {
   wyraId: string;
-  fetchWyras: any
-  setShowEditWyraModal: any
+  fetchWyras: any;
+  setShowEditWyraModal: any;
 }
 
-export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: EditWyraProps) {
+export default function EditWyra({
+  wyraId,
+  fetchWyras,
+  setShowEditWyraModal,
+}: EditWyraProps) {
   const [optionOne, setOptionOne] = useState("");
   const [originalOptionOne, setOriginalOptionOne] = useState("");
   const [originalOptionTwo, setOriginalOptionTwo] = useState("");
   const [optionTwo, setOptionTwo] = useState("");
   const [optionOneId, setOptionOneId] = useState<string | null>(null);
   const [optionTwoId, setOptionTwoId] = useState<string | null>(null);
-  const [mediaOne, setMediaOne] = useState<{ id?: string; url: string; type: string }[]>([]);
-  const [mediaTwo, setMediaTwo] = useState<{ id?: string; url: string; type: string }[]>([]);
+  const [mediaOne, setMediaOne] = useState<
+    { id?: string; url: string; type: string }[]
+  >([]);
+  const [mediaTwo, setMediaTwo] = useState<
+    { id?: string; url: string; type: string }[]
+  >([]);
   const [loading, setLoading] = useState(false);
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [activeOption, setActiveOption] = useState<1 | 2 | null>(null);
+  const [activeTab, setActiveTab] = useState(1); // mobile stepper
 
   const supabase = createClient();
   const router = useRouter();
@@ -50,12 +59,13 @@ export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: E
 
       optionsData?.forEach((option) => {
         if (option.position === 1) {
-          setOptionOne(option.option_text || "");
+          // only set state if not already set
+          setOptionOne((prev) => prev || option.option_text || "");
           setOriginalOptionOne(option.option_text || "");
           setOptionOneId(option.id);
           optionOneID = option.id;
         } else if (option.position === 2) {
-          setOptionTwo(option.option_text || "");
+          setOptionTwo((prev) => prev || option.option_text || "");
           setOriginalOptionTwo(option.option_text || "");
           setOptionTwoId(option.id);
           optionTwoID = option.id;
@@ -84,13 +94,11 @@ export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: E
           setMediaOne(mediaForOptionOne);
           setMediaTwo(mediaForOptionTwo);
         }
-
-
       }
     }
 
     fetchWyraData();
-  }, [wyraId]);
+  }, [wyraId]); // run only when wyraId changes
 
   const handleEmojiClick = (emojiData: any) => {
     if (activeOption === 1) {
@@ -152,53 +160,48 @@ export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: E
   };
 
   const handleSubmit = async () => {
-  if (!optionOne.trim() || !optionTwo.trim()) {
-    alert("Both options must be filled.");
-    return;
-  }
+    if (!optionOne.trim() || !optionTwo.trim()) {
+      alert("Both options must be filled.");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  const updates = [];
+    const updates = [];
 
-  // Update the first option only if the value has changed
-  if (optionOneId && optionOne.trim() !== originalOptionOne.trim()) {
-    updates.push(
-      supabase
-        .from("wyra_option")
-        .update({ option_text: optionOne, is_edit: true })
-        .eq("id", optionOneId)
-    );
-  }
+    if (optionOneId && optionOne.trim() !== originalOptionOne.trim()) {
+      updates.push(
+        supabase
+          .from("wyra_option")
+          .update({ option_text: optionOne, is_edit: true })
+          .eq("id", optionOneId)
+      );
+    }
 
-  // Update the second option only if the value has changed
-  if (optionTwoId && optionTwo.trim() !== originalOptionTwo.trim()) {
-    updates.push(
-      supabase
-        .from("wyra_option")
-        .update({ option_text: optionTwo, is_edit: true })
-        .eq("id", optionTwoId)
-    );
-  }
+    if (optionTwoId && optionTwo.trim() !== originalOptionTwo.trim()) {
+      updates.push(
+        supabase
+          .from("wyra_option")
+          .update({ option_text: optionTwo, is_edit: true })
+          .eq("id", optionTwoId)
+      );
+    }
 
-  // Update is_edit column in wyra table only if any option was updated
-  if (updates.length > 0 && wyraId) {
-    updates.push(
-      supabase
-        .from("wyra")
-        .update({ is_edit: true })
-        .eq("id", wyraId)
-    );
-  }
+    if (updates.length > 0 && wyraId) {
+      updates.push(
+        supabase.from("wyra").update({ is_edit: true }).eq("id", wyraId)
+      );
+    }
 
-  if (updates.length > 0) {
-    await Promise.all(updates);
-  }
+    if (updates.length > 0) {
+      await Promise.all(updates);
+    }
 
-  setLoading(false);
-  fetchWyras();
-  setShowEditWyraModal({ isShow: false, id: "" });
-};
+    setLoading(false);
+    fetchWyras();
+    setShowEditWyraModal({ isShow: false, id: "" });
+  };
+
 
   return (
     <div className="w-full flex justify-center relative">
@@ -206,133 +209,265 @@ export default function EditWyra({ wyraId, fetchWyras, setShowEditWyraModal }: E
         <Card className="border-0 animate-slide-in-right">
           <CardContent>
             <div className="max-w-2xl mx-auto">
-              {/* <h1 className="text-center text-3xl font-bold mb-3 md:mb-10 text-black">Edit Wyra</h1> */}
+              {/* Desktop Layout */}
+              <div className="hidden md:block">
 
-              {/* Option One */}
-              <div className="bg-white border rounded-2xl shadow p-5 mb-3 md:mb-8 relative">
-                <textarea
-                  maxLength={150}
-                  rows={4}
-                  placeholder="Type option one..."
-                  className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
-                  value={optionOne}
-                  onChange={(e) => setOptionOne(e.target.value)}
-                />
-                <div className="text-xs text-gray-400 absolute bottom-3 right-6">
-                  {150 - optionOne.length} Max
-                </div>
-                <div className="flex items-center mt-4 gap-4 relative">
-                  <FaSmile
-                    size={22}
-                    className="text-gray-600 cursor-pointer"
-                    onClick={() => {
-                      setActiveOption(1);
-                      setShowEmojiPicker((prev) => !prev);
-                    }}
+                <div className="bg-white border rounded-2xl shadow p-5 mb-3 md:mb-8 relative">
+                  <textarea
+                    maxLength={150}
+                    rows={4}
+                    placeholder="Type option one..."
+                    className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                    value={optionOne}
+                    onChange={(e) => setOptionOne(e.target.value)}
                   />
-                  <label className="cursor-pointer">
-                    <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
-
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*,video/*"
-                      onChange={(e) => handleAddMedia(1, e.target.files)}
+                  <div className="text-xs text-gray-400 absolute bottom-3 right-6">
+                    {150 - optionOne.length} Max
+                  </div>
+                  <div className="flex items-center mt-4 gap-4 relative">
+                    <FaSmile
+                      size={22}
+                      className="text-gray-600 cursor-pointer"
+                      onClick={() => {
+                        setActiveOption(1);
+                        setShowEmojiPicker((prev) => !prev);
+                      }}
                     />
-                  </label>
+                    <label className="cursor-pointer">
+                      <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*,video/*"
+                        onChange={(e) => handleAddMedia(1, e.target.files)}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Media Inside Container */}
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    {mediaOne.map((m) => (
+                      <div key={m.id} className="relative w-24 h-24 border rounded-md overflow-hidden">
+                        {m.type === "video" ? (
+                          <video src={m.url} controls className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={m.url} alt="media" className="w-full h-full object-cover" />
+                        )}
+                        <button
+                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                          onClick={() => handleDeleteMedia(1, m.id)}
+                        >
+                          <FaTrash size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-center font-semibold text-xl text-gray-700 mb-3 md:mb-8">
+                  OR
                 </div>
 
-                {/* Media Inside Container */}
-                <div className="flex flex-wrap gap-3 mt-3">
-                  {mediaOne.map((m) => (
-                    <div key={m.id} className="relative w-24 h-24 border rounded-md overflow-hidden">
-                      {m.type === "video" ? (
-                        <video src={m.url} controls className="w-full h-full object-cover" />
-                      ) : (
-                        <img src={m.url} alt="media" className="w-full h-full object-cover" />
-                      )}
-                      <button
-                        className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
-                        onClick={() => handleDeleteMedia(1, m.id)}
-                      >
-                        <FaTrash size={12} />
-                      </button>
-                    </div>
-                  ))}
+                <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
+                  <textarea
+                    maxLength={150}
+                    rows={4}
+                    placeholder="Type option two..."
+                    className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                    value={optionTwo}
+                    onChange={(e) => setOptionTwo(e.target.value)}
+                  />
+                  <div className="text-xs text-gray-400 absolute bottom-3 right-6">
+                    {150 - optionTwo.length} Max
+                  </div>
+                  <div className="flex items-center mt-4 gap-4 relative">
+                    <FaSmile
+                      size={22}
+                      className="text-gray-600 cursor-pointer"
+                      onClick={() => {
+                        setActiveOption(2);
+                        setShowEmojiPicker((prev) => !prev);
+                      }}
+                    />
+                    <label className="cursor-pointer">
+                      <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*,video/*"
+                        onChange={(e) => handleAddMedia(2, e.target.files)}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Media Inside Container */}
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    {mediaTwo.map((m) => (
+                      <div key={m.id} className="relative w-24 h-24 border rounded-md overflow-hidden">
+                        {m.type === "video" ? (
+                          <video src={m.url} controls className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={m.url} alt="media" className="w-full h-full object-cover" />
+                        )}
+                        <button
+                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                          onClick={() => handleDeleteMedia(2, m.id)}
+                        >
+                          <FaTrash size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="text-center mt-10">
+                  <Button
+                    btnText="Update Wyra"
+                    loading={loading}
+                    className="bg-blue-600 text-white"
+                    loadingText="Updating..."
+                    onClick={handleSubmit}
+                  />
                 </div>
               </div>
 
-              <div className="text-center font-semibold text-xl text-gray-700 mb-3 md:mb-8">OR</div>
+              {/* Mobile Layout (tabs/steps) */}
+              <div className="block md:hidden">
+                {activeTab === 1 && (
+                  <>
+                    <h1 className="font-semibold text-xl text-gray-700">Option 1:</h1>
+                    <div className="bg-white border rounded-2xl shadow p-5 mb-3 md:mb-8 relative">
+                      <textarea
+                        maxLength={150}
+                        rows={4}
+                        placeholder="Type option one..."
+                        className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                        value={optionOne}
+                        onChange={(e) => setOptionOne(e.target.value)}
+                      />
+                      <div className="text-xs text-gray-400 absolute bottom-3 right-6">
+                        {150 - optionOne.length} Max
+                      </div>
+                      <div className="flex items-center mt-4 gap-4 relative">
+                        <FaSmile
+                          size={22}
+                          className="text-gray-600 cursor-pointer"
+                          onClick={() => {
+                            setActiveOption(1);
+                            setShowEmojiPicker((prev) => !prev);
+                          }}
+                        />
+                        <label className="cursor-pointer">
+                          <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
 
-              {/* Option Two */}
-              <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
-                <textarea
-                  maxLength={150}
-                  rows={4}
-                  placeholder="Type option two..."
-                  className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
-                  value={optionTwo}
-                  onChange={(e) => setOptionTwo(e.target.value)}
-                />
-                <div className="text-xs text-gray-400 absolute bottom-3 right-6">
-                  {150 - optionTwo.length} Max
-                </div>
-                <div className="flex items-center mt-4 gap-4 relative">
-                  <FaSmile
-                    size={22}
-                    className="text-gray-600 cursor-pointer"
-                    onClick={() => {
-                      setActiveOption(2);
-                      setShowEmojiPicker((prev) => !prev);
-                    }}
-                  />
-                  <label className="cursor-pointer">
-                    <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*,video/*"
-                      onChange={(e) => handleAddMedia(2, e.target.files)}
-                    />
-                  </label>
-                </div>
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*,video/*"
+                            onChange={(e) => handleAddMedia(1, e.target.files)}
+                          />
+                        </label>
+                      </div>
 
-                {/* Media Inside Container */}
-                <div className="flex flex-wrap gap-3 mt-3">
-                  {mediaTwo.map((m) => (
-                    <div key={m.id} className="relative w-24 h-24 border rounded-md overflow-hidden">
-                      {m.type === "video" ? (
-                        <video src={m.url} controls className="w-full h-full object-cover" />
-                      ) : (
-                        <img src={m.url} alt="media" className="w-full h-full object-cover" />
-                      )}
-                      <button
-                        className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
-                        onClick={() => handleDeleteMedia(2, m.id)}
-                      >
-                        <FaTrash size={12} />
-                      </button>
+                      {/* Media Inside Container */}
+                      <div className="flex flex-wrap gap-3 mt-3">
+                        {mediaOne.map((m) => (
+                          <div key={m.id} className="relative w-24 h-24 border rounded-md overflow-hidden">
+                            {m.type === "video" ? (
+                              <video src={m.url} controls className="w-full h-full object-cover" />
+                            ) : (
+                              <img src={m.url} alt="media" className="w-full h-full object-cover" />
+                            )}
+                            <button
+                              className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                              onClick={() => handleDeleteMedia(1, m.id)}
+                            >
+                              <FaTrash size={12} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  ))}
-                </div>
+                    <div className="text-right mt-4">
+                      <Button btnText="Next" onClick={() => setActiveTab(2)} />
+                    </div>
+                  </>
+                )}
+                {activeTab === 2 && (
+                  <>
+                    <h1 className="font-semibold text-xl text-gray-700">Option 2:</h1>
+
+                    <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
+                      <textarea
+                        maxLength={150}
+                        rows={4}
+                        placeholder="Type option two..."
+                        className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                        value={optionTwo}
+                        onChange={(e) => setOptionTwo(e.target.value)}
+                      />
+                      <div className="text-xs text-gray-400 absolute bottom-3 right-6">
+                        {150 - optionTwo.length} Max
+                      </div>
+                      <div className="flex items-center mt-4 gap-4 relative">
+                        <FaSmile
+                          size={22}
+                          className="text-gray-600 cursor-pointer"
+                          onClick={() => {
+                            setActiveOption(2);
+                            setShowEmojiPicker((prev) => !prev);
+                          }}
+                        />
+                        <label className="cursor-pointer">
+                          <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*,video/*"
+                            onChange={(e) => handleAddMedia(2, e.target.files)}
+                          />
+                        </label>
+                      </div>
+
+                      {/* Media Inside Container */}
+                      <div className="flex flex-wrap gap-3 mt-3">
+                        {mediaTwo.map((m) => (
+                          <div key={m.id} className="relative w-24 h-24 border rounded-md overflow-hidden">
+                            {m.type === "video" ? (
+                              <video src={m.url} controls className="w-full h-full object-cover" />
+                            ) : (
+                              <img src={m.url} alt="media" className="w-full h-full object-cover" />
+                            )}
+                            <button
+                              className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                              onClick={() => handleDeleteMedia(2, m.id)}
+                            >
+                              <FaTrash size={12} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between mt-4">
+                      <Button btnText="Back" className="w-[28%] px-4 mr-3" onClick={() => setActiveTab(1)} />
+                      <Button
+                        btnText="Update Wyra"
+                        loading={loading}
+                        className="bg-blue-600 text-white w-[70%] px-4"
+                        loadingText="Updating..."
+                        onClick={handleSubmit}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* Emoji Picker */}
               {showEmojiPicker && (
                 <div className="absolute z-50 bottom-20">
                   <EmojiPicker onEmojiClick={handleEmojiClick} />
                 </div>
               )}
-
-              <div className="text-center mt-10">
-                <Button
-                  btnText="Update Wyra"
-                  loading={loading}
-                  className="bg-blue-600 text-white"
-                  loadingText="Updating..."
-                  onClick={handleSubmit}
-                />
-              </div>
             </div>
           </CardContent>
         </Card>

@@ -214,7 +214,7 @@ export default function UserProfile({ userId }: ProfileProps) {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <MyWyras userId={userId} />
+                    <MyWyras userId={userId} loggedInUserId={user?.id}/>
                 </CardContent>
             </Card>
 
