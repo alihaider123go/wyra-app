@@ -44,6 +44,9 @@ export default function LoginPage() {
     router.push("/forgot-password");
   };
 
+  const isShowTrendingSection = wyraList
+    .filter((wyra: any) => wyra.likeCount > 10).length > 0
+
   return (
     <div className="w-full flex flex-col items-center mt-20 mb-20">
       {/* ===== Top Header: WYRA Logo ===== */}
@@ -59,7 +62,7 @@ export default function LoginPage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="w-12 h-12 text-white"
+                className="w-12 h-12 text-white dark:text-black"
               >
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
               </svg>
@@ -73,49 +76,56 @@ export default function LoginPage() {
 
       {/* ===== Tagline ===== */}
       <div className="text-center mb-8 animate-fade-in">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 leading-tight">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-4 leading-tight">
           Life&apos;s full of choices – <br />
           <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             make them fun! ✨
           </span>
         </h2>
-        <p className="text-gray-600 text-lg">
+        <p className="text-gray-600 dark:text-gray-300 text-lg">
           Join millions making meaningful choices together
         </p>
       </div>
 
-      <div className="grid grid-cols-3 lg:w-[30%] gap-4 mb-8 animate-slide-in-left">
-        <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
+      <div className={`grid grid-cols-3 ${isShowTrendingSection ? "lg:w-[30%]" : "lg:w-[35%]"} gap-4 mb-8 animate-slide-in-left`}>
+        <div className="text-center p-4 bg-white dark:bg-black/60 backdrop-blur-sm rounded-2xl border border-white/20">
           <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2">
-            <Sparkles className="w-6 h-6 text-white" />
+            <Sparkles className="w-6 h-6 text-white dark:text-black" />
           </div>
-          <p className="text-sm font-semibold text-gray-700">Create</p>
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Create</p>
         </div>
-        <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
+        <div className="text-center p-4 bg-white dark:bg-black/60 backdrop-blur-sm rounded-2xl border border-white/20">
           <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-2">
-            <Zap className="w-6 h-6 text-white" />
+            <Zap className="w-6 h-6 text-white dark:text-black" />
           </div>
-          <p className="text-sm font-semibold text-gray-700">Choose</p>
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Choose</p>
         </div>
-        <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
+        <div className="text-center p-4 bg-white dark:bg-black/60 backdrop-blur-sm rounded-2xl border border-white/20">
           <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-2">
-            <Users className="w-6 h-6 text-white" />
+            <Users className="w-6 h-6 text-white dark:text-black" />
           </div>
-          <p className="text-sm font-semibold text-gray-700">Connect</p>
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Connect</p>
         </div>
       </div>
 
       {/* ===== Cards Section ===== */}
-      <div className="flex flex-col md:flex-row w-full max-w-5xl md:divide-x md:divide-gray-200">
+      <div className={`${isShowTrendingSection
+        ?
+        "flex flex-col md:flex-row w-full max-w-5xl md:divide-x md:divide-gray-200"
+
+        :
+        'flex justify-center w-full max-w-5xl md:divide-x md:divide-gray-200'
+
+        }`}>
         {/* Left Side: Login Card + Feature Icons */}
-        <div className="w-full md:w-1/2 md:pr-4 flex flex-col items-center">
+        <div className={`w-full md:w-1/2 ${isShowTrendingSection ? "md:pr-4" : ""} flex flex-col items-center`}>
           {/* Login Card */}
-          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right w-full max-w-md">
+          <Card className={`shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right w-full ${isShowTrendingSection ? "max-w-md" : ""}`}>
             <CardHeader className="text-center pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-800">
+              <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
                 Welcome Back
               </CardTitle>
-              <CardDescription className="text-gray-600 text-lg">
+              <CardDescription className="text-gray-600 dark:text-gray-300 text-lg">
                 Sign in to start making choices
               </CardDescription>
             </CardHeader>
@@ -124,7 +134,7 @@ export default function LoginPage() {
               {/* <div className="space-y-4 pt-2">
               <Button
                 onClick={() => goToSignUpPage()}
-                className="w-full h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="w-full h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white dark:text-black font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 Create Account
               </Button>
@@ -142,44 +152,43 @@ export default function LoginPage() {
           </Card>
         </div>
 
-        <div className="w-full md:w-1/2 md:pl-4 mt-8 md:mt-0 flex justify-center items-start">
-          <div className="shadow-2xl border-0 p-2 bg-white/80 h-[522px] overflow-x-hidden overflow-y-auto backdrop-blur-lg animate-slide-in-right w-full max-w-md">
-            <div className="space-y-6">
-              {
-                wyraList
-                  .filter((wyra: any) => wyra.likeCount > 20).length > 0
-                  ?
+        {isShowTrendingSection
+          ?
 
+          <div className="w-full md:w-1/2 md:pl-4 mt-8 md:mt-0 flex justify-center items-start">
+            <div className="shadow-2xl border-0 p-2 bg-white dark:bg-black/80 h-[522px] overflow-x-hidden overflow-y-auto backdrop-blur-lg animate-slide-in-right w-full max-w-md">
+              <div className="space-y-6">
+                {
                   wyraList
-                    .filter((wyra: any) => wyra.likeCount > 20)
+                    .filter((wyra: any) => wyra.likeCount > 10)
                     .map((wyra: any, index) => (
                       <Card
                         key={index}
-                        className="shadow-md hover:shadow-2xl border-0 bg-white/80 backdrop-blur-lg transition-all pt-4 animate-slide-in-right"
+                        className="shadow-md hover:shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg transition-all pt-4 animate-slide-in-right"
                       >
                         <CardContent className="p-2">
                           <div className="flex md:gap-2">
                             {/* user info */}
                             <div className="flex items-center gap-3 w-full">
-                              <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
+                              <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
 
-                                <CustomAvatar userId={wyra.creator?.id} firstName={wyra.creator.firstname} lastName={wyra.creator.lastname}/>
-                                
+                                <CustomAvatar userId={wyra.creator?.id} firstName={wyra.creator.firstname} lastName={wyra.creator.lastname} />
+
                               </div>
                               <div>
-                                <h2 className="text-lg font-bold text-black">
+                                <h2 className="text-lg font-bold text-black dark:text-white">
                                   {wyra.creator.firstname} {wyra.creator.lastname}
                                   <span>
                                     <span className="font-bold text-md mt-6">
                                       {" "}
                                       Asked,{" "}
                                     </span>
-                                    <small className="text-gray-500">
+                                    <small className="text-gray-500 dark:text-gray-200">
                                       {relativeTime(wyra.created_at)}
                                     </small>
                                   </span>
                                 </h2>
-                                <p className="text-gray-600 text-sm">
+                                <p className="text-gray-600 dark:text-gray-300 text-sm">
                                   @{wyra.creator.username}
                                 </p>
                               </div>
@@ -200,7 +209,7 @@ export default function LoginPage() {
                                 return (
                                   <React.Fragment key={opt.id}>
                                     {index === 1 && (
-                                      <span className="w-12 h-12 px-4 text-white rounded-full flex justify-center items-center text-sm font-semibold  bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900">
+                                      <span className="w-12 h-12 px-4 text-white dark:text-black rounded-full flex justify-center items-center text-sm font-semibold  bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900">
                                         OR
                                       </span>
                                     )}
@@ -208,7 +217,7 @@ export default function LoginPage() {
                                     <div
                                       className={`
             my-1 relative overflow-hidden border shadow p-4 rounded-lg cursor-pointer w-full transition-all duration-300 transform hover:scale-[1.02]
-            ${"hover:bg-gray-100"
+            ${"hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-800"
                                         }
           `}
                                     // onClick={() => {
@@ -220,13 +229,13 @@ export default function LoginPage() {
                                     >
 
                                       <p
-                                        className={`text-sm font-medium mb-1 ${"text-gray-500"
+                                        className={`text-sm font-medium mb-1 ${"text-gray-500 dark:text-gray-200"
                                           }`}
                                       >
                                         Option {index + 1}:
                                       </p>
                                       <p
-                                        className={`font-bold text-lg mb-1 ${"text-gray-800"
+                                        className={`font-bold text-lg mb-1 ${"text-gray-800 dark:text-gray-200"
                                           }`}
                                       >
                                         {opt.option_text}
@@ -258,30 +267,30 @@ export default function LoginPage() {
                           </div>
                           <hr />
                           <div className="flex justify-between">
-                            <div className="mt-4 text-sm text-gray-500 flex gap-4">
-                              <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-green-200 text-gray-800 hover:bg-green-300">
+                            <div className="mt-4 text-sm text-gray-500 dark:text-gray-200 flex gap-4">
+                              <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-green-200 text-gray-800 dark:text-gray-200 hover:bg-green-300">
                                 <ThumbsUp className="w-4 h-4 mr-1" size={18} /> {wyra?.likeCount}{" "}
                               </span>
-                              <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-red-200 text-gray-800 hover:bg-red-300">
+                              <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-red-200 text-gray-800 dark:text-gray-200 hover:bg-red-300">
                                 <ThumbsDown className="w-4 h-4 mr-1" size={18} /> {wyra?.dislikeCount}
                               </span>
-                              <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-blue-200 text-gray-800 hover:bg-blue-300">
+                              <span className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-blue-200 text-gray-800 dark:text-gray-200 hover:bg-blue-300">
                                 <MessageCircle className="w-4 h-4 mr-1" size={18} /> {wyra?.commentCount}
                               </span>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
-                    )) :
-                  <div className="flex h-[500px] justify-center items-center">
-                    <div className="text-center pt-5">
-                      <p>Trending Wyras</p>
-                    </div>
-                  </div>
-              }
+                    ))
+                }
+              </div>
             </div>
           </div>
-        </div>
+          :
+          null}
+
+
+
       </div>
     </div>
   );

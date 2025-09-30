@@ -122,7 +122,7 @@ const DeleteAccountButton = () => {
 
   return (
     <>
-      <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 hover:bg-red-600 text-lg text-bold text-white w-full h-12">
+      <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 hover:bg-red-600 text-lg text-bold text-white dark:text-black w-full h-12">
         <Trash2 className="w-4 h-4 mr-2" /> Delete Account
       </Button>
 
@@ -175,7 +175,7 @@ const DeleteAccountButton = () => {
                     <Button onClick={handleMainAction}>
                       {reasonsMap[selectedReason]?.buttonText}
                     </Button>
-                    <p className="mt-4 text-sm text-gray-500">
+                    <p className="mt-4 text-sm text-gray-500 dark:text-gray-200">
                       Still want to delete your account?{" "}
                       <button
                         className="text-red-600 hover:text-red-600 underline"
@@ -195,13 +195,13 @@ const DeleteAccountButton = () => {
                     </p>
                     <div className="flex flex-col gap-2 mt-4">
                       <Button
-                        className="bg-yellow-500 hover:bg-yellow-500 text-white"
+                        className="bg-yellow-500 hover:bg-yellow-500 text-white dark:text-black"
                         onClick={handleFinalDeactivate}
                       >
                         Deactivate Instead
                       </Button>
                       <Button
-                        className="bg-red-600 hover:bg-red-600 text-white"
+                        className="bg-red-600 hover:bg-red-600 text-white dark:text-black"
                         onClick={handleFinalDelete}
                         disabled={loading}
                       >

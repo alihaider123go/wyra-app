@@ -164,7 +164,7 @@ export default function AccountPrivacySettings() {
   }, {});
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-8 text-gray-800">
+    <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-black rounded-lg shadow-md space-y-8 text-gray-800 dark:text-gray-200">
       {Object.entries(groupedSettings).map(([category, settings]) => (
         <section key={category}>
           <h2 className="text-xl font-semibold mb-4 border-b border-gray-300 pb-2">{category}</h2>
@@ -175,7 +175,7 @@ export default function AccountPrivacySettings() {
                   <label htmlFor={id} className="font-medium cursor-pointer">
                     {label}
                   </label>
-                  <p className="text-sm text-gray-600">{description}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
                 </div>
                 <div>
                   <input
@@ -192,7 +192,7 @@ export default function AccountPrivacySettings() {
         </section>
       ))}
 
-      <footer className="mt-10 text-center text-gray-600 text-sm">
+      <footer className="mt-10 text-center text-gray-600 dark:text-gray-300 text-sm">
         ✨ Need help? Questions? Just shoot us an email at{" "}
         <a href="mailto:info@wyra.xyz" className="text-indigo-600 underline">
           info@wyra.xyz

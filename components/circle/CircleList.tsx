@@ -130,7 +130,7 @@ export default function CircleList({ userId }: CircleListProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
         <button
           onClick={() => setShowModal(true)}
-          className="flex justify-center items-center gap-2 px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
+          className="flex justify-center items-center gap-2 px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white dark:text-black font-medium rounded-lg transition"
         >
           <Plus size={18} /> Create Circle
         </button>
@@ -139,7 +139,7 @@ export default function CircleList({ userId }: CircleListProps) {
             setShowDetailsModal(true);
             setSelectedCircleId(circle.id);
           }}
-            className="bg-white rounded-xl border shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-center items-center text-center gap-4 px-4 py-3">
+            className="bg-white dark:bg-black rounded-xl border shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-center items-center text-center gap-4 px-4 py-3">
             {circle.icon ? (
               <img
                 src={circle.icon}
@@ -147,21 +147,21 @@ export default function CircleList({ userId }: CircleListProps) {
                 className="w-20 h-20 shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover"
               />
             ) : (
-              <div className="w-20 h-20 shadow-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full flex items-center justify-center text-gray-600 font-bold text-4xl  flex justify-center items-center p-1">
-                <div className="w-full h-full bg-white rounded-full flex justify-center items-center">
+              <div className="w-20 h-20 shadow-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 font-bold text-4xl  flex justify-center items-center p-1">
+                <div className="w-full h-full bg-white dark:bg-black rounded-full flex justify-center items-center">
                   {circle.name[0]?.toUpperCase()}
                 </div>
               </div>
             )}
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-gray-900">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                 {circle.name}
               </h3>
-              <p className="text-sm text-gray-500 flex items-center gap-1">
+              <p className="text-sm text-gray-500 dark:text-gray-200 flex items-center gap-1">
                 <Users size={14} /> {circle.circle_members[0]?.count || 0}{" "}
                 members
               </p>
-              <p className="text-sm text-gray-500 flex items-center gap-1">
+              <p className="text-sm text-gray-500 dark:text-gray-200 flex items-center gap-1">
                 <Paperclip size={14} /> {circle.wyra_circles[0]?.count || 0}{" "}
                 {circle.wyra_circles[0]?.count > 1 ? "wyras":"wyra" }
               </p>
@@ -197,7 +197,7 @@ export default function CircleList({ userId }: CircleListProps) {
             <ModalBody>
 
               <div className="space-y-2">
-                <Label htmlFor="circleName" className="text-sm font-semibold text-gray-700"> Circle Name </Label>
+                <Label htmlFor="circleName" className="text-sm font-semibold text-gray-700 dark:text-gray-300"> Circle Name </Label>
                 <Input
                   id="circleName"
                   type="text"
@@ -205,13 +205,13 @@ export default function CircleList({ userId }: CircleListProps) {
                   onChange={(e) => setCreateCircleName(e.target.value)}
                   placeholder="Circle Name"
                   disabled={uploading}
-                  className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+                  className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
                   required
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="circleIcon" className="text-sm font-semibold text-gray-700"> Upload Icon (optional) </Label>
+                <Label htmlFor="circleIcon" className="text-sm font-semibold text-gray-700 dark:text-gray-300"> Upload Icon (optional) </Label>
                 <Input
                   id="circleIcon"
                 type="file"
@@ -222,7 +222,7 @@ export default function CircleList({ userId }: CircleListProps) {
                   }
                 }}
                 disabled={uploading}
-                className="text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+                className="text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
                 required
                 />
               </div>
@@ -230,12 +230,12 @@ export default function CircleList({ userId }: CircleListProps) {
 
             <ModalFooter className="flex justify-between">
                 <Button
-                className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => setShowModal(!showModal)}>
+                className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white dark:text-black font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => setShowModal(!showModal)}>
                   Cancel
                 </Button>
                 <Button
                 onClick={handleCreateCircle}
-                disabled={uploading || !createCircleName.trim()} className="w-full h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                disabled={uploading || !createCircleName.trim()} className="w-full h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white dark:text-black font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                     {uploading ? "Uploading..." : "Create"}
                 </Button>
             </ModalFooter>
@@ -277,13 +277,13 @@ export default function CircleList({ userId }: CircleListProps) {
 
             <ModalFooter className="flex justify-between">
                 <Button
-                className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => setShowDeleteModal(!showDeleteModal)}>
+                className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white dark:text-black font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => setShowDeleteModal(!showDeleteModal)}>
                   Cancel
                 </Button>
                 <Button
                 onClick={handleDeleteCircle}
                 disabled={deleting}
-                  className="w-full h-14 bg-gradient-to-r from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                  className="w-full h-14 bg-gradient-to-r from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 text-white dark:text-black font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                 {deleting ? "Deleting..." : "Delete"}
                 </Button>
             </ModalFooter>

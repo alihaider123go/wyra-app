@@ -101,11 +101,11 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId, isFlo
       <button
         onClick={toggleFavourite}
         disabled={loading}
-        className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer ${favourited ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" : "bg-gray-200 text-gray-800"
+        className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer ${favourited ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white dark:text-black" : "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
           }`}
       >
         <Heart
-          className={`w-4 h-4 mr-1 transition ${favourited ? "fill-current text-white" : ""
+          className={`w-4 h-4 mr-1 transition ${favourited ? "fill-current text-white dark:text-black" : ""
             }`}
         />
         <span className="md:block hidden">

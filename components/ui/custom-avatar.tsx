@@ -49,7 +49,7 @@ export default function CustomAvatar({
     >
       <div
         className="w-full h-full rounded-full flex items-center justify-center
-                   bg-white text-gray-700 font-bold text-lg"
+                   bg-white dark:bg-black text-gray-700 dark:text-gray-300 font-bold text-lg"
       >
         {initials || "?"}
       </div>

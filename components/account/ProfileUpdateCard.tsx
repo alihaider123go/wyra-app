@@ -251,7 +251,7 @@ export default function ProfileInformation({
           className="flex items-center justify-center shadow-2xl p-1 bg-gradient-to-r 
                      from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
                      border-gray-700 w-24 h-24 rounded-full mb-2 
-                     text-white text-3xl font-bold uppercase"
+                     text-white dark:text-black text-3xl font-bold uppercase"
         >
           {getAvatarInitials(profile?.firstname + " " + profile?.lastname)}
         </div>
@@ -267,7 +267,7 @@ export default function ProfileInformation({
         <button
           type="button"
           onClick={handleButtonClick}
-          className="h-12 w-full text-[13px] md:text-[16px] mx-[-50px] my-auto px-2 md:px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          className="h-12 w-full text-[13px] md:text-[16px] mx-[-50px] my-auto px-2 md:px-4 py-2 bg-blue-600 text-white dark:text-black rounded hover:bg-blue-700 transition"
         >
           Upload Profile Picture
         </button>
@@ -277,7 +277,7 @@ export default function ProfileInformation({
         <div className="space-y-2">
           <Label
             htmlFor="firstname"
-            className="text-sm font-semibold text-gray-700"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             {" "}
             First Name{" "}
@@ -290,7 +290,7 @@ export default function ProfileInformation({
             onChange={(e) =>
               setProfile((p) => ({ ...p, firstname: e.target.value }))
             }
-            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
             required
           />
         </div>
@@ -298,7 +298,7 @@ export default function ProfileInformation({
         <div className="space-y-2">
           <Label
             htmlFor="lastname"
-            className="text-sm font-semibold text-gray-700"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             {" "}
             Last Name{" "}
@@ -311,7 +311,7 @@ export default function ProfileInformation({
             onChange={(e) =>
               setProfile((p) => ({ ...p, lastname: e.target.value }))
             }
-            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
             required
           />
         </div>
@@ -321,7 +321,7 @@ export default function ProfileInformation({
         <div className="space-y-2">
           <Label
             htmlFor="username"
-            className="text-sm font-semibold text-gray-700"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             {" "}
             Username{" "}
@@ -334,7 +334,7 @@ export default function ProfileInformation({
             onChange={(e) =>
               setProfile((p) => ({ ...p, username: e.target.value }))
             }
-            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
             minLength={3}
             required
           />
@@ -342,7 +342,7 @@ export default function ProfileInformation({
             {profile.username !== originalUsername && (
               <>
                 {checkingUsername && (
-                  <span className="text-gray-500">
+                  <span className="text-gray-500 dark:text-gray-200">
                     Checking availability...
                   </span>
                 )}
@@ -360,7 +360,7 @@ export default function ProfileInformation({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dob" className="text-sm font-semibold text-gray-700">
+          <Label htmlFor="dob" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             {" "}
             Date of Birth{" "}
           </Label>
@@ -370,7 +370,7 @@ export default function ProfileInformation({
             id="dob"
             value={profile.dob}
             onChange={(e) => setProfile((p) => ({ ...p, dob: e.target.value }))}
-            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
             required
           />
         </div>
@@ -379,7 +379,7 @@ export default function ProfileInformation({
         <div className="space-y-2">
           <Label
             htmlFor="gender"
-            className="text-sm font-semibold text-gray-700"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Gender
           </Label>
@@ -392,11 +392,11 @@ export default function ProfileInformation({
               onChange={(e) =>
                 setProfile((p) => ({ ...p, gender: e.target.value }))
               }
-              className={`w-full h-14 text-base border-2 border-gray-200 focus:border-blue-500 focus:ring-0 focus:outline-none rounded-xl bg-white/90 backdrop-blur-sm px-4 pr-10 appearance-none 
+              className={`w-full h-14 text-base border-2 border-gray-200 focus:border-blue-500 focus:ring-0 focus:outline-none rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm px-4 pr-10 appearance-none 
                           ${
                             profile.gender === ""
                               ? "text-gray-400"
-                              : "text-gray-900"
+                              : "text-gray-900 dark:text-gray-100"
                           }`}
             >
               <option value="" disabled>
@@ -410,7 +410,7 @@ export default function ProfileInformation({
 
             {/* Custom Dropdown Icon */}
             <svg
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 dark:text-gray-200 pointer-events-none"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -428,7 +428,7 @@ export default function ProfileInformation({
         <div className="space-y-2">
           <Label
             htmlFor="email"
-            className="text-sm font-semibold text-gray-700"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Email
           </Label>
@@ -441,14 +441,14 @@ export default function ProfileInformation({
               setProfile((p) => ({ ...p, email: e.target.value }))
             }
             placeholder="Email"
-            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
             disabled
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="bio" className="text-sm font-semibold text-gray-700">
+        <Label htmlFor="bio" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           {" "}
           Bio{" "}
         </Label>
@@ -459,10 +459,10 @@ export default function ProfileInformation({
           maxLength={200}
           value={profile.bio}
           onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
-          className="text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+          className="text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
           required
         />
-        <div className="text-right text-sm text-gray-500 mt-1">
+        <div className="text-right text-sm text-gray-500 dark:text-gray-200 mt-1">
           {profile.bio.length}/200 characters
         </div>
       </div>
@@ -520,7 +520,7 @@ export default function ProfileInformation({
           {profile.username !== originalUsername && (
             <>
               {checkingUsername && (
-                <span className="text-gray-500">Checking availability...</span>
+                <span className="text-gray-500 dark:text-gray-200">Checking availability...</span>
               )}
               {!checkingUsername && usernameAvailable === true && (
                 <span className="text-green-600">Username is available ✓</span>
@@ -543,7 +543,7 @@ export default function ProfileInformation({
           className="border p-2 rounded w-full"
           placeholder="Write something about yourself"
         />
-        <div className="text-right text-sm text-gray-500 mt-1">
+        <div className="text-right text-sm text-gray-500 dark:text-gray-200 mt-1">
           {profile.bio.length}/200 characters
         </div>
       </div>
@@ -567,7 +567,7 @@ export default function ProfileInformation({
       <Button
         type="submit"
         disabled={updating}
-        className="w-full h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        className="w-full h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white dark:text-black font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
       >
         {updating ? (
           <>
@@ -581,7 +581,7 @@ export default function ProfileInformation({
       {/* <button
         type="submit"
         disabled={updating}
-        className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+        className="bg-blue-600 text-white dark:text-black px-4 py-2 rounded disabled:opacity-50"
       >
         {updating ? "Saving..." : "Update Profile"}
       </button> */}

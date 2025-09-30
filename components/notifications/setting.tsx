@@ -130,7 +130,7 @@ export default function NotificationsSettings({ userId }: NotificationProps) {
 }, [userId]);
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-8 text-gray-800">
+    <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-black rounded-lg shadow-md space-y-8 text-gray-800 dark:text-gray-200">
       <section>
         <h2 className="text-xl font-semibold mb-6 border-b border-gray-300 pb-2 flex items-center gap-2">
           <span role="img" aria-label="bell">
@@ -145,7 +145,7 @@ export default function NotificationsSettings({ userId }: NotificationProps) {
                 <label htmlFor={id} className="font-medium cursor-pointer">
                   {label}
                 </label>
-                <p className="text-sm text-gray-600">{description}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
               </div>
               <input
                 type="checkbox"

@@ -104,11 +104,11 @@ const CommentModal: React.FC<Props> = ({ wyraId, userId, onClose }) => {
   };
 
   return (
-    <div className="bg-white p-6 pt-1 rounded-lg w-full">
+    <div className="bg-white dark:bg-black p-6 pt-1 rounded-lg w-full">
       {/* Close icon */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
+        className="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 focus:outline-none"
         aria-label="Close comment modal"
       >
         <X className="w-6 h-6" />
@@ -124,7 +124,7 @@ const CommentModal: React.FC<Props> = ({ wyraId, userId, onClose }) => {
           maxLength={150} // limit input to 150 chars
           onChange={(e) => setContent(e.target.value)}
         />
-        <div className="text-right text-xs text-gray-500 mb-4">
+        <div className="text-right text-xs text-gray-500 dark:text-gray-200 mb-4">
           {content.length} / 150
         </div>
       </>
@@ -132,7 +132,7 @@ const CommentModal: React.FC<Props> = ({ wyraId, userId, onClose }) => {
       <div className="flex justify-end gap-2 mb-6">
         <button
           onClick={handleSubmit}
-          className={`px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+          className={`px-4 py-2 text-sm bg-blue-600 text-white dark:text-black rounded hover:bg-blue-700"
              ${loading
               ? "bg-gradient-to-r from-gray-500 to-gray-800 hover:from-gray-600 hover:to-gray-900"
               : "bg-gradient-to-r from-blue-500 to-blue-800 hover:from-blue-600 hover:to-blue-900"
@@ -145,9 +145,9 @@ const CommentModal: React.FC<Props> = ({ wyraId, userId, onClose }) => {
 
       {/* Comment list */}
       {fetchingComments ? (
-        <p className="text-sm text-gray-500">Loading comments...</p>
+        <p className="text-sm text-gray-500 dark:text-gray-200">Loading comments...</p>
       ) : comments.length === 0 ? (
-        <p className="text-sm text-gray-500">No comments yet.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-200">No comments yet.</p>
       ) : (
         <ul className="space-y-4">
           {comments.map((comment) => (
@@ -164,7 +164,7 @@ const CommentModal: React.FC<Props> = ({ wyraId, userId, onClose }) => {
                   {new Date(comment.created_at).toLocaleString()}
                 </span>
               </div>
-              <p className="text-sm text-gray-800 text-left">{comment.content}</p>
+              <p className="text-sm text-gray-800 dark:text-gray-200 text-left">{comment.content}</p>
             </li>
           ))}
         </ul>

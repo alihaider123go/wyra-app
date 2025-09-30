@@ -137,7 +137,7 @@ const SignUpForm = () => {
           <div className="space-y-2">
             <Label
               htmlFor="firstname"
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               First Name
             </Label>
@@ -146,7 +146,7 @@ const SignUpForm = () => {
               id="firstname"
               name="firstname"
               placeholder="First Name"
-              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
               required
             />
           </div>
@@ -154,7 +154,7 @@ const SignUpForm = () => {
           <div className="space-y-2">
             <Label
               htmlFor="lastname"
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               Last Name
             </Label>
@@ -163,7 +163,7 @@ const SignUpForm = () => {
               id="lastname"
               name="lastname"
               placeholder="Last Name"
-              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
               required
             />
           </div>
@@ -173,7 +173,7 @@ const SignUpForm = () => {
           <div className="space-y-2">
             <Label
               htmlFor="dob"
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               Date Of Birth
             </Label>
@@ -182,7 +182,7 @@ const SignUpForm = () => {
               id="dob"
               name="dob"
               placeholder="DOB"
-              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
               required
               max={minAgeDate}
             />
@@ -190,7 +190,7 @@ const SignUpForm = () => {
           <div className="space-y-2">
             <Label
               htmlFor="gender"
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               Gender
             </Label>
@@ -201,8 +201,8 @@ const SignUpForm = () => {
                 required
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
-                className={`w-full h-14 text-base border-2 border-gray-200 focus:border-blue-500 focus:ring-0 focus:outline-none rounded-xl bg-white/90 backdrop-blur-sm px-4 pr-10 appearance-none 
-        ${gender === "" ? "text-gray-400" : "text-gray-900"}`}
+                className={`w-full h-14 text-base border-2 border-gray-200 focus:border-blue-500 focus:ring-0 focus:outline-none rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm px-4 pr-10 appearance-none 
+        ${gender === "" ? "text-gray-400" : "text-gray-900 dark:text-gray-100"}`}
               >
                 <option value="" disabled>
                   Select Gender
@@ -215,7 +215,7 @@ const SignUpForm = () => {
 
               {/* Custom Dropdown Icon */}
               <svg
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 dark:text-gray-200 pointer-events-none"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -236,7 +236,7 @@ const SignUpForm = () => {
           <div className="space-y-2">
             <Label
               htmlFor="username"
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               Username
             </Label>
@@ -248,14 +248,14 @@ const SignUpForm = () => {
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Username"
               minLength={3}
-              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
               required
             />
             <div className="text-sm mt-1">
               {username.length >= 3 && (
                 <>
                   {checkingUsername && (
-                    <span className="text-gray-500">
+                    <span className="text-gray-500 dark:text-gray-200">
                       Checking availability...
                     </span>
                   )}
@@ -274,7 +274,7 @@ const SignUpForm = () => {
           <div className="space-y-2">
             <Label
               htmlFor="email"
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               Email
             </Label>
@@ -283,7 +283,7 @@ const SignUpForm = () => {
               name="email"
               type="email"
               placeholder="Email"
-              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+              className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
               required
             />
           </div>
@@ -293,7 +293,7 @@ const SignUpForm = () => {
           <div className="space-y-2">
             <Label
               htmlFor="password"
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               Password
             </Label>
@@ -303,13 +303,13 @@ const SignUpForm = () => {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
-                className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+                className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-300 transition-colors"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -322,7 +322,7 @@ const SignUpForm = () => {
           <div className="space-y-2">
             <Label
               htmlFor="confirm-password"
-              className="text-sm font-semibold text-gray-700"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
               Confirm Password
             </Label>
@@ -332,13 +332,13 @@ const SignUpForm = () => {
                 name="confirm-password"
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm Password"
-                className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+                className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-300 transition-colors"
               >
                 {showConfirmPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -358,7 +358,7 @@ const SignUpForm = () => {
               className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-0 focus:outline-none"
             />
           </label>
-          <span className="text-sm font-semibold text-gray-700 ml-2">
+          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-2">
             I agree to the
             <span
               onClick={() => setIsModalOpen({ isOpen: true, type: "terms" })}
@@ -390,7 +390,7 @@ const SignUpForm = () => {
           </div>
 
           <div className="space-y-4 md:pt-2 text-center">
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
               Already have an account?{" "}
               <button
                 onClick={() => goToSingInPage()}
@@ -409,7 +409,7 @@ const SignUpForm = () => {
             {" "}
             <button
               onClick={() => setIsModalOpen({ isOpen: false, type: "" })}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
+              className="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 focus:outline-none"
               aria-label="Close comment modal"
             >
               <X className="w-6 h-6" />

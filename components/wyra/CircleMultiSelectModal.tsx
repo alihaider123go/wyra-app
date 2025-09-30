@@ -27,12 +27,12 @@ export default function CircleMultiSelectModal({ userId, onSelect, onCancel, cir
     <Dialog open={true} onClose={onCancel} className="relative z-50">
       <div className="fixed inset-0 bg-black/30" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="bg-white rounded-xl p-6 max-w-md w-full shadow-lg">
+        <Dialog.Panel className="bg-white dark:bg-black rounded-xl p-6 max-w-md w-full shadow-lg">
           <Dialog.Title className="text-lg font-bold mb-4">
             Share this Wyra with your circles?
           </Dialog.Title>
           {circles.length === 0 ? (
-            <p className="text-gray-500">You don’t have any circles yet.</p>
+            <p className="text-gray-500 dark:text-gray-200">You don’t have any circles yet.</p>
           ) : (
             <ul className="space-y-3 max-h-64 overflow-y-auto">
               {circles.map((circle) => (
@@ -52,7 +52,7 @@ export default function CircleMultiSelectModal({ userId, onSelect, onCancel, cir
             <Button
               btnText="Post Wyra"
               onClick={() => onSelect(selected)}
-              className="bg-blue-600 text-white"
+              className="bg-blue-600 text-white dark:text-black"
             />
           </div>
         </Dialog.Panel>

@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,17 +19,40 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Run before React hydration, sets theme instantly */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem("theme");
+                  if (theme === "dark") {
+                    document.documentElement.classList.add("dark");
+                  } else {
+                    document.documentElement.classList.remove("dark");
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex flex-col relative overflow-hidden">
-        {/* <div className="mx-auto max-w-screen-lg h-screen flex flex-col"> */}
-          {/* <Navbar /> */}
+        <div
+          className="min-h-screen flex flex-col relative overflow-hidden 
+            bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100
+            dark:from-gray-900 dark:via-gray-900 dark:to-gray-900"
+          suppressHydrationWarning
+        >
           <div className="flex-grow">{children}</div>
         </div>
       </body>

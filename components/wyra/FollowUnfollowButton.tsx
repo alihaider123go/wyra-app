@@ -14,7 +14,7 @@ export default function FollowButton({
   return (
     <div
       onClick={toggleFollow}
-      className="flex w-full text-sm text-gray-700 cursor-pointer"
+      className="flex w-full text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
     >
       {loading ? (
         <>

@@ -35,7 +35,7 @@ export default function BottomNavigation({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-200/50 md:hidden shadow-2xl">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black/90 backdrop-blur-lg border-t border-gray-200/50 md:hidden shadow-2xl">
       <div className="flex items-center justify-around py-2 px-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -49,10 +49,10 @@ export default function BottomNavigation({
               className={`flex flex-col items-center justify-center p-3 min-w-0 flex-1 rounded-2xl transition-all duration-300 transform
     ${
       tab.disable
-        ? "text-gray-400 cursor-not-allowed bg-gray-100"
+        ? "text-gray-400 cursor-not-allowed bg-gray-900 dark:bg-gray-800"
         : isActive
-        ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-110"
-        : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
+        ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white dark:text-black shadow-lg scale-110"
+        : "text-gray-500 dark:text-gray-200 hover:text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-800/50"
     }`}
             >
               {tab.id === "profile" && userProfile?.avatar ? (
@@ -73,8 +73,8 @@ export default function BottomNavigation({
                     tab.disable
                       ? "bg-gray-300 text-gray-400"
                       : isActive
-                      ? "bg-white/20"
-                      : "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg"
+                      ? "bg-white dark:bg-black/20"
+                      : "bg-gradient-to-br from-blue-500 to-purple-600 text-white dark:text-black shadow-lg"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -89,7 +89,7 @@ export default function BottomNavigation({
 
               <span
                 className={`text-xs mt-1 font-semibold ${
-                  isActive ? tab.disable ? "text-gray-400" : "text-white" : "text-gray-400"
+                  isActive ? tab.disable ? "text-gray-400" : "text-white dark:text-black" : "text-gray-400"
                 }`}
               >
                 {tab.label}

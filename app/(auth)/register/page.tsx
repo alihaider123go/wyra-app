@@ -29,7 +29,7 @@ export default function LoginPage() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="w-12 h-12 text-white"
+                    className="w-12 h-12 text-white dark:text-black"
                   >
                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                   </svg>
@@ -43,42 +43,42 @@ export default function LoginPage() {
 
            {/* ===== Tagline ===== */}
     <div className="text-center mb-8 animate-fade-in">
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 leading-tight">
+      <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-4 leading-tight">
         Life&apos;s full of choices – <br />
         <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           make them fun! ✨
         </span>
       </h2>
-      <p className="text-gray-600 text-lg">
+      <p className="text-gray-600 dark:text-gray-300 text-lg">
         Join millions making meaningful choices together
       </p>
     </div>
 
        <div className="grid grid-cols-3 gap-4 mb-8 animate-slide-in-left">
-          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
+          <div className="text-center p-4 bg-white dark:bg-black/60 backdrop-blur-sm rounded-2xl border border-white/20">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <Sparkles className="w-6 h-6 text-white" />
+              <Sparkles className="w-6 h-6 text-white dark:text-black" />
             </div>
-            <p className="text-sm font-semibold text-gray-700">Create</p>
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Create</p>
           </div>
-          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
+          <div className="text-center p-4 bg-white dark:bg-black/60 backdrop-blur-sm rounded-2xl border border-white/20">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <Zap className="w-6 h-6 text-white" />
+              <Zap className="w-6 h-6 text-white dark:text-black" />
             </div>
-            <p className="text-sm font-semibold text-gray-700">Choose</p>
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Choose</p>
           </div>
-          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20">
+          <div className="text-center p-4 bg-white dark:bg-black/60 backdrop-blur-sm rounded-2xl border border-white/20">
             <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <Users className="w-6 h-6 text-white" />
+              <Users className="w-6 h-6 text-white dark:text-black" />
             </div>
-            <p className="text-sm font-semibold text-gray-700">Connect</p>
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Connect</p>
           </div>
         </div>
 
-          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+          <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
             <CardHeader className="text-center pb-6">
-              <CardTitle className="text-2xl font-bold text-gray-800">Sign Up</CardTitle>
-              <CardDescription className="text-gray-600 text-lg">Sign up to start making choices</CardDescription>
+              <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">Sign Up</CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-300 text-lg">Sign up to start making choices</CardDescription>
             </CardHeader>
             <CardContent>
 

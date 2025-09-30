@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function CSAEPolicy() {
   return (
-    <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right max-w-3xl mx-auto my-10">
+    <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right max-w-3xl mx-auto my-10">
       <CardHeader className="text-center pb-6">
-        <CardTitle className="text-2xl font-bold text-gray-800">
+        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
           Child Sexual Abuse and Exploitation (CSAE) Policy
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="text-left space-y-4 text-gray-700 text-sm leading-relaxed">
+      <CardContent className="text-left space-y-4 text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
         <p>
           At Wyra, we’re here to help you spark conversations, ask bold questions, and share your “Why”s — but
           protecting children is not up for debate. We are firmly committed to preventing and responding to all forms of
@@ -20,7 +20,7 @@ export default function CSAEPolicy() {
           needs help.
         </p>
 
-        <h3 className="text-lg font-semibold text-gray-800">1. Our Commitment</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">1. Our Commitment</h3>
         <p>
           We believe every child has the right to grow up free from sexual abuse, exploitation, and harm. That’s why Wyra
           has a zero-tolerance policy towards any content or behavior that depicts, enables, encourages, or trivializes CSAE.
@@ -33,7 +33,7 @@ export default function CSAEPolicy() {
           <li>International best practices, including recommendations from NCMEC (National Center for Missing & Exploited Children), Internet Watch Foundation (IWF), and WePROTECT Global Alliance.</li>
         </ul>
 
-        <h3 className="text-lg font-semibold text-gray-800">2. What’s Prohibited on Wyra</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">2. What’s Prohibited on Wyra</h3>
         <p>
           The following are strictly forbidden on Wyra. Posting, sharing, soliciting, or engaging in any of these behaviors
           will result in immediate removal of content, permanent banning of accounts, and escalation to law enforcement
@@ -60,7 +60,7 @@ export default function CSAEPolicy() {
           <li>✅ Advertising or arranging paid sexual services involving minors.</li>
         </ul>
 
-        <h3 className="text-lg font-semibold text-gray-800">3. How We Detect & Respond</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">3. How We Detect & Respond</h3>
         <p>We take a proactive and reactive approach to keep CSAE off Wyra:</p>
         <ul className="list-disc list-inside ml-4">
           <li>We use automated tools to scan uploads against known CSAE material databases (such as NCMEC’s CyberTipline hash lists).</li>
@@ -70,7 +70,7 @@ export default function CSAEPolicy() {
           <li>We may preserve evidence of CSAE activity in accordance with legal requirements to assist investigations.</li>
         </ul>
 
-        <h3 className="text-lg font-semibold text-gray-800">4. Reporting CSAE Content or Behavior</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">4. Reporting CSAE Content or Behavior</h3>
         <p>If you see something suspicious, don’t scroll past — please report it.</p>
         <p>How to report:</p>
         <ul className="list-disc list-inside ml-4">
@@ -83,7 +83,7 @@ export default function CSAEPolicy() {
           you will not face retaliation or penalties — even if it turns out to be a false alarm.
         </p>
 
-        <h3 className="text-lg font-semibold text-gray-800">5. Legal Definitions & Age of Consent</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">5. Legal Definitions & Age of Consent</h3>
         <p>For the purposes of Wyra:</p>
         <ul className="list-disc list-inside ml-4">
           <li>A child is defined as any person under 18, regardless of local age of consent laws for sexual activity.</li>
@@ -91,7 +91,7 @@ export default function CSAEPolicy() {
           <li>Grooming, sextortion, and solicitation are crimes even if no physical abuse occurs.</li>
         </ul>
 
-        <h3 className="text-lg font-semibold text-gray-800">6. What to Do if You’re Affected</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">6. What to Do if You’re Affected</h3>
         <p>If you’re under 18 and someone is making you feel uncomfortable, pressuring you to share explicit material, or threatening you — please know it’s not your fault, and help is available:</p>
         <ul className="list-disc list-inside ml-4">
           <li>Report the behavior to Wyra immediately.</li>
@@ -102,7 +102,7 @@ export default function CSAEPolicy() {
           <li>Globally: <a href="https://childhelplineinternational.org" className="underline text-indigo-600">childhelplineinternational.org</a></li>
         </ul>
 
-        <h3 className="text-lg font-semibold text-gray-800">7. Our Shared Responsibility</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">7. Our Shared Responsibility</h3>
         <p>Keeping Wyra safe for everyone — especially children — is a team effort. As a community, we ask all our users to:</p>
         <ul className="list-disc list-inside ml-4">
           <li>Think before you post: if your question involves a minor, keep it wholesome and respectful.</li>
@@ -110,7 +110,7 @@ export default function CSAEPolicy() {
           <li>Speak up if you see something concerning — you might just save someone from harm.</li>
         </ul>
 
-        <h3 className="text-lg font-semibold text-gray-800">8. Contact Us</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">8. Contact Us</h3>
         <p>
           If you have questions about this policy, need to make a report, or want to suggest ways we can improve our protections
           for minors, please reach out to us anytime at <a href="mailto:info@wyra.xyz" className="text-indigo-600 underline">info@wyra.xyz</a>. Our team is here to listen, take action, and keep our community safe.

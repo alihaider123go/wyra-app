@@ -41,6 +41,7 @@ export default function MessageInput({
     const isNotAllowed = await isSettingAllowed(senderId, "no_dm")
     const isFollowing = await isUserFollowing(currentUserId, senderId)
 
+    console.log("he;;p",senderId,isAllowedEveryone,isAllowedFollower,isNotAllowed)
     if (isNotAllowed) {
       setIsUserAllowToSendMessage(false)
     }
@@ -78,7 +79,7 @@ export default function MessageInput({
     <div>
       {!isUserAllowToSendMessage
         ?
-        <h3 className="text-black text-sm p-2">
+        <h3 className="text-black dark:text-white text-sm p-2">
           You are not allowed to send a message to this user.
         </h3>
         : null}
@@ -96,7 +97,7 @@ export default function MessageInput({
             if (e.key === "Enter") sendMessage();
           }}
         />
-        <button disabled={!isUserAllowToSendMessage} onClick={sendMessage} className="ml-2 bg-blue-600 text-white px-4 py-2 rounded">
+        <button disabled={!isUserAllowToSendMessage} onClick={sendMessage} className="ml-2 bg-blue-600 text-white dark:text-black px-4 py-2 rounded">
           Send
         </button>
       </div>

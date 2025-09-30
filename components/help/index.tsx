@@ -157,14 +157,14 @@ export default function WyraHelpCenter() {
   };
 
   return (
-    <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-fade-in max-w-3xl mx-auto my-10">
+    <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-fade-in max-w-3xl mx-auto my-10">
       <CardHeader className="text-center pb-6">
-        <CardTitle className="text-2xl font-bold text-gray-800">
+        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
           Wyra Help Center
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="text-left space-y-4 text-gray-700 text-sm leading-relaxed">
+      <CardContent className="text-left space-y-4 text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
         {sections.map((section, i) => (
           <div key={i} className="border-b pb-4">
             <button
@@ -177,7 +177,7 @@ export default function WyraHelpCenter() {
               )}
             </button>
             {openSections[i] && (
-              <div className="mt-2 text-gray-700">{section.content}</div>
+              <div className="mt-2 text-gray-700 dark:text-gray-300">{section.content}</div>
             )}
           </div>
         ))}

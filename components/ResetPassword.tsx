@@ -35,7 +35,7 @@ const ResetPassword = () => {
             placeholder="New Password"
             id="Password"
             name="password"
-            className="mt-1 w-full px-4 p-2  h-10 rounded-md border border-gray-200 bg-white text-sm text-gray-700"
+            className="mt-1 w-full px-4 p-2  h-10 rounded-md border border-gray-200 bg-white dark:bg-black text-sm text-gray-700 dark:text-gray-300"
           />
         </div>
 

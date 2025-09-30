@@ -145,7 +145,7 @@ export default function CircleDetailModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-xl w-[95%] max-w-md relative max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-black p-6 rounded-xl w-[95%] max-w-md relative max-h-[90vh] overflow-y-auto">
         <h2 className="flex items-center justify-center text-2xl font-bold mb-4 gap-2">
           {circle?.icon && (
             <img
@@ -186,14 +186,14 @@ export default function CircleDetailModal({
         <div className="flex justify-between gap-4">
           <Button
             onClick={onClose}
-            className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="w-full h-14 bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-white dark:text-black font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             Close
           </Button>
           <Button
             onClick={handleAddMembers}
             disabled={selectedUsers.length === 0}
-            className="w-full h-14 bg-gradient-to-r from-blue-400 to-purple-600 hover:from-blue-500 hover:to-purple-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-14 bg-gradient-to-r from-blue-400 to-purple-600 hover:from-blue-500 hover:to-purple-700 text-white dark:text-black font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Add Selected Members
           </Button>
@@ -207,7 +207,7 @@ export default function CircleDetailModal({
             >
               <div>
                 <p className="font-medium text-left">{`${member.user_profiles.firstname} ${member.user_profiles.lastname}`}</p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   {member.user_profiles.email}
                 </p>
               </div>
@@ -221,7 +221,7 @@ export default function CircleDetailModal({
             </li>
           ))}
           {members.length === 0 && (
-            <p className="text-center text-gray-500">
+            <p className="text-center text-gray-500 dark:text-gray-200">
               No members yet in this circle.
             </p>
           )}

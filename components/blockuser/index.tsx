@@ -2,23 +2,32 @@
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/modal";
+import { X } from "lucide-react";
 
-export default function BlockUserInfo({setActiveTab,setSelectedUserId}:any) {
+export default function BlockUserInfo({ setActiveTab, setSelectedUserId }: any) {
   const supabase = createClient();
   const [blockedUsers, setBlockedUsers] = useState<any[]>([]);
   const [userID, setUserID] = useState("");
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<any[]>([]);
-const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [blockModal, setBlockModal] = useState<any>({ isOpen: false, userId: null, action: "" });
 
- const fetchBlockedUsers = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+  const fetchBlockedUsers = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
 
-      if (user) {
-        setUserID(user.id);
-        const { data, error } = await supabase
-          .from("user_blocks")
-          .select(`
+    if (user) {
+      setUserID(user.id);
+      const { data, error } = await supabase
+        .from("user_blocks")
+        .select(`
             blocked_id,
             user_profiles:blocked_id (
               id,
@@ -28,15 +37,15 @@ const dropdownRef = useRef<HTMLDivElement>(null);
               avatar
             )
           `)
-          .eq("blocker_id", user.id);
+        .eq("blocker_id", user.id);
 
-        if (error) {
-          console.error("Failed to fetch blocked users", error);
-        } else {
-          setBlockedUsers(data || []);
-        }
+      if (error) {
+        console.error("Failed to fetch blocked users", error);
+      } else {
+        setBlockedUsers(data || []);
       }
-    };
+    }
+  };
 
   useEffect(() => {
     fetchBlockedUsers();
@@ -89,7 +98,7 @@ const dropdownRef = useRef<HTMLDivElement>(null);
         .from("user_blocks")
         .select("blocked_id")
         .eq("blocker_id", userID);
-      setBlockedUsers(data || []);
+      fetchBlockedUsers();
     }
   };
 
@@ -107,66 +116,68 @@ const dropdownRef = useRef<HTMLDivElement>(null);
   };
 
   useEffect(() => {
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node)
-    ) {
-      setSearch("");       // Clear the input
-      setResults([]);      // Hide results
-    }
-  };
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setSearch("");       // Clear the input
+        setResults([]);      // Hide results
+      }
+    };
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-6 text-gray-800">
+    <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-black rounded-lg shadow-md space-y-6 text-gray-800 dark:text-gray-200">
       <div className="flex justify-between">
-      <h2 className="text-2xl font-semibold flex items-center gap-2">
-        🚫 Block User
-      </h2>
+        <h2 className="text-2xl font-semibold flex items-center gap-2">
+          🚫 Block User
+        </h2>
 
-      <div ref={dropdownRef} className="relative w-60">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search users..."
-          className="border p-2 w-full rounded"
-          autoFocus
-        />
-        {search && results.length > 0 && (
-          <div className="absolute top-full left-0 w-full bg-white border rounded mt-1 shadow-lg z-10 max-h-60 overflow-y-auto">
-            {results.map((user) => (
-              <div
-                key={user.id}
-                className="flex justify-between items-center p-2 hover:bg-gray-100"
-              >
-                <div>
-                  <div className="font-medium">
-                    {user.firstname} {user.lastname}
-                  </div>
-                  <div className="text-sm text-gray-500">@{user.username}</div>
-                  <div className="text-xs text-gray-400">{user.email}</div>
-                </div>
-                <Button
-                  onClick={() => blockUser(user.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white p-2 text-xs"
+        <div ref={dropdownRef} className="relative w-60">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search users..."
+            className="border p-2 w-full rounded"
+            autoFocus
+          />
+          {search && results.length > 0 && (
+            <div className="absolute top-full left-0 w-full bg-white dark:bg-black border rounded mt-1 shadow-lg z-10 max-h-60 overflow-y-auto">
+              {results.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex justify-between items-center p-2 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800"
                 >
-                  Block
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-        {search && results.length === 0 && (
-          <p className="text-sm text-gray-500 mt-2">No users found</p>
-        )}
-      </div>
+                  <div>
+                    <div className="font-medium">
+                      {user.firstname} {user.lastname}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-200">@{user.username}</div>
+                    <div className="text-xs text-gray-400">{user.email}</div>
+                  </div>
+                  <Button
+                    // onClick={() => blockUser(user.id)}
+                    onClick={() => setBlockModal({ isOpen: true, userId: user.id, action: "block" })}
+
+                    className="bg-red-500 hover:bg-red-600 text-white dark:text-black p-2 text-xs"
+                  >
+                    Block
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+          {search && results.length === 0 && (
+            <p className="text-sm text-gray-500 dark:text-gray-200 mt-2">No users found</p>
+          )}
+        </div>
       </div>
 
 
@@ -179,7 +190,7 @@ const dropdownRef = useRef<HTMLDivElement>(null);
               key={item?.blocked_id}
               className="flex justify-between items-center border p-3 rounded shadow-sm"
             >
-              <div onClick={() => { setActiveTab("user-profile"), setSelectedUserId(item?.user_profiles?.id)}} className="flex items-center cursor-pointer space-x-3">
+              <div onClick={() => { setActiveTab("user-profile"), setSelectedUserId(item?.user_profiles?.id) }} className="flex items-center cursor-pointer space-x-3">
                 {item?.user_profiles?.avatar ? (
                   <img
                     src={item?.user_profiles?.avatar}
@@ -187,7 +198,7 @@ const dropdownRef = useRef<HTMLDivElement>(null);
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-lg font-bold text-white">
+                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-lg font-bold text-white dark:text-black">
                     {item?.user_profiles?.firstname?.[0]?.toUpperCase()}
                   </div>
                 )}
@@ -196,14 +207,16 @@ const dropdownRef = useRef<HTMLDivElement>(null);
                     {item?.user_profiles?.firstname}{" "}
                     {item?.user_profiles?.lastname}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-200">
                     @{item?.user_profiles?.username}
                   </p>
                 </div>
               </div>
               <Button
-                onClick={() => unblockUser(item?.blocked_id)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm"
+                // onClick={() => unblockUser(item?.blocked_id)}
+                onClick={() => setBlockModal({ isOpen: true, userId: item?.blocked_id, action: "unblock" })}
+
+                className="bg-green-600 hover:bg-green-700 text-white dark:text-black px-4 py-2 text-sm"
               >
                 Unblock
               </Button>
@@ -212,6 +225,48 @@ const dropdownRef = useRef<HTMLDivElement>(null);
         </div>
       )}
 
+      <Modal isOpen={blockModal?.isOpen} hideCloseButton={true}>
+        <ModalContent>
+          <ModalHeader>
+            {blockModal?.action === "block" ? "Block User" : "Unblock User"}
+            <button
+              onClick={() => setBlockModal({ isOpen: false, userId: null, action: "" })}
+              className="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 focus:outline-none"
+              aria-label="Close block modal"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </ModalHeader>
+          <ModalBody>
+            <p>
+              {blockModal?.action === "block"
+                ? "Are you sure you want to block this user?"
+                : "Are you sure you want to unblock this user?"}
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="outline"
+              onClick={() => setBlockModal({ isOpen: false, userId: null, action: "" })}
+            >
+              Cancel
+            </Button>
+            <Button
+              className={blockModal?.action === "block" ? "bg-red-600 hover:bg-red-700 text-white dark:text-black" : ""}
+              onClick={async () => {
+                if (blockModal?.action === "block") {
+                  await blockUser(blockModal?.userId);
+                } else {
+                  await unblockUser(blockModal?.userId);
+                }
+                setBlockModal({ isOpen: false, userId: null, action: "" });
+              }}
+            >
+              {blockModal?.action === "block" ? "Block" : "Unblock"}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       <p>
         Sometimes, the best choice you can make is… <em>neither.</em>
@@ -224,7 +279,7 @@ const dropdownRef = useRef<HTMLDivElement>(null);
       </p>
 
       <h3 className="text-lg font-semibold mt-4">✋ What happens when you block someone?</h3>
-      <ul className="list-disc list-inside space-y-2 text-gray-700">
+      <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
         <li>They won’t be able to follow you anymore.</li>
         <li>They won’t see your Wyras on their feed or in your Circles.</li>
         <li>They won’t be able to DM you.</li>
@@ -245,7 +300,7 @@ const dropdownRef = useRef<HTMLDivElement>(null);
 
       <h3 className="text-lg font-semibold mt-4">🔍 How do you block someone?</h3>
       <p>It’s easy:</p>
-      <ol className="list-decimal list-inside space-y-2 text-gray-700">
+      <ol className="list-decimal list-inside space-y-2 text-gray-700 dark:text-gray-300">
         <li>Go to their profile page.</li>
         <li>Tap or click the three vertical dots in the corner.</li>
         <li>Select Block User.</li>

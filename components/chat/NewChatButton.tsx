@@ -99,14 +99,14 @@ export default function NewChatButton({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="bg-blue-500 px-3 py-1 rounded text-white"
+        className="bg-blue-500 px-3 py-1 rounded text-white dark:text-black"
       >
         <Plus className="inline mr-1" />
 
       </button>
       {open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
-          <div className="bg-white p-6 rounded shadow w-96">
+          <div className="bg-white dark:bg-black p-6 rounded shadow w-96">
             <h3 className="text-lg font-bold mb-4">Start new chat</h3>
             <input
               type="text"
@@ -118,19 +118,19 @@ export default function NewChatButton({
             />
             <div className="max-h-48 overflow-y-auto">
               {results.length === 0 && (
-                <p className="text-gray-500 px-2 py-1">No users found</p>
+                <p className="text-gray-500 dark:text-gray-200 px-2 py-1">No users found</p>
               )}
 
               {results.map((user) => (
                 <div
                   key={user.id}
-                  className="p-2 hover:bg-gray-100 cursor-pointer border-b"
+                  className="p-2 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800 cursor-pointer border-b"
                   onClick={() => createChatWithUser(user.id)}
                 >
                   <div className="font-medium">
                     {user.firstname} {user.lastname}
                   </div>
-                  <div className="text-sm text-gray-500">@{user.username}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-200">@{user.username}</div>
                   <div className="text-xs text-gray-400">{user.email}</div>
                 </div>
               ))}

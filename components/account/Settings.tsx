@@ -25,9 +25,9 @@ export default function Settings({ user, isVerified,refetch}: SettingsProps) {
   return (
     <>
       {!isVerified ? (
-        <Card className="mb-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+        <Card className="mb-[50px] shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
           <CardHeader className="text-center pb-6">
-            <CardTitle className="text-2xl font-bold text-gray-800">
+            <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
               Email Verification
             </CardTitle>
           </CardHeader>
@@ -38,9 +38,9 @@ export default function Settings({ user, isVerified,refetch}: SettingsProps) {
       ) : null}
 
       {/* Personal Information Card */}
-      <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+      <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
         <CardHeader className="text-center pb-6">
-          <CardTitle className="text-2xl font-bold text-gray-800">
+          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
             Personal Information
           </CardTitle>
         </CardHeader>
@@ -50,9 +50,9 @@ export default function Settings({ user, isVerified,refetch}: SettingsProps) {
       </Card>
 
       {/* Change password card */}
-      <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+      <Card className="mt-[50px] shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
         <CardHeader className="text-center pb-6">
-          <CardTitle className="text-2xl font-bold text-gray-800">
+          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
             Change Password
           </CardTitle>
         </CardHeader>
@@ -62,15 +62,15 @@ export default function Settings({ user, isVerified,refetch}: SettingsProps) {
       </Card>
 
       {/* Delete account card */}
-      <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+      <Card className="mt-[50px] shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
         <CardHeader className="pb-6">
           {/* <CardTitle className="text-3xl text-left font-bold text-red-600">
             Danger Zone
           </CardTitle> */}
-          <CardTitle className="text-2xl text-center font-bold text-gray-800">
+          <CardTitle className="text-2xl text-center font-bold text-gray-800 dark:text-gray-200">
             Delete Account
           </CardTitle>
-          <CardDescription className="text-gray-600 text-lg">
+          <CardDescription className="text-gray-600 dark:text-gray-300 text-lg">
             Once you delete your account, there is no going back. Please be
             certain.
           </CardDescription>

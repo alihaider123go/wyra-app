@@ -230,7 +230,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
   return (
     <>
       <Tooltip
-        className="bg-black text-white"
+        className="bg-black text-white dark:text-black"
         color="success"
         content="Create Wyra"
       >
@@ -238,7 +238,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
           onClick={() => setShowCreateWyraModal(true)}
           className="rounded-full h-12 w-12 fixed bottom-[5%] right-[5%] z-50 hidden md:flex items-center justify-center"
         >
-          <Plus className="h-8 w-8 text-white" />
+          <Plus className="h-8 w-8 text-white dark:text-black" />
         </Button>
       </Tooltip>
 
@@ -252,8 +252,8 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
               key={tab.id}
               onClick={() => setActiveFeatureTab(tab.id)}
               className={`flex flex-col items-center justify-center p-3 min-w-0 flex-1 rounded-2xl transition-all duration-300 transform ${isActive
-                ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-110"
-                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
+                ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white dark:text-black shadow-lg scale-110"
+                : "text-gray-500 dark:text-gray-200 hover:text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800/50"
                 }`}
             >
               {
@@ -269,7 +269,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
               }
 
               <span
-                className={`text-xs mt-1 font-semibold ${isActive ? "text-white" : ""
+                className={`text-xs mt-1 font-semibold ${isActive ? "text-white dark:text-black" : ""
                   }`}
               >
                 {tab.label}
@@ -287,7 +287,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
 
               {activeFeatureTab === "trending" ? (
                 <WyraSection
-                  wyras={wyraList.filter((wyra: any) => wyra.likeCount > 20)}
+                  wyras={wyraList.filter((wyra: any) => wyra.likeCount > 10)}
                   fetchWyras={fetchWyras}
                   searchTerm={searchTerm}
                   postId={postId}
@@ -316,9 +316,9 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
                   />
                 </div>
               ) : (
-                <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+                <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
                   <CardHeader className="text-center pb-6">
-                    <CardTitle className="text-2xl font-bold text-gray-800">
+                    <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
                       Following
                     </CardTitle>
                   </CardHeader>
@@ -343,7 +343,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
             Create Wyra
             <button
               onClick={() => setShowCreateWyraModal(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
+              className="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 focus:outline-none"
               aria-label="Close comment modal"
             >
               <X className="w-6 h-6" />
@@ -361,7 +361,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
             Edit Wyra
             <button
               onClick={() => { setShowEditWyraModal({ isShow: false, id: "" }) }}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
+              className="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 focus:outline-none"
               aria-label="Close comment modal"
             >
               <X className="w-6 h-6" />

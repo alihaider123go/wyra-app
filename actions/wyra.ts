@@ -220,7 +220,10 @@ export const getUnifiedHomeWyras = async (
             id,
             firstname,
             lastname,
-            username
+            username,
+            account_settings (
+              multi_color_why_boxes
+            )
           ),
           wyra_selected_option_reaction:wyra_selected_option_reaction!left (
             id,
@@ -246,7 +249,7 @@ export const getUnifiedHomeWyras = async (
 
   // 7. Filter out blocked users' wyras
   const filteredWyras = (data ?? []).filter(
-    (wyra:any) => !blockedIds.includes(wyra.created_by)
+    (wyra: any) => !blockedIds.includes(wyra.created_by)
   );
 
   // 8. Extract Wyra IDs
@@ -312,23 +315,25 @@ export const getUnifiedHomeWyras = async (
   });
 
   // 12. Apply search filter
-if (search.trim()) {
-  const searchWords = search.toLowerCase().split(/\s+/); // split by spaces
+  if (search.trim()) {
+    const searchWords = search.toLowerCase().split(/\s+/); // split by spaces
 
-  formattedData = formattedData.filter((wyra) => {
-    const username =
-      wyra.creator?.username?.toLowerCase() ||
-      wyra.creator?.firstname?.toLowerCase() ||
-      "";
-    const optionTexts =
-      wyra.wyra_option?.map((opt) => opt.option_text.toLowerCase()) || [];
+    formattedData = formattedData.filter((wyra) => {
+      const username =
+        wyra.creator?.username?.toLowerCase() ||
+        wyra.creator?.firstname?.toLowerCase() ||
+        "";
+      const optionTexts =
+        wyra.wyra_option?.map((opt) => opt.option_text.toLowerCase()) || [];
 
-    // Check if ANY search word matches username or option texts
-    return searchWords.some((word) => 
-      username.includes(word) || optionTexts.some((text) => text.includes(word))
-    );
-  });
-}
+      // Check if ANY search word matches username or option texts
+      return searchWords.some(
+        (word) =>
+          username.includes(word) ||
+          optionTexts.some((text) => text.includes(word))
+      );
+    });
+  }
 
   formattedData = formattedData.filter((wyra: any) => {
     if (
@@ -341,9 +346,9 @@ if (search.trim()) {
   });
 
   return formattedData.map((wyra) => ({
-  ...wyra,
-  source: "wyra", // ✅ add marker
-}));
+    ...wyra,
+    source: "wyra", // ✅ add marker
+  }));
 };
 
 export const getAllWyras = async () => {
@@ -525,7 +530,10 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
             id,
             firstname,
             lastname,
-            username
+            username,
+                        account_settings (
+              multi_color_why_boxes
+            )
           ),
           wyra_selected_option_reaction:wyra_selected_option_reaction!left (
             id,
@@ -595,23 +603,26 @@ export const getFavoriteWyras = async (userId: string, search: string = "") => {
   );
 
   // ✅ Search Filter (username or option_text)
- if (search.trim()) {
-  const searchWords = search.toLowerCase().split(/\s+/); // split by spaces
+  if (search.trim()) {
+    const searchWords = search.toLowerCase().split(/\s+/); // split by spaces
 
-  formattedData = formattedData.filter((wyra) => {
-    const username =
-      wyra.creator?.username?.toLowerCase() ||
-      wyra.creator?.firstname?.toLowerCase() ||
-      "";
-    const optionTexts =
-      wyra.wyra_option?.map((opt:any) => opt.option_text.toLowerCase()) || [];
+    formattedData = formattedData.filter((wyra) => {
+      const username =
+        wyra.creator?.username?.toLowerCase() ||
+        wyra.creator?.firstname?.toLowerCase() ||
+        "";
+      const optionTexts =
+        wyra.wyra_option?.map((opt: any) => opt.option_text.toLowerCase()) ||
+        [];
 
-    // Check if ANY search word matches username or option texts
-    return searchWords.some((word) => 
-      username.includes(word) || optionTexts.some((text:any) => text.includes(word))
-    );
-  });
-}
+      // Check if ANY search word matches username or option texts
+      return searchWords.some(
+        (word) =>
+          username.includes(word) ||
+          optionTexts.some((text: any) => text.includes(word))
+      );
+    });
+  }
 
   return formattedData;
 };
@@ -666,7 +677,10 @@ export const getWyrasWithCircles = async (
             id,
             firstname,
             lastname,
-            username
+            username,
+                        account_settings (
+              multi_color_why_boxes
+            )
           ),
           wyra_selected_option_reaction:wyra_selected_option_reaction!left (
             id,
@@ -745,26 +759,29 @@ export const getWyrasWithCircles = async (
 
   // ✅ Search filter (username, option_text, circle name)
   if (search.trim()) {
-  const searchWords = search.toLowerCase().split(/\s+/); // split by spaces
+    const searchWords = search.toLowerCase().split(/\s+/); // split by spaces
 
-  formattedData = formattedData.filter((wyra) => {
-    const username =
-      wyra.creator?.username?.toLowerCase() ||
-      wyra.creator?.firstname?.toLowerCase() ||
-      "";
+    formattedData = formattedData.filter((wyra) => {
+      const username =
+        wyra.creator?.username?.toLowerCase() ||
+        wyra.creator?.firstname?.toLowerCase() ||
+        "";
       const circleNames =
         wyra.circles?.map((c: any) => c.name.toLowerCase()) || [];
 
-    const optionTexts =
-      wyra.wyra_option?.map((opt:any) => opt.option_text.toLowerCase()) || [];
+      const optionTexts =
+        wyra.wyra_option?.map((opt: any) => opt.option_text.toLowerCase()) ||
+        [];
 
-    // Check if ANY search word matches username or option texts
-    return searchWords.some((word) => 
-      username.includes(word) || optionTexts.some((text:any) => text.includes(word)) ||
-     circleNames.some((name: string) => name.includes(word))
-    );
-  });
-}
+      // Check if ANY search word matches username or option texts
+      return searchWords.some(
+        (word) =>
+          username.includes(word) ||
+          optionTexts.some((text: any) => text.includes(word)) ||
+          circleNames.some((name: string) => name.includes(word))
+      );
+    });
+  }
 
   return formattedData;
 };
@@ -810,7 +827,6 @@ export const searchUsers = async (search: string, userProfileId: string) => {
     source: "user", // ✅ add marker
   }));
 };
-
 
 export const unifiedSearch = async (userId: any, search: string) => {
   const [userResults, wyraResults] = await Promise.all([

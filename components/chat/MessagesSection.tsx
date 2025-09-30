@@ -116,7 +116,7 @@ export default function MessagesSection({
     return (
       <div className="w-3/4 flex flex-col items-center justify-center border-l">
         <h3 className="text-xl font-semibold mb-2">Select a chat</h3>
-        <p className="text-gray-500">Choose a conversation to start messaging</p>
+        <p className="text-gray-500 dark:text-gray-200">Choose a conversation to start messaging</p>
       </div>
     );
   }
@@ -124,7 +124,7 @@ export default function MessagesSection({
   return (
 <div className=" flex flex-col md:h-[88vh] h-[80vh]">
   {/* Chat Header */}
-   <div className="md:hidden flex items-center p-3 border-b bg-white">
+   <div className="md:hidden flex items-center p-3 border-b bg-white dark:bg-black">
         <button onClick={onBack} className="text-blue-600 text-2xl font-semibold">
           <IoMdArrowRoundBack />
         </button>

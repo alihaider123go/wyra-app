@@ -32,14 +32,14 @@ export default function NotificationsList({ userId,setActiveTab,setPostId }: any
       </div>
 
       {notifications.length === 0 ? (
-        <p className="text-gray-500">No notifications yet</p>
+        <p className="text-gray-500 dark:text-gray-200">No notifications yet</p>
       ) : (
         <ul className="space-y-3">
           {notifications.map((n) => (
             <li
               key={n.id}
               className={`p-4 rounded-lg border shadow-sm cursor-pointer transition ${
-                n.is_read ? "bg-gray-100" : "bg-white"
+                n.is_read ? "bg-gray-900 dark:bg-gray-800" : "bg-white dark:bg-black"
               }`}
               onClick={() => handleNotificationClick(n)}
             >
@@ -66,7 +66,7 @@ export default function NotificationsList({ userId,setActiveTab,setPostId }: any
                     </span>{" "}
                     {n.message}
                   </p>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-500 dark:text-gray-200">
                     {formatDistanceToNow(new Date(n.created_at), {
                       addSuffix: true,
                     })}

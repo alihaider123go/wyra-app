@@ -66,7 +66,7 @@ App Store: https://apps.apple.com/app/id000000000
       <button
         onClick={handleShare}
         className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer
-        bg-gray-200 text-gray-800`}
+        bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200`}
       >
         <Forward className="w-4 h-4 mr-1" />
         <span className="md:block hidden">Share</span>

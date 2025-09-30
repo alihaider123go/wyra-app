@@ -47,7 +47,7 @@ const LoginForm = () => {
         <div className="space-y-2">
           <Label
             htmlFor="email"
-            className="text-sm font-semibold text-gray-700"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Email/Username
           </Label>
@@ -56,7 +56,7 @@ const LoginForm = () => {
             name="email"
             type="text"
             placeholder="email/username"
-            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+            className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
             required
           />
         </div>
@@ -64,7 +64,7 @@ const LoginForm = () => {
         <div className="space-y-2">
           <Label
             htmlFor="password"
-            className="text-sm font-semibold text-gray-700"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Password
           </Label>
@@ -74,13 +74,13 @@ const LoginForm = () => {
               name="password"
               type={showPassword ? "text" : "password"}
               placeholder="password"
-              className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+              className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-300 transition-colors"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -96,7 +96,7 @@ const LoginForm = () => {
             <AuthButton type="Sign In" loading={loading} />
           </div>
           <div className="space-y-4 pt-2 text-center">
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
               Don’t have an account?{" "}
               <button
                 onClick={() => goToSignUpPage()}

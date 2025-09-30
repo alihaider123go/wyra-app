@@ -19,7 +19,7 @@ const btn = ({
       onClick={onClick}
       className={`${
         loading ? "bg-gray-600" : "bg-blue-600"
-      } rounded-md w-full px-12 py-3 text-sm font-medium text-white ${className}`}
+      } rounded-md w-full px-12 py-3 text-sm font-medium text-white dark:text-black ${className}`}
     >
       {loading ? loadingText : btnText}
     </button>

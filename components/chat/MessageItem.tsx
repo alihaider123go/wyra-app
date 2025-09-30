@@ -36,11 +36,11 @@ export default function MessageItem({
 
       <div
         className={`inline-block px-3 py-1 rounded ${
-          isMine ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
+          isMine ? "bg-blue-500 text-white" : "bg-gray-200 dark:bg-gray-800 text-black dark:text-white"
         }`}
       >
         <div>{message.content}</div>
-        <small className="text-xs text-white-600">
+        <small className="text-xs text-white">
           {formatDateTime(message.created_at)}
         </small>
       

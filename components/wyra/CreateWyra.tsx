@@ -167,15 +167,15 @@ export default function CreateWyra({ onTabChange }: { onTabChange?: (tab: string
         <Card className="border-0 animate-slide-in-right">
           <CardContent>
             <div className="max-w-2xl mx-auto p-6">
-              <h1 className="text-center text-3xl font-bold mb-10 text-black">Would you rather...</h1>
+              <h1 className="text-center text-3xl font-bold mb-10 text-black dark:text-white">Would you rather...</h1>
 
               {/* Option One */}
-              <div className="bg-white border rounded-2xl shadow p-5 mb-8 relative">
+              <div className="bg-white dark:bg-black border rounded-2xl shadow p-5 mb-8 relative">
                 <textarea
                   maxLength={150}
                   rows={4}
                   placeholder="Type option one..."
-                  className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                  className="w-full border border-gray-300 bg-white dark:bg-black text-gray-900 dark:text-gray-100 rounded-md p-4 resize-none text-base font-medium"
                   value={optionOne}
                   onChange={(e) => setOptionOne(e.target.value)}
                 />
@@ -184,7 +184,7 @@ export default function CreateWyra({ onTabChange }: { onTabChange?: (tab: string
                 </div>
                 <div className="flex items-center mt-4 gap-4 relative">
                   <label className="cursor-pointer">
-                    <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                    <FaRegImage size={22} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:text-gray-200" />
                     <input
                       type="file"
                       accept="image/*,video/*"
@@ -195,7 +195,7 @@ export default function CreateWyra({ onTabChange }: { onTabChange?: (tab: string
                   </label>
                   <FaSmile
                     size={22}
-                    className="text-gray-600 cursor-pointer"
+                    className="text-gray-600 dark:text-gray-300 cursor-pointer"
                     onClick={() => {
                       setActiveOption(1);
                       setShowEmojiPicker((prev) => !prev);
@@ -205,15 +205,15 @@ export default function CreateWyra({ onTabChange }: { onTabChange?: (tab: string
                 {renderPreviews(filesOne)}
               </div>
 
-              <div className="text-center font-semibold text-xl text-gray-700 mb-8">OR</div>
+              <div className="text-center font-semibold text-xl text-gray-700 dark:text-gray-300 mb-8">OR</div>
 
               {/* Option Two */}
-              <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
+              <div className="bg-white dark:bg-black border rounded-2xl shadow p-5 mb-4 relative">
                 <textarea
                   maxLength={150}
                   rows={4}
                   placeholder="Type option two..."
-                  className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                  className="w-full border border-gray-300 bg-white dark:bg-black text-gray-900 dark:text-gray-100 rounded-md p-4 resize-none text-base font-medium"
                   value={optionTwo}
                   onChange={(e) => setOptionTwo(e.target.value)}
                 />
@@ -222,7 +222,7 @@ export default function CreateWyra({ onTabChange }: { onTabChange?: (tab: string
                 </div>
                 <div className="flex items-center mt-4 gap-4 relative">
                   <label className="cursor-pointer">
-                    <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                    <FaRegImage size={22} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:text-gray-200" />
                     <input
                       type="file"
                       accept="image/*,video/*"
@@ -233,7 +233,7 @@ export default function CreateWyra({ onTabChange }: { onTabChange?: (tab: string
                   </label>
                   <FaSmile
                     size={22}
-                    className="text-gray-600 cursor-pointer"
+                    className="text-gray-600 dark:text-gray-300 cursor-pointer"
                     onClick={() => {
                       setActiveOption(2);
                       setShowEmojiPicker((prev) => !prev);
@@ -254,7 +254,7 @@ export default function CreateWyra({ onTabChange }: { onTabChange?: (tab: string
             <Button
               btnText="Create Wyra"
               loading={loading}
-              className="bg-blue-600 text-white"
+              className="bg-blue-600 text-white dark:text-black"
               loadingText="Creating..."
               onClick={prepareToSubmit}
             />

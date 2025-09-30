@@ -56,8 +56,8 @@ setSelectedUserId
                             key={circle.id}
                             onClick={() => setSelectedCircleId(circle.id)}
                             className={`px-4 py-2 rounded-full font-medium transition ${selectedCircleId === circle.id
-                                ? "bg-blue-500 text-white"
-                                : "bg-gray-200 hover:bg-gray-300"
+                                ? "bg-blue-500 text-white dark:text-black"
+                                : "bg-gray-200 dark:bg-gray-800 hover:bg-gray-300"
                                 }`}
                         >
                             {circle.name}

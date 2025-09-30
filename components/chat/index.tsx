@@ -164,7 +164,7 @@ export default function ChatPage({ userId }: ChatProps) {
           />
         ) : (
           <div className="hidden md:flex items-center justify-center w-full">
-            <p className="text-gray-500">Select a chat to start messaging</p>
+            <p className="text-gray-500 dark:text-gray-200">Select a chat to start messaging</p>
           </div>
         )}
       </div>

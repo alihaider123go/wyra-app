@@ -41,7 +41,7 @@ const ForgotPassword = () => {
 
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
+              <Label htmlFor="email" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Email
               </Label>
               <Input
@@ -49,7 +49,7 @@ const ForgotPassword = () => {
                 name="email"
                 type="text"
                 placeholder="Email"
-                className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+                className="h-14 text-base placeholder:text-gray-400 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
                 required
               />
             </div>

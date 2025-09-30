@@ -58,7 +58,7 @@ export default function AddedCircles({ userId }: CircleListProps) {
                         // setShowDetailsModal(true);
                         // setSelectedCircleId(circle.id);
                     }}
-                        className="bg-white rounded-xl border shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-center items-center text-center gap-4 px-4 py-3">
+                        className="bg-white dark:bg-black rounded-xl border shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-center items-center text-center gap-4 px-4 py-3">
                         {circle.icon ? (
                             <img
                                 src={circle.icon}
@@ -66,14 +66,14 @@ export default function AddedCircles({ userId }: CircleListProps) {
                                 className="w-20 h-20 shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full object-cover"
                             />
                         ) : (
-                            <div className="w-20 h-20 shadow-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full flex items-center justify-center text-gray-600 font-bold text-4xl  flex justify-center items-center p-1">
-                                <div className="w-full h-full bg-white rounded-full flex justify-center items-center">
+                            <div className="w-20 h-20 shadow-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 font-bold text-4xl  flex justify-center items-center p-1">
+                                <div className="w-full h-full bg-white dark:bg-black rounded-full flex justify-center items-center">
                                     {circle.name[0]?.toUpperCase()}
                                 </div>
                             </div>
                         )}
                         <div className="flex-1">
-                            <h3 className="text-base font-semibold text-gray-900">
+                            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                                 {circle.name}
                             </h3>
                         </div>

@@ -45,7 +45,7 @@ export default function UserName({
     fetchOtherUser();
   }, [chat, currentUserId]);
 
-  if (!user) return <span className="text-gray-500">Loading...</span>;
+  if (!user) return <span className="text-gray-500 dark:text-gray-200">Loading...</span>;
 
   return (
     <div className="flex items-center space-x-3">
@@ -57,7 +57,7 @@ export default function UserName({
           className="w-10 h-10 rounded-full object-cover"
         />
       ) : (
-        <div className="w-10 h-10 rounded-full bg-gray-300 text-gray-700 flex items-center justify-center font-semibold text-sm uppercase">
+        <div className="w-10 h-10 rounded-full bg-gray-300 text-gray-700 dark:text-gray-300 flex items-center justify-center font-semibold text-sm uppercase">
           {user.firstname?.[0]}
           {user.lastname?.[0]}
         </div>
@@ -68,7 +68,7 @@ export default function UserName({
         <div className="font-medium">
           {user.firstname} {user.lastname}
         </div>
-        <div className="text-sm text-gray-500">@{user.username}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-200">@{user.username}</div>
       </div>
     </div>
   );

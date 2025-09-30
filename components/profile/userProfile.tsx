@@ -121,9 +121,9 @@ export default function UserProfile({ userId }: ProfileProps) {
     return (
         <>
             {/* Personal Information Card */}
-            <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+            <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
                 <CardHeader className="text-center pb-6">
-                    <CardTitle className="text-2xl font-bold text-gray-800">Profile</CardTitle>
+                    <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">Profile</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <UserProfileHeader
@@ -154,9 +154,9 @@ export default function UserProfile({ userId }: ProfileProps) {
 
             {
                 user?.id === userId &&
-                <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+                <Card className="mt-[50px] shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
                     <CardHeader className="text-center pb-6">
-                        <CardTitle className="text-2xl font-bold text-gray-800">Circles</CardTitle>
+                        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">Circles</CardTitle>
                     </CardHeader>
 
                     {
@@ -190,9 +190,9 @@ export default function UserProfile({ userId }: ProfileProps) {
             }
 
             {/* My Wyras Card */}
-            <Card className="mt-[50px] shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right">
+            <Card className="mt-[50px] shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
                 <CardHeader className="text-center pb-6">
-                    <CardTitle className="text-2xl font-bold text-gray-800 flex justify-between">
+                    <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200 flex justify-between">
                         {
                             user?.id === userId
                                 ?
@@ -201,7 +201,7 @@ export default function UserProfile({ userId }: ProfileProps) {
                                         My Wyras
                                     </span>
                                     <Link href="/create-wyra" passHref>
-                                        <Button className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium rounded-lg transition">
+                                        <Button className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white dark:text-black font-medium rounded-lg transition">
                                             <Plus size={18} /> Create Wyra
                                         </Button>
                                     </Link>

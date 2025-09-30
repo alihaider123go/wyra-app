@@ -18,7 +18,7 @@ const CommentButton: React.FC<Props> = ({ wyraId, userId }) => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-gray-200 text-gray-800 hover:bg-gray-300 cursor-pointer"
+        className="flex items-center px-3 py-1 rounded-full text-sm font-medium transition bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 cursor-pointer"
       >
         <MessageCircle className="w-4 h-4 mr-1" />
                <span className="md:block hidden">Comment</span>

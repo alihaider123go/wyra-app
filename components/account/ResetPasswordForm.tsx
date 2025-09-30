@@ -69,7 +69,7 @@ const ResetPasswordForm = ({email}:ResetPasswordProps) => {
               <input type="email" name="email" value={email} placeholder="Email" required readOnly/>
             </div> 
             <div className="space-y-2">
-              <Label htmlFor="oldPassword" className="text-sm font-semibold text-gray-700">
+              <Label htmlFor="oldPassword" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Old Password
               </Label>
               <div className="relative">
@@ -78,13 +78,13 @@ const ResetPasswordForm = ({email}:ResetPasswordProps) => {
                   name="oldPassword"
                   type={showOldPassword ? "text" : "password"}
                   placeholder="Old Password"
-                  className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+                  className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowOldPassword(!showOldPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-300 transition-colors"
                 >
                   {showOldPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -92,7 +92,7 @@ const ResetPasswordForm = ({email}:ResetPasswordProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="newPassword" className="text-sm font-semibold text-gray-700">
+              <Label htmlFor="newPassword" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 New Password
               </Label>
               <div className="relative">
@@ -101,13 +101,13 @@ const ResetPasswordForm = ({email}:ResetPasswordProps) => {
                   name="newPassword"
                   type={showNewPassword ? "text" : "password"}
                   placeholder="New Password"
-                  className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+                  className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-300 transition-colors"
                 >
                   {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -115,7 +115,7 @@ const ResetPasswordForm = ({email}:ResetPasswordProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmNewPassword" className="text-sm font-semibold text-gray-700">
+              <Label htmlFor="confirmNewPassword" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Confirm New Password
               </Label>
               <div className="relative">
@@ -124,13 +124,13 @@ const ResetPasswordForm = ({email}:ResetPasswordProps) => {
                   name="confirmNewPassword"
                   type={showConfirmNewPassword ? "text" : "password"}
                   placeholder="Confirm New Password"
-                  className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
+                  className="h-14 text-base placeholder:text-gray-400 pr-12 border-2 border-gray-200 focus:border-blue-500 rounded-xl bg-white dark:bg-black/90 backdrop-blur-sm"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-300 transition-colors"
                 >
                   {showConfirmNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>

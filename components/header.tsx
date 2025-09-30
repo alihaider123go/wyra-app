@@ -174,13 +174,13 @@ export default function Header({
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-white dark:bg-black border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left - Hamburger Menu */}
           <button
             onClick={() => setIsDrawerOpen(true)}
-            className="p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded"
+            className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100  dark:bg-gray-800 dark:hover:bg-gray-800 rounded"
           >
             <Menu className="w-5 h-5" />
             <span className="sr-only">Open menu</span>
@@ -214,7 +214,7 @@ export default function Header({
                   leaveFrom="translate-x-0"
                   leaveTo="-translate-x-full"
                 >
-                  <Dialog.Panel className="relative w-80 max-w-full bg-white h-full shadow-xl overflow-y-auto">
+                  <Dialog.Panel className="relative w-80 max-w-full bg-white dark:bg-black h-full shadow-xl overflow-y-auto">
                     <div className="flex flex-col h-full">
                       <div className="flex items-center p-6 border-b border-gray-200">
                         <Link
@@ -231,7 +231,7 @@ export default function Header({
                                 strokeWidth="2"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                className="w-8 h-8 text-white"
+                                className="w-8 h-8 text-white dark:text-black"
                               >
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                               </svg>
@@ -244,7 +244,7 @@ export default function Header({
                       </div>
                       {/* User Info */}
                       <div
-                        className="p-6 border-b border-gray-200 flex items-center cursor-pointer hover:bg-gray-50"
+                        className="p-6 border-b border-gray-200 flex items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900"
                         onClick={() => isProfileCompleted ? onHandlePageClick("profile") : ""}
                       >
                         {userProfile?.avatar ? (
@@ -257,8 +257,8 @@ export default function Header({
                             <UserOnlineStatus userId={userProfile?.id} />
                           </div>
                         ) : (
-                          <div className="w-12 h-12 bg-gray-200 relative rounded-full flex items-center justify-center mr-3">
-                            <span className="text-lg font-semibold text-gray-600">
+                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-800 relative rounded-full flex items-center justify-center mr-3">
+                            <span className="text-lg font-semibold text-gray-600 dark:text-gray-300">
                               {userProfile?.firstname?.[0]?.toUpperCase() ||
                                 userProfile?.email?.[0]?.toUpperCase()}
                             </span>
@@ -266,10 +266,10 @@ export default function Header({
                           </div>
                         )}
                         <div>
-                          <div className="font-semibold text-gray-900">
+                          <div className="font-semibold text-gray-900 dark:text-gray-100">
                             {userProfile?.firstname} {userProfile?.lastname}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-gray-200">
                             @{userProfile?.username}
                           </div>
                         </div>
@@ -284,10 +284,10 @@ export default function Header({
                             onClick={() => onHandlePageClick(item.slug)}
                             className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors
                             ${activeTab === item.slug
-                                ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-105"
+                                ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white dark:text-black shadow-lg scale-105"
                                 : item.disable
                                   ? "text-gray-400 cursor-not-allowed bg-gray-50"
-                                  : "text-gray-700 hover:bg-gray-100"
+                                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800"
                               }`}
                           >
                             <item.icon className="w-5 h-5 mr-3" />
@@ -328,7 +328,7 @@ export default function Header({
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="lucide lucide-heart w-8 h-8 text-white"
+                    className="lucide lucide-heart w-8 h-8 text-white dark:text-black"
                   >
                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
                   </svg>
@@ -350,27 +350,27 @@ export default function Header({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
 
-                className="pl-10 pr-4 py-2 w-28 md:w-64 bg-gray-50 border-gray-200 focus:bg-white"
+                className="pl-10 pr-4 py-2 w-28 md:w-64 bg-gray-50 border-gray-200 focus:bg-white dark:bg-black"
               />
               {search && results.length > 0 && (
-                <div className="absolute top-full left-0 w-full bg-white border rounded mt-1 shadow-lg z-10 max-h-60 overflow-y-auto p-2 space-y-4">
+                <div className="absolute top-full left-0 w-full bg-white dark:bg-black border rounded mt-1 shadow-lg z-10 max-h-60 overflow-y-auto p-2 space-y-4">
                   {/* Users Section */}
                   {results.some((r) => r.source === "user") && (
                     <div>
-                      <h3 className="text-gray-700 text-sm font-bold mb-2">Users</h3>
+                      <h3 className="text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Users</h3>
                       {results
                         .filter((item) => item.source === "user")
                         .map((user) => (
                           <div
                             key={`user-${user.id}`}
                             onClick={() => { setActiveTab("user-profile"), setSelectedUserId(user?.id), setSearch("") }}
-                            className="flex justify-between items-center p-2 hover:bg-gray-100 rounded"
+                            className="flex justify-between items-center p-2 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800 rounded"
                           >
                             <div>
                               <div className="font-medium">
                                 {highlightText(`${user.firstname} ${user.lastname}`, search)}
                               </div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-sm text-gray-500 dark:text-gray-200">
                                 @{highlightText(user.username, search)}
                               </div>
                               <div className="text-xs text-gray-400">
@@ -385,7 +385,7 @@ export default function Header({
                   {/* Wyras Section */}
                   {results.some((r) => r.source === "wyra") && (
                     <div>
-                      <h3 className="text-gray-700 text-sm font-bold mb-2">Wyras</h3>
+                      <h3 className="text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Wyras</h3>
                       {results
                         .filter((item) => item.source === "wyra")
                         .map((wyra) => {
@@ -399,7 +399,7 @@ export default function Header({
                               key={`wyra-${wyra.id}`}
                               onClick={() => { setActiveTab("home"), setPostId(wyra.id), setSearch("") }}
 
-                              className="p-2 hover:bg-gray-100 rounded"
+                              className="p-2 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800 rounded"
                             >
                               <h2 className="text-md font-bold text-black">
                                 {highlightText(
@@ -409,7 +409,7 @@ export default function Header({
                               </h2>
 
                               {matchedOption && (
-                                <p className="text-sm text-gray-600 mt-1">
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                                   <span className="font-semibold">
                                     Option {matchedOption.position}:
                                   </span>{" "}
@@ -429,8 +429,8 @@ export default function Header({
               onClick={() => onTabChange("home")}
               className={`relative p-2 rounded-full transition-colors  md:block hidden
               ${!isProfileCompleted
-                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  ? "text-gray-400 bg-gray-900 dark:bg-gray-800 cursor-not-allowed"
+                  : "text-gray-600 dark:text-gray-300 hover:text-gray-900 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800"
                 }`}
             >
               <Home
@@ -444,15 +444,15 @@ export default function Header({
               className={`relative p-2 rounded-full transition-colors
                 md:block hidden
               ${!isProfileCompleted
-                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  ? "text-gray-400 bg-gray-900 dark:bg-gray-800 cursor-not-allowed"
+                  : "text-gray-600 dark:text-gray-300 hover:text-gray-900  hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800"
                 }`}
             >
               <MessageCircle
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
               {unreadMessagesCount > 0 && isProfileCompleted && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white dark:text-black text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
                 </span>
               )}
@@ -465,8 +465,8 @@ export default function Header({
               className={`relative p-2 rounded-full transition-colors
                 md:block hidden
               ${!isProfileCompleted
-                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  ? "text-gray-400 bg-gray-900 dark:bg-gray-800 cursor-not-allowed"
+                  : "text-gray-600 dark:text-gray-300 hover:text-gray-900 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800"
                 }`}
             >
               <Heart
@@ -480,15 +480,15 @@ export default function Header({
               onClick={() => onTabChange("notifications")}
               className={`relative p-2 rounded-full transition-colors
               ${!isProfileCompleted
-                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  ? "text-gray-400 bg-gray-900 dark:bg-gray-800 cursor-not-allowed"
+                  : "text-gray-600 dark:text-gray-300 hover:text-gray-900 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800"
                 }`}
             >
               <Bell
                 className={`w-5 h-5 ${!isProfileCompleted ? "text-gray-400" : ""}`}
               />
               {unreadCount > 0 && isProfileCompleted && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white dark:text-black text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}

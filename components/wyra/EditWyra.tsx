@@ -212,12 +212,12 @@ export default function EditWyra({
               {/* Desktop Layout */}
               <div className="hidden md:block">
 
-                <div className="bg-white border rounded-2xl shadow p-5 mb-3 md:mb-8 relative">
+                <div className="bg-white dark:bg-black border rounded-2xl shadow p-5 mb-3 md:mb-8 relative">
                   <textarea
                     maxLength={150}
                     rows={4}
                     placeholder="Type option one..."
-                    className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                    className="w-full border border-gray-300 bg-white dark:bg-black text-gray-900 dark:text-gray-100 rounded-md p-4 resize-none text-base font-medium"
                     value={optionOne}
                     onChange={(e) => setOptionOne(e.target.value)}
                   />
@@ -227,14 +227,14 @@ export default function EditWyra({
                   <div className="flex items-center mt-4 gap-4 relative">
                     <FaSmile
                       size={22}
-                      className="text-gray-600 cursor-pointer"
+                      className="text-gray-600 dark:text-gray-300 cursor-pointer"
                       onClick={() => {
                         setActiveOption(1);
                         setShowEmojiPicker((prev) => !prev);
                       }}
                     />
                     <label className="cursor-pointer">
-                      <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                      <FaRegImage size={22} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:text-gray-200" />
 
                       <input
                         type="file"
@@ -255,7 +255,7 @@ export default function EditWyra({
                           <img src={m.url} alt="media" className="w-full h-full object-cover" />
                         )}
                         <button
-                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                          className="absolute top-1 right-1 bg-red-600 text-white dark:text-black p-1 rounded-full"
                           onClick={() => handleDeleteMedia(1, m.id)}
                         >
                           <FaTrash size={12} />
@@ -264,16 +264,16 @@ export default function EditWyra({
                     ))}
                   </div>
                 </div>
-                <div className="text-center font-semibold text-xl text-gray-700 mb-3 md:mb-8">
+                <div className="text-center font-semibold text-xl text-gray-700 dark:text-gray-300 mb-3 md:mb-8">
                   OR
                 </div>
 
-                <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
+                <div className="bg-white dark:bg-black border rounded-2xl shadow p-5 mb-4 relative">
                   <textarea
                     maxLength={150}
                     rows={4}
                     placeholder="Type option two..."
-                    className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                    className="w-full border border-gray-300 bg-white dark:bg-black text-gray-900 dark:text-gray-100 rounded-md p-4 resize-none text-base font-medium"
                     value={optionTwo}
                     onChange={(e) => setOptionTwo(e.target.value)}
                   />
@@ -283,14 +283,14 @@ export default function EditWyra({
                   <div className="flex items-center mt-4 gap-4 relative">
                     <FaSmile
                       size={22}
-                      className="text-gray-600 cursor-pointer"
+                      className="text-gray-600 dark:text-gray-300 cursor-pointer"
                       onClick={() => {
                         setActiveOption(2);
                         setShowEmojiPicker((prev) => !prev);
                       }}
                     />
                     <label className="cursor-pointer">
-                      <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                      <FaRegImage size={22} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:text-gray-200" />
                       <input
                         type="file"
                         className="hidden"
@@ -310,7 +310,7 @@ export default function EditWyra({
                           <img src={m.url} alt="media" className="w-full h-full object-cover" />
                         )}
                         <button
-                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                          className="absolute top-1 right-1 bg-red-600 text-white dark:text-black p-1 rounded-full"
                           onClick={() => handleDeleteMedia(2, m.id)}
                         >
                           <FaTrash size={12} />
@@ -324,7 +324,7 @@ export default function EditWyra({
                   <Button
                     btnText="Update Wyra"
                     loading={loading}
-                    className="bg-blue-600 text-white"
+                    className="bg-blue-600 text-white dark:text-black"
                     loadingText="Updating..."
                     onClick={handleSubmit}
                   />
@@ -335,13 +335,13 @@ export default function EditWyra({
               <div className="block md:hidden">
                 {activeTab === 1 && (
                   <>
-                    <h1 className="font-semibold text-xl text-gray-700">Option 1:</h1>
-                    <div className="bg-white border rounded-2xl shadow p-5 mb-3 md:mb-8 relative">
+                    <h1 className="font-semibold text-xl text-gray-700 dark:text-gray-300">Option 1:</h1>
+                    <div className="bg-white dark:bg-black border rounded-2xl shadow p-5 mb-3 md:mb-8 relative">
                       <textarea
                         maxLength={150}
                         rows={4}
                         placeholder="Type option one..."
-                        className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                        className="w-full border border-gray-300 bg-white dark:bg-black text-gray-900 dark:text-gray-100 rounded-md p-4 resize-none text-base font-medium"
                         value={optionOne}
                         onChange={(e) => setOptionOne(e.target.value)}
                       />
@@ -351,14 +351,14 @@ export default function EditWyra({
                       <div className="flex items-center mt-4 gap-4 relative">
                         <FaSmile
                           size={22}
-                          className="text-gray-600 cursor-pointer"
+                          className="text-gray-600 dark:text-gray-300 cursor-pointer"
                           onClick={() => {
                             setActiveOption(1);
                             setShowEmojiPicker((prev) => !prev);
                           }}
                         />
                         <label className="cursor-pointer">
-                          <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                          <FaRegImage size={22} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:text-gray-200" />
 
                           <input
                             type="file"
@@ -379,7 +379,7 @@ export default function EditWyra({
                               <img src={m.url} alt="media" className="w-full h-full object-cover" />
                             )}
                             <button
-                              className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                              className="absolute top-1 right-1 bg-red-600 text-white dark:text-black p-1 rounded-full"
                               onClick={() => handleDeleteMedia(1, m.id)}
                             >
                               <FaTrash size={12} />
@@ -389,20 +389,20 @@ export default function EditWyra({
                       </div>
                     </div>
                     <div className="text-right mt-4">
-                      <Button btnText="Next" onClick={() => setActiveTab(2)} />
+                      <Button btnText="Option 2" onClick={() => setActiveTab(2)} />
                     </div>
                   </>
                 )}
                 {activeTab === 2 && (
                   <>
-                    <h1 className="font-semibold text-xl text-gray-700">Option 2:</h1>
+                    <h1 className="font-semibold text-xl text-gray-700 dark:text-gray-300">Option 2:</h1>
 
-                    <div className="bg-white border rounded-2xl shadow p-5 mb-4 relative">
+                    <div className="bg-white dark:bg-black border rounded-2xl shadow p-5 mb-4 relative">
                       <textarea
                         maxLength={150}
                         rows={4}
                         placeholder="Type option two..."
-                        className="w-full border border-gray-300 bg-white text-gray-900 rounded-md p-4 resize-none text-base font-medium"
+                        className="w-full border border-gray-300 bg-white dark:bg-black text-gray-900 dark:text-gray-100 rounded-md p-4 resize-none text-base font-medium"
                         value={optionTwo}
                         onChange={(e) => setOptionTwo(e.target.value)}
                       />
@@ -412,14 +412,14 @@ export default function EditWyra({
                       <div className="flex items-center mt-4 gap-4 relative">
                         <FaSmile
                           size={22}
-                          className="text-gray-600 cursor-pointer"
+                          className="text-gray-600 dark:text-gray-300 cursor-pointer"
                           onClick={() => {
                             setActiveOption(2);
                             setShowEmojiPicker((prev) => !prev);
                           }}
                         />
                         <label className="cursor-pointer">
-                          <FaRegImage size={22} className="text-gray-600 hover:text-gray-800" />
+                          <FaRegImage size={22} className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:text-gray-200" />
                           <input
                             type="file"
                             className="hidden"
@@ -439,7 +439,7 @@ export default function EditWyra({
                               <img src={m.url} alt="media" className="w-full h-full object-cover" />
                             )}
                             <button
-                              className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                              className="absolute top-1 right-1 bg-red-600 text-white dark:text-black p-1 rounded-full"
                               onClick={() => handleDeleteMedia(2, m.id)}
                             >
                               <FaTrash size={12} />
@@ -454,7 +454,7 @@ export default function EditWyra({
                       <Button
                         btnText="Update Wyra"
                         loading={loading}
-                        className="bg-blue-600 text-white w-[70%] px-4"
+                        className="bg-blue-600 text-white dark:text-black w-[70%] px-4"
                         loadingText="Updating..."
                         onClick={handleSubmit}
                       />

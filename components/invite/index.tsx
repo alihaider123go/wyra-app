@@ -24,14 +24,14 @@ Play Store: https://play.google.com/store/apps/details?id=`;
   };
 
   return (
-    <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right max-w-3xl mx-auto my-10 p-6">
+    <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right max-w-3xl mx-auto my-10 p-6">
       <CardHeader className="text-center pb-4">
-        <CardTitle className="text-2xl font-bold text-gray-800">
+        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
           🎉 Invite Your Friends to Wyra
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-6 text-sm text-gray-700 leading-relaxed">
+      <CardContent className="space-y-6 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
         <p>
           Wyra is more fun when your crew is in on it! Ready to spark debates,
           settle dilemmas, and find out exactly why your friends think pineapple
@@ -50,7 +50,7 @@ Play Store: https://play.google.com/store/apps/details?id=`;
           📲 Send Invite:
         </h3>
 
-        <div className="bg-gray-100 rounded-lg p-4 relative">
+        <div className="bg-gray-900 dark:bg-gray-800 rounded-lg p-4 relative">
           <p className="whitespace-pre-line text-sm">{inviteMessage}</p>
           <Button
             onClick={handleCopy}
@@ -90,7 +90,7 @@ Play Store: https://play.google.com/store/apps/details?id=`;
           </a>
         </div>
 
-        <p className="text-center text-sm mt-6 italic text-gray-600">
+        <p className="text-center text-sm mt-6 italic text-gray-600 dark:text-gray-300">
           ✅ Pro Tip: Don’t just answer Wyras… create your own, follow your
           friends, join Circles, and watch the whys roll in. Let’s see who
           disagrees with you the most. 😏

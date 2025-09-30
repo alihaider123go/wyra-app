@@ -16,8 +16,8 @@ const LoginGithub = () => {
       onClick={handleGithubLogin}
       className="w-full gap-4 hover:cursor-pointer mt-6 h-12 bg-gray-800 rounded-md p-4 flex justify-center items-center"
     >
-      <FaGithub className="text-white" />
-      <p className="text-white">
+      <FaGithub className="text-white dark:text-black" />
+      <p className="text-white dark:text-black">
         {isPending ? "Redirecting..." : "Login with Github"}
       </p>
     </div>

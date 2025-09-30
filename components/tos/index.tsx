@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function TermsOfService() {
   return (
-    <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg animate-slide-in-right max-w-3xl mx-auto my-10">
+    <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right max-w-3xl mx-auto my-10">
       <CardHeader className="text-center pb-6">
-        <CardTitle className="text-2xl font-bold text-gray-800">
+        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
           Terms & Conditions
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="text-left space-y-4 text-gray-700 text-sm leading-relaxed">
+      <CardContent className="text-left space-y-4 text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
         <p>
           Welcome to Wyra — the place where every question has two sides and every answer has a story. Before you dive
           into the debates, here’s the legal stuff you agree to when using our app. We promise to keep it human, not
@@ -140,7 +140,7 @@ export default function TermsOfService() {
           },
         ].map(({ title, content }, i) => (
           <div key={i}>
-            <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">{title}</h3>
             <div>{content}</div>
           </div>
         ))}

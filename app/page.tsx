@@ -28,7 +28,7 @@ import { useSessionUser } from "@/utils/useSessionUser";
 import FavoritesWyra from "@/components/wyra/FavoritesWyra";
 import NotificationsList from "@/components/notifications/notificationList";
 import { NotificationsProvider } from "@/components/notifications/useNotifications";
-import { isNotificationAllowed } from "@/utils/helper";
+import { isNotificationAllowed, isSettingAllowed } from "@/utils/helper";
 import { checkUserOnlineStatus, updateLastSeen } from "@/actions/common";
 import '@ant-design/v5-patch-for-react-19';
 import UserProfile from "@/components/profile/userProfile";
@@ -36,6 +36,32 @@ import UserProfile from "@/components/profile/userProfile";
 export default function Home() {
   const supabase = createClient();
   const { user: sessionUser, loading, isVerified, isProfileCompleted, refetch } = useSessionUser();
+  const [themeLoaded, setThemeLoaded] = useState(false);
+
+
+
+ useEffect(() => {
+  const checkDarkMode = async () => {
+    if (!sessionUser?.id) {
+      setThemeLoaded(true);
+      return;
+    }
+
+    const isDarkMode = await isSettingAllowed(sessionUser?.id, "dark_mode");
+
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+
+    setThemeLoaded(true);
+  };
+
+  checkDarkMode();
+}, [sessionUser]);
 
   // const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
@@ -93,9 +119,9 @@ export default function Home() {
       case "chat":
         return <Chat userId={sessionUser?.id} />;
       case "profile":
-        return <Profile userId={sessionUser?.id} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId}/>;
+        return <Profile userId={sessionUser?.id} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
       case "user-profile":
-        return <UserProfile userId={selectedUserId} />;  
+        return <UserProfile userId={selectedUserId} />;
       case "profile-settings":
         return <Settings user={sessionUser} isVerified={isVerified} refetch={refetch} />;
       case "account-settings":
@@ -107,7 +133,7 @@ export default function Home() {
       case "invite":
         return <InviteFriends />;
       case "block-unblock":
-        return <BlockUserInfo setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId}/>;
+        return <BlockUserInfo setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
       case "help-faqs":
         return <HelpCenter />;
       case "about-us":
@@ -125,7 +151,7 @@ export default function Home() {
       case "csae":
         return <CSAEPolicy />;
       case "favorites":
-        return <FavoritesWyra searchTerm={searchTerm} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId}/>;
+        return <FavoritesWyra searchTerm={searchTerm} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
       default:
         return null;
     }
@@ -138,6 +164,14 @@ export default function Home() {
       }, 5000);
     }
   }, [postId])
+
+   if (!themeLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <Loader width={20} height={20} color="border-gray-700" />
+      </div>
+    );
+  }
 
   if (!loading && !sessionUser)
     return (
