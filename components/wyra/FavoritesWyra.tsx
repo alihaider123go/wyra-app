@@ -45,7 +45,7 @@ import UserOnlineStatus from "../ui/userOnlineStatus";
 import { useRouter } from "next/navigation";
 import WyraSection from "./Wyra";
 
-export default function FavoritesWyra({ searchTerm,setActiveTab,setSelectedUserId }: any) {
+export default function FavoritesWyra({ searchTerm, setActiveTab, setSelectedUserId, userId }: any) {
   const [wyraList, setWyraList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
@@ -84,7 +84,7 @@ export default function FavoritesWyra({ searchTerm,setActiveTab,setSelectedUserI
     }
 
     try {
-      const result = await getFavoriteWyras(user.id, debouncedSearch);
+      const result = await getFavoriteWyras(userId ? userId : user.id, debouncedSearch);
       setWyraList(result || []);
     } catch (err) {
       // console.error("Failed to fetch wyras", err);
@@ -148,7 +148,7 @@ export default function FavoritesWyra({ searchTerm,setActiveTab,setSelectedUserI
         const { error } = await supabase
           .from("user_followers")
           .delete()
-          .eq("follower_id", user.id)
+          .eq("follower_id", userId ? userId : user.id)
           .eq("following_id", profileUserId);
 
         if (!error) {
@@ -158,7 +158,7 @@ export default function FavoritesWyra({ searchTerm,setActiveTab,setSelectedUserI
         // Follow
         const { error } = await supabase
           .from("user_followers")
-          .upsert([{ follower_id: user.id, following_id: profileUserId }], {
+          .upsert([{ follower_id: userId ? userId : user.id, following_id: profileUserId }], {
             onConflict: "follower_id,following_id",
           });
 

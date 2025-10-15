@@ -12,9 +12,12 @@ import { Button } from "@/components/ui/button"
 import { Plus, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
 import AddedCircles from "../circle/AddedCircleList";
 import { User } from "@supabase/supabase-js";
+import FavoritesWyra from "../wyra/FavoritesWyra";
 
 interface ProfileProps {
     userId: any;
+    setActiveTab: any;
+    setSelectedUserId: any;
 }
 
 interface UserProfile {
@@ -27,7 +30,7 @@ interface UserProfile {
     account_settings?: any;
 }
 
-export default function UserProfile({ userId }: ProfileProps) {
+export default function UserProfile({ userId, setActiveTab, setSelectedUserId }: ProfileProps) {
     const supabase = createClient();
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -36,7 +39,8 @@ export default function UserProfile({ userId }: ProfileProps) {
     const [followingCount, setFollowingCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<"myCircles" | "addedCircles">("myCircles")
+    const [activeCircleTab, setActiveCircleTab] = useState<"myCircles" | "addedCircles">("myCircles")
+    const [activeWyraTab, setActiveWyraTab] = useState<"myWyras" | "favouriteWyras">("myWyras")
     const [user, setUser] = useState<User | null>(null);
 
     const fetchUserDetail = async () => {
@@ -69,7 +73,8 @@ export default function UserProfile({ userId }: ProfileProps) {
                 const { data: profileData, error: profileError } = await supabase
                     .from(`user_profiles`)
                     .select(`*,account_settings(
-              show_circles_on_profile
+              show_circles_on_profile,
+              show_favorites_publicly
             )`)
                     .eq("id", userId)
                     .single();
@@ -164,14 +169,14 @@ export default function UserProfile({ userId }: ProfileProps) {
 
                         <div className="flex justify-center gap-4 border-b pb-2">
                             <Button
-                                variant={activeTab === "myCircles" ? "default" : "ghost"}
-                                onClick={() => setActiveTab("myCircles")}
+                                variant={activeCircleTab === "myCircles" ? "default" : "ghost"}
+                                onClick={() => setActiveCircleTab("myCircles")}
                             >
                                 My Circles
                             </Button>
                             <Button
-                                variant={activeTab === "addedCircles" ? "default" : "ghost"}
-                                onClick={() => setActiveTab("addedCircles")}
+                                variant={activeCircleTab === "addedCircles" ? "default" : "ghost"}
+                                onClick={() => setActiveCircleTab("addedCircles")}
                             >
                                 Added Circles
                             </Button>
@@ -179,44 +184,84 @@ export default function UserProfile({ userId }: ProfileProps) {
                     }
 
                     <CardContent className="pt-6">
-                        {activeTab === "myCircles" && <CircleList userId={userId} />}
+                        {activeCircleTab === "myCircles" && <CircleList userId={userId} />}
                         {
                             profile?.account_settings?.show_circles_on_profile &&
 
 
-                            activeTab === "addedCircles" && <AddedCircles userId={userId} />}
+                            activeCircleTab === "addedCircles" && <AddedCircles userId={userId} />}
                     </CardContent>
                 </Card>
             }
 
             {/* My Wyras Card */}
-            <Card className="mt-[50px] shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
-                <CardHeader className="text-center pb-6">
-                    <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200 flex justify-between">
-                        {
-                            user?.id === userId
-                                ?
-                                <>
-                                    <span>
-                                        My Wyras
-                                    </span>
-                                    <Link href="/create-wyra" passHref>
-                                        <Button className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white dark:text-black font-medium rounded-lg transition">
-                                            <Plus size={18} /> Create Wyra
-                                        </Button>
-                                    </Link>
-                                </>
-                                :
-                                <span>
-                                    {profile.firstname + " " + profile.lastname}&apos;s Wyras
-                                </span>
+            {
+
+                <Card className="mt-[50px] shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
+                    <CardHeader className="text-center pb-2">
+                        <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">Wyras</CardTitle>
+                    </CardHeader>
+
+                    {
+                        profile?.account_settings?.show_favorites_publicly &&
+
+                        <div className="flex justify-center gap-4 border-b pb-2">
+                            <Button
+                                variant={activeWyraTab === "myWyras" ? "default" : "ghost"}
+                                onClick={() => setActiveWyraTab("myWyras")}
+                            >
+                                Wyras
+                            </Button>
+                            <Button
+                                variant={activeWyraTab === "favouriteWyras" ? "default" : "ghost"}
+                                onClick={() => setActiveWyraTab("favouriteWyras")}
+                            >
+                                Favourite Wyras
+                            </Button>
+                        </div>
+                    }
+
+                    <CardContent className="pt-6">
+                        {activeWyraTab === "myWyras" &&
+
+                            <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
+                                <CardHeader className="text-center pb-6">
+                                    <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200 flex justify-between">
+                                        {
+                                            user?.id === userId
+                                                ?
+                                                <>
+                                                    <span>
+                                                        My Wyras
+                                                    </span>
+                                                    <Link href="/create-wyra" passHref>
+                                                        <Button className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white dark:text-black font-medium rounded-lg transition">
+                                                            <Plus size={18} /> Create Wyra
+                                                        </Button>
+                                                    </Link>
+                                                </>
+                                                :
+                                                <span>
+                                                    {profile.firstname + " " + profile.lastname}&apos;s Wyras
+                                                </span>
+                                        }
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <MyWyras userId={userId} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} loggedInUserId={user?.id} />
+                                </CardContent>
+                            </Card>
                         }
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <MyWyras userId={userId} loggedInUserId={user?.id}/>
-                </CardContent>
-            </Card>
+                        {
+                            profile?.account_settings?.show_favorites_publicly &&
+
+
+                            activeWyraTab === "favouriteWyras" &&
+                            <FavoritesWyra userId={userId} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />
+                        }
+                    </CardContent>
+                </Card>
+            }
 
         </>
     );

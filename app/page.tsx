@@ -121,7 +121,7 @@ export default function Home() {
       case "profile":
         return <Profile userId={sessionUser?.id} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
       case "user-profile":
-        return <UserProfile userId={selectedUserId} />;
+        return <UserProfile userId={selectedUserId} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId}/>;
       case "profile-settings":
         return <Settings user={sessionUser} isVerified={isVerified} refetch={refetch} />;
       case "account-settings":

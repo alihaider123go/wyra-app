@@ -55,12 +55,12 @@ const settings: Setting[] = [
     description: "For your inner night owl.",
     category: "Appearance & Theme",
   },
-  {
-    id: "highContrast",
-    label: "High-contrast mode",
-    description: "Make things pop, accessibility-style.",
-    category: "Appearance & Theme",
-  },
+  // {
+  //   id: "highContrast",
+  //   label: "High-contrast mode",
+  //   description: "Make things pop, accessibility-style.",
+  //   category: "Appearance & Theme",
+  // },
   {
     id: "animateFloatingEffects",
     label: "Animate floating ‘Agree/Disagree’ effects",

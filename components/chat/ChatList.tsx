@@ -35,7 +35,7 @@ export default function ChatList({
   }, [searchTerm, chats]);
 
   return (
-    <div className="border flex flex-col h-full">
+    <div className="bg-white dark:bg-gray-900 border flex flex-col h-full">
       <div className="p-4 border-b flex justify-between items-center space-x-4">
         <h2 className="font-bold text-xl">Chats</h2>
         <NewChatButton

@@ -39,7 +39,7 @@ export default function NotificationsList({ userId,setActiveTab,setPostId }: any
             <li
               key={n.id}
               className={`p-4 rounded-lg border shadow-sm cursor-pointer transition ${
-                n.is_read ? "bg-gray-900 dark:bg-gray-800" : "bg-white dark:bg-black"
+                n.is_read ? "bg-gray-200 dark:bg-gray-800" : "bg-white dark:bg-black"
               }`}
               onClick={() => handleNotificationClick(n)}
             >

@@ -56,12 +56,12 @@ const settings: Setting[] = [
     description: "For your inner night owl.",
     category: "Appearance & Theme",
   },
-  {
-    id: "high_contrast",
-    label: "High-contrast mode",
-    description: "Make things pop, accessibility-style.",
-    category: "Appearance & Theme",
-  },
+  // {
+  //   id: "high_contrast",
+  //   label: "High-contrast mode",
+  //   description: "Make things pop, accessibility-style.",
+  //   category: "Appearance & Theme",
+  // },
   {
     id: "animate_floating_effects",
     label: "Animate floating ‘Agree/Disagree’ effects",
@@ -97,9 +97,9 @@ const settings: Setting[] = [
 
   // Circles & Community
   {
-    id: "auto_join_circles",
-    label: "Auto-join suggested Circles",
-    description: "Let us match you to your tribe automatically.",
+    id: "auto_suggest_circles",
+    label: "Auto-suggest Circles",
+    description: "Let us show you circles that would match your Vibe.",
     category: "Circles & Community",
   },
   {
