@@ -40,28 +40,28 @@ export default function Home() {
 
 
 
- useEffect(() => {
-  const checkDarkMode = async () => {
-    if (!sessionUser?.id) {
+  useEffect(() => {
+    const checkDarkMode = async () => {
+      if (!sessionUser?.id) {
+        setThemeLoaded(true);
+        return;
+      }
+
+      const isDarkMode = await isSettingAllowed(sessionUser?.id, "dark_mode");
+
+      if (isDarkMode) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+
       setThemeLoaded(true);
-      return;
-    }
+    };
 
-    const isDarkMode = await isSettingAllowed(sessionUser?.id, "dark_mode");
-
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-
-    setThemeLoaded(true);
-  };
-
-  checkDarkMode();
-}, [sessionUser]);
+    checkDarkMode();
+  }, [sessionUser]);
 
   // const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
@@ -94,6 +94,38 @@ export default function Home() {
   // }, []);
 
   useEffect(() => {
+  // 🔹 Listen for mobile app BACK button events
+  const handleMessage = (event: MessageEvent) => {
+    console.log('Message received from RN app:', event.data);
+
+    try {
+      const data = JSON.parse(event.data);
+      if (data.type === 'BACK_BUTTON') {
+        console.log('Back button detected!');
+
+        // Simulate browser back (popstate) manually
+        if (window.history.state?.tab) {
+          window.history.back();
+        } else {
+          // If no previous state, default to home
+          setActiveTab("home");
+        }
+      }
+    } catch {
+      console.warn('Non-JSON message received:', event.data);
+    }
+  };
+
+  window.addEventListener('message', handleMessage); // Android
+  window.addEventListener('message', handleMessage);   // iOS / Web
+
+  return () => {
+    window.removeEventListener('message', handleMessage);
+    window.removeEventListener('message', handleMessage);
+  };
+}, []);
+
+  useEffect(() => {
     if (!sessionUser?.id) return;
 
     const interval = setInterval(() => {
@@ -105,10 +137,39 @@ export default function Home() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
+  // const handleTabClick = (tab: string) => {
+  //   setActiveTab(tab);
+  //   setSearchTerm("")
+  // };
+
   const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
-    setSearchTerm("")
+    if (tab !== activeTab) {
+      setActiveTab(tab);
+      setSearchTerm("");
+      // Push new state into browser history
+      window.history.pushState({ tab }, "", `#${tab}`);
+    }
   };
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state?.tab) {
+        setActiveTab(event.state.tab);
+      } else {
+        setActiveTab("home"); // default when no state exists
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    // Push initial state
+    window.history.replaceState({ tab: "home" }, "", "#home");
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
 
   const renderCurrentTab = () => {
     switch (activeTab) {
@@ -121,7 +182,7 @@ export default function Home() {
       case "profile":
         return <Profile userId={sessionUser?.id} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
       case "user-profile":
-        return <UserProfile userId={selectedUserId} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId}/>;
+        return <UserProfile userId={selectedUserId} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
       case "profile-settings":
         return <Settings user={sessionUser} isVerified={isVerified} refetch={refetch} />;
       case "account-settings":
@@ -165,7 +226,7 @@ export default function Home() {
     }
   }, [postId])
 
-   if (!themeLoaded) {
+  if (!themeLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <Loader width={20} height={20} color="border-gray-700" />

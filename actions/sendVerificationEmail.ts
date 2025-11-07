@@ -17,16 +17,16 @@ export async function sendVerificationEmail(userId: string, email: string) {
   const verificationLink = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
   // Example using Nodemailer (can be replaced with SendGrid, Resend, etc.)
   const transporter = nodemailer.createTransport({
-    host: 'sandbox.smtp.mailtrap.io',
+    host: 'mail.privateemail.com',
     port: 587,
     auth: {
-      user: "b6c273aca20ae6",
-      pass: "a5b5e7f4a37a61"
+      user: "info@wyra.xyz",
+      pass: "Churchlane20"
     }
   });
 
   await transporter.sendMail({
-    from: 'noreply@yourdomain.com',
+    from: 'info@wyra.xyz',
     to: email,
     subject: 'Verify your email',
     text: `Click this link to verify your email: ${verificationLink}`,
