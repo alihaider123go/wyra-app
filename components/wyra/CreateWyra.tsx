@@ -157,7 +157,6 @@ export default function CreateWyra({ onTabChange }: { onTabChange?: (tab: string
     if (onTabChange){
       onTabChange("home");
     }
-
   };
   
 

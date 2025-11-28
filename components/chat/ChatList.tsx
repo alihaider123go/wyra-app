@@ -58,18 +58,24 @@ export default function ChatList({
 
       {/* Chat list */}
       <div className="overflow-y-auto">
-        {filteredChats.length === 0 ? (
-          <p className="p-4 text-gray-500 dark:text-gray-200 text-center">No chats found</p>
-        ) : (
-          filteredChats.map((chat) => (
-            <ChatListItem
-              key={chat.id}
-              chat={chat}
-              isSelected={chat.id === selectedChat?.id}
-              onClick={() => onSelectChat(chat)}
-            />
-          ))
-        )}
+        {(() => {
+          const visibleChats = filteredChats.filter(
+            (chat) => chat.lastMessage != null && chat.lastMessage !== ""
+          );
+
+          return visibleChats.length === 0 ? (
+            <p className="p-4 text-gray-500 dark:text-gray-200 text-center">No chats found</p>
+          ) : (
+            visibleChats.map((chat) => (
+              <ChatListItem
+                key={chat.id}
+                chat={chat}
+                isSelected={chat.id === selectedChat?.id}
+                onClick={() => onSelectChat(chat)}
+              />
+            ))
+          );
+        })()}
       </div>
     </div>
   );

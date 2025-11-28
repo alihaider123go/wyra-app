@@ -28,7 +28,7 @@ export default function MessageInput({
     .maybeSingle(); // or `.single()` if you expect exactly one
 
   if (error) {
-    console.error(error)
+    // console.error(error)
     return false
   }
 
@@ -41,12 +41,14 @@ export default function MessageInput({
     const isNotAllowed = await isSettingAllowed(senderId, "no_dm")
     const isFollowing = await isUserFollowing(currentUserId, senderId)
 
-    console.log("he;;p",senderId,isAllowedEveryone,isAllowedFollower,isNotAllowed)
+    console.log("he;;p",senderId,isAllowedEveryone,isAllowedFollower,isNotAllowed,isFollowing)
     if (isNotAllowed) {
       setIsUserAllowToSendMessage(false)
     }
     if (isAllowedEveryone) {
       setIsUserAllowToSendMessage(true)
+    }else{
+      setIsUserAllowToSendMessage(false)
     }
     if (isAllowedFollower && isFollowing) {
       setIsUserAllowToSendMessage(true)
@@ -54,8 +56,10 @@ export default function MessageInput({
   }
 
   useEffect(() => {
-    checkUserSettings()
-  }, [])
+    if(senderId){
+      checkUserSettings()
+    }
+  }, [senderId])
 
   const sendMessage = async () => {
     if (!chatId || !text.trim()) return;

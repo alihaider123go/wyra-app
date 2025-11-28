@@ -33,6 +33,14 @@ import { checkUserOnlineStatus, updateLastSeen } from "@/actions/common";
 import '@ant-design/v5-patch-for-react-19';
 import UserProfile from "@/components/profile/userProfile";
 
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
+
 export default function Home() {
   const supabase = createClient();
   const { user: sessionUser, loading, isVerified, isProfileCompleted, refetch } = useSessionUser();
@@ -76,54 +84,31 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("home");
   const [postId, setPostId] = useState("");
   const [selectedUserId, setSelectedUserId] = useState(null);
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     const {
-  //       data: { user },
-  //       error: authError,
-  //     } = await supabase.auth.getUser();
-
-  //     if (authError || !user) {
-  //       console.error("Auth error:", authError);
-  //       return;
-  //     }
-  //     setUser(user);
-  //   };
-
-  //   fetchUser();
-  // }, []);
 
   useEffect(() => {
-  // 🔹 Listen for mobile app BACK button events
-  const handleMessage = (event: MessageEvent) => {
-    console.log('Message received from RN app:', event.data);
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data);
 
-    try {
-      const data = JSON.parse(event.data);
-      if (data.type === 'BACK_BUTTON') {
-        console.log('Back button detected!');
-
-        // Simulate browser back (popstate) manually
-        if (window.history.state?.tab) {
-          window.history.back();
-        } else {
-          // If no previous state, default to home
-          setActiveTab("home");
+        if (data.type === "BACK_BUTTON") {
+          if (activeTab === "home") {
+            window?.ReactNativeWebView?.postMessage(JSON.stringify({ type: "EXIT_APP" }));
+          } else {
+            if (window.history.state?.tab) {
+              window.history.back();
+            } else {
+              setActiveTab("home");
+            }
+          }
         }
+      } catch {
+        console.warn("Invalid message received:", event.data);
       }
-    } catch {
-      console.warn('Non-JSON message received:', event.data);
-    }
-  };
+    };
 
-  window.addEventListener('message', handleMessage); // Android
-  window.addEventListener('message', handleMessage);   // iOS / Web
-
-  return () => {
-    window.removeEventListener('message', handleMessage);
-    window.removeEventListener('message', handleMessage);
-  };
-}, []);
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [activeTab]);
 
   useEffect(() => {
     if (!sessionUser?.id) return;
@@ -137,20 +122,19 @@ export default function Home() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  // const handleTabClick = (tab: string) => {
-  //   setActiveTab(tab);
-  //   setSearchTerm("")
-  // };
-
   const handleTabClick = (tab: string) => {
     if (tab !== activeTab) {
       setActiveTab(tab);
       setSearchTerm("");
-      // Push new state into browser history
-      window.history.pushState({ tab }, "", `#${tab}`);
+
+      if (tab === "home") {
+        // Clear history and push home as the only entry
+        window.history.replaceState({ tab: "home" }, "", "#home");
+      } else {
+        window.history.pushState({ tab }, "", `#${tab}`);
+      }
     }
   };
-
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       if (event.state?.tab) {
@@ -190,7 +174,7 @@ export default function Home() {
       case "notification-settings":
         return <NotificationsSettings userId={sessionUser?.id} />;
       case "notifications":
-        return <NotificationsList userId={sessionUser?.id} setActiveTab={setActiveTab} setPostId={setPostId} />;
+        return <NotificationsList userId={sessionUser?.id} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} setPostId={setPostId} />;
       case "invite":
         return <InviteFriends />;
       case "block-unblock":

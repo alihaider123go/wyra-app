@@ -50,6 +50,7 @@ import { useRouter } from "next/navigation";
 import WyraSection from "./Wyra";
 import Loader from "../common/loader";
 import { FaUsers } from "react-icons/fa";
+import PullToRefresh from "../common/PullToRefresh";
 
 export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSelectedUserId }: any) {
   const [wyraList, setWyraList] = useState<any[]>([]);
@@ -259,9 +260,9 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
               {
                 tab.isImage
                   ?
-                    <FaUsers 
-                      className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
-                    />
+                  <FaUsers
+                    className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
+                  />
                   :
                   <Icon
                     className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
@@ -284,28 +285,30 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
           !wyraLoading
             ?
             <>
-
               {activeFeatureTab === "trending" ? (
-                <WyraSection
-                  wyras={wyraList.filter((wyra: any) => wyra.likeCount > 10)}
-                  fetchWyras={fetchWyras}
-                  searchTerm={searchTerm}
-                  postId={postId}
-                  setActiveTab={setActiveTab}
-                  setSelectedUserId={setSelectedUserId}
-                />
-
+                <PullToRefresh onRefresh={fetchWyras}>
+                  <WyraSection
+                    wyras={wyraList.filter((wyra: any) => wyra.likeCount > 10)}
+                    fetchWyras={fetchWyras}
+                    searchTerm={searchTerm}
+                    postId={postId}
+                    setActiveTab={setActiveTab}
+                    setSelectedUserId={setSelectedUserId}
+                  />
+                </PullToRefresh>
               ) : activeFeatureTab === "recent" ? (
-                <WyraSection
-                  wyras={wyraList}
-                  fetchWyras={fetchWyras}
-                  searchTerm={searchTerm}
-                  postId={postId}
-                  setActiveTab={setActiveTab}
-                  setSelectedUserId={setSelectedUserId}
-                />
+                <PullToRefresh onRefresh={fetchWyras}>
+                  <WyraSection
+                    wyras={wyraList}
+                    fetchWyras={fetchWyras}
+                    searchTerm={searchTerm}
+                    postId={postId}
+                    setActiveTab={setActiveTab}
+                    setSelectedUserId={setSelectedUserId}
+                  />
+                </PullToRefresh>
               ) : activeFeatureTab === "circles" ? (
-                <div>
+                <PullToRefresh onRefresh={fetchWyras}>
                   <CirclesWyras
                     wyras={wyrasWithCircles}
                     fetchWyras={fetchCircleWyras}
@@ -314,7 +317,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
                     setActiveTab={setActiveTab}
                     setSelectedUserId={setSelectedUserId}
                   />
-                </div>
+                </PullToRefresh>
               ) : (
                 <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
                   <CardHeader className="text-center pb-6">

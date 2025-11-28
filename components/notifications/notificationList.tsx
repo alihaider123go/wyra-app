@@ -3,7 +3,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { useNotifications } from "./useNotifications";
 
-export default function NotificationsList({ userId,setActiveTab,setPostId }: any) {
+export default function NotificationsList({ userId,setActiveTab,setSelectedUserId,setPostId }: any) {
   const {
     notifications,
     unreadCount,
@@ -15,6 +15,12 @@ export default function NotificationsList({ userId,setActiveTab,setPostId }: any
     markAsRead(n.id)
     setActiveTab("home")
     setPostId(n.post_id)
+  }
+
+  const handleUserNameClick = (n:any)=>{
+    
+    setActiveTab("user-profile")
+    setSelectedUserId(n.sender?.id)
   }
 
   return (
@@ -59,7 +65,7 @@ export default function NotificationsList({ userId,setActiveTab,setPostId }: any
 
                 <div>
                   <p className="text-sm">
-                    <span className="font-medium">
+                    <span onClick={(e) => { e.stopPropagation();handleUserNameClick(n)}} className="font-medium">
                       {n.sender
                         ? `${n.sender.firstname} ${n.sender.lastname}`
                         : "Someone"}

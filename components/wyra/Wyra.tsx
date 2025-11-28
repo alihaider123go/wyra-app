@@ -209,7 +209,7 @@ export default function WyraSection({
                                 sender_id: user.id,
                                 recipient_id: profileUserId,
                                 post_id: null,
-                                message: "follow you",
+                                message: "is following you",
                             },
                         ]);
                     }
@@ -577,7 +577,7 @@ export default function WyraSection({
                                             ).map((item: any) => {
                                                 return (
                                                     <div className={`my-2 ml-4 ${user?.id === item?.user_profiles?.id && item?.user_profiles?.account_settings?.multi_color_why_boxes ? "border rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white dark:text-black shadow-lg p-2" : "border-b"}`} key={item?.id}>
-                                                        <div onClick={() => {setActiveTab("user-profile"), setSelectedUserId(item?.user_profiles?.id) }} className="flex cursor-pointer items-center">
+                                                        <div onClick={() => { setActiveTab("user-profile"), setSelectedUserId(item?.user_profiles?.id) }} className="flex cursor-pointer items-center">
                                                             <div className="relative w-12 h-12 rounded-full mr-2">
                                                                 <CustomAvatar userId={item?.user_profiles?.id} firstName={item?.user_profiles.firstname} lastName={item?.user_profiles.lastname} />
                                                             </div>
@@ -589,13 +589,18 @@ export default function WyraSection({
                                                             </p>
                                                         </div>
                                                         <div className="ml-12 rounded">
-                                                            <div className="flex ml-2">
-                                                                <h3 className="text-lg font-bold">Why?</h3>
-                                                                <div className="flex items-center">
-                                                                    <p className="italic ml-2">{item?.why}</p>
+                                                            <div className="ml-2">
+                                                                <div className="flex items-center my-2">
+                                                                    <div className="flex-grow border-t"></div>
+
+                                                                    <h3 className="mx-4 text-lg font-bold whitespace-nowrap">Why?</h3>
+
+                                                                    <div className="flex-grow border-t"></div>
                                                                 </div>
+
+                                                                <p className="text-center italic">{item?.why}</p>
                                                             </div>
-                                                            <div className="my-2 flex gap-2">
+                                                            <div className="my-2 flex justify-center gap-2">
                                                                 <WyraSelectedOptionLikeButton
                                                                     wyraSelectedOptionId={item?.id}
                                                                     userId={item?.user_profiles?.id}
