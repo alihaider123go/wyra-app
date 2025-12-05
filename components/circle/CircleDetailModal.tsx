@@ -78,7 +78,7 @@ export default function CircleDetailModal({
       email,
       account_settings (
         find_by_email,
-        find_by_phone
+        find_by_username
       )
     `)
       .or(

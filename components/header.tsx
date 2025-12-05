@@ -25,6 +25,7 @@ import {
   UserRoundCog,
   Home,
   Heart,
+  Baby
 } from "lucide-react";
 import Link from "next/link";
 import { ExtendedUser, UserProfile } from "@/actions/types";
@@ -138,7 +139,7 @@ export default function Header({
       disable: !isProfileCompleted,
     },
     {
-      icon: AlertTriangle,
+      icon: Baby,
       label: "CSAE Policy",
       slug: "csae",
       disable: !isProfileCompleted,

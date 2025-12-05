@@ -25,8 +25,8 @@ const settings: Setting[] = [
     category: "Account & Privacy",
   },
   {
-    id: "find_by_phone",
-    label: "Allow people to find me by phone number",
+    id: "find_by_username",
+    label: "Allow people to find me by user name",
     description: "Only for the bold. Or the social butterflies.",
     category: "Account & Privacy",
   },

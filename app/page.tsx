@@ -206,7 +206,7 @@ export default function Home() {
     if (postId) {
       setTimeout(() => {
         setPostId("")
-      }, 5000);
+      }, 10000);
     }
   }, [postId])
 

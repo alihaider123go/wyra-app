@@ -27,6 +27,8 @@ interface UserProfileHeaderProps {
   };
   onEditProfile: () => void;
   onShareProfile: () => void;
+  onFollowersClick: () => void;
+  onFollowingClick: () => void;
   showEditButton?: any
 }
 
@@ -34,6 +36,8 @@ export default function UserProfileHeader({
   user,
   onEditProfile,
   onShareProfile,
+  onFollowersClick,
+onFollowingClick,
   showEditButton,
 }: UserProfileHeaderProps) {
   return (
@@ -62,11 +66,11 @@ export default function UserProfileHeader({
               <div className="text-3xl">{formatNumber(user.stats.wyras)}</div>
               <div className="text-gray-500 dark:text-gray-200">Wyras</div>
             </div>
-            <div>
+            <div onClick={onFollowersClick} className="cursor-pointer">
               <div className="text-3xl">{formatNumber(user.stats.followers)}</div>
               <div className="text-gray-500 dark:text-gray-200">Followers</div>
             </div>
-            <div>
+            <div onClick={onFollowingClick} className="cursor-pointer">
               <div className="text-3xl">{formatNumber(user.stats.following)}</div>
               <div className="text-gray-500 dark:text-gray-200">Following</div>
             </div>

@@ -1,225 +1,144 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { deleteWyra, getUnifiedHomeWyras, getWyrasWithCircles } from "@/actions/wyra";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import {
+  getFollowingUsersWyras,
+  getUnifiedHomeWyras,
+  getWyraById,
+  getWyrasWithCircles,
+} from "@/actions/wyra";
 import { createClient } from "@/utils/supabase/client";
-import LikeButton from "./LikeBtn";
-import DislikeButton from "./DislikeBtn";
-import CommentButton from "./CommentBtn";
-import FollowButton from "./FollowUnfollowButton";
-import { Tooltip } from "@heroui/tooltip";
-import CreateWyra from "@/components/wyra/CreateWyra";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Plus,
-  MoreHorizontal,
-  Trash2,
-  Edit,
-  Flag,
-  X,
-  User as UserIcon,
-  Users,
-  CircleOff,
-} from "lucide-react";
-import { Sparkles, TrendingUp, Clock } from "lucide-react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from "@heroui/modal";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
-import { Wyra } from "@/actions/types";
-import { isNotificationAllowed, isSettingAllowed, relativeTime } from "@/utils/helper";
-import ShareButton from "./ShareBtn";
-import FavouriteButton from "./FavouriteBtn";
-import UserOnlineStatus from "../ui/userOnlineStatus";
-import EditWyra from "./EditWyra";
-import CirclesWyras from "./CirclesWyra";
-import { useRouter } from "next/navigation";
-import WyraSection from "./Wyra";
 import Loader from "../common/loader";
+import WyraSection from "./Wyra";
+import CirclesWyras from "./CirclesWyra";
 import { FaUsers } from "react-icons/fa";
-import PullToRefresh from "../common/PullToRefresh";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, TrendingUp, Clock, Sparkles } from "lucide-react";
 
-export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSelectedUserId }: any) {
-  const [wyraList, setWyraList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [wyraLoading, setWyraLoading] = useState(true);
-  const [showCreateWyraModal, setShowCreateWyraModal] = useState(false);
-  const [showEditWyraModal, setShowEditWyraModal] = useState({ isShow: false, id: "" });
-  const [user, setUser] = useState<User | null>(null);
-  const [wyrasWithCircles, setWyrasWithCircles] = useState<any[]>([]);
-  const [selectedWyraOption, setSelectedWyraOption] = useState<any>();
-  const [whyText, setWhyText] = useState<any>();
-  const router = useRouter();
-  const [expandedWyras, setExpandedWyras] = useState<{ [key: string]: boolean }>({});
-
-  const [activeFeatureTab, setActiveFeatureTab] = useState<string>("recent");
-  const [selectedOptions, setSelectedOptions] = useState<{
-    [wyraId: number]: number | null;
-  }>({});
-
-  const [isShowWhyReasonContainer, setIsShowWhyReasonContainer] = useState<{
-    [wyraId: number]: boolean;
-  }>({});
-
-  // For tracking if the "Why" reason is set per wyra
-  const [isWhyReasonSet, setIsWhyReasonSet] = useState<{
-    [wyraId: number]: boolean;
-  }>({});
-  const [reaction, setReaction] = useState<"like" | "dislike" | null>(null);
-  // Map to track follow status per profileUserId
-  const [followStatus, setFollowStatus] = useState<Record<string, boolean>>({});
-  const [loadingStatus, setLoadingStatus] = useState<Record<string, boolean>>(
-    {}
-  );
-
-  // const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-    }, 500); // 500ms debounce
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchTerm]);
-
+export default function WyraTimeline({ searchTerm, postId, setActiveTab }: any) {
   const supabase = createClient();
 
-  const fetchWyras = async () => {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
+  const [wyraList, setWyraList] = useState<any[]>([]);
+  const [circleList, setCircleList] = useState<any[]>([]);
+  const [followingWyraList, setFollowingWyraList] = useState<any[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeFeatureTab, setActiveFeatureTab] = useState("recent");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-    if (error || !user) {
-      console.error("User not logged in");
+  const loaderRef = useRef<HTMLDivElement | null>(null);
+  const pageRef = useRef(1);
+  const hasMoreRef = useRef(true);
+  const isFetchingRef = useRef(false);
 
-      setTimeout(() => setLoading(false), 1000);
-      return;
-    } else {
-      setUser(user);
-    }
-
-    try {
-      setWyraLoading(true)
-      const result = await getUnifiedHomeWyras(user.id, debouncedSearch);
-      setWyraList(result || []);
-      setTimeout(() => setWyraLoading(false), 1000);
-
-    } catch (err) {
-      console.error("Failed to fetch wyras", err);
-      setTimeout(() => setWyraLoading(false), 1000);
-
-    } finally {
-      setTimeout(() => setLoading(false), 1000);
-      setTimeout(() => setWyraLoading(false), 1000);
-
-    }
-  }
-
+  // Debounce search input
   useEffect(() => {
-    fetchWyras();
-  }, [debouncedSearch]);
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
+  // Fetch user
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setUser(data.user);
+      setLoading(false);
+    });
+  }, []);
 
-  const fetchCircleWyras = async () => {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
+  // =============================
+  // Fetch paginated wyras
+  // =============================
+  const fetchWyras = useCallback(
+    async (reset = false) => {
+      if (!user || isFetchingRef.current) return;
+      if (!reset && !hasMoreRef.current) return;
 
-    if (error || !user) {
-      console.error("User not logged in");
-      setTimeout(() => setLoading(false), 1000);
-      return;
-    } else {
-      setUser(user);
-    }
+      isFetchingRef.current = true;
 
-    try {
-      setWyraLoading(true)
-      const result = await getWyrasWithCircles(user.id, debouncedSearch);
-      setWyrasWithCircles(result || []);
+      const limit = 20;
+      try {
+        let data: any[] = [];
 
-    } catch (err) {
-      console.error("Failed to fetch wyras", err);
+        if (postId) {
+          const res = await getWyraById(postId, user.id);
+          data = [res];
+        } else {
+          data = await getUnifiedHomeWyras(
+            user.id,
+            debouncedSearch,
+            reset ? 1 : pageRef.current,
+            limit
+          );
+        }
 
-    } finally {
-      setTimeout(() => setLoading(false), 1000);
-      setTimeout(() => setWyraLoading(false), 1000);
+        setWyraList((prev) => {
+          const combined = reset ? data : [...prev, ...data];
+          return Array.from(new Map(combined.map((w) => [w.id, w])).values());
+        });
 
-    }
-  }
+        if (reset) pageRef.current = 2;
+        else pageRef.current += 1;
+
+        hasMoreRef.current = data.length === limit;
+      } catch (err) {
+        console.error("Error fetching wyras:", err);
+      } finally {
+        isFetchingRef.current = false;
+      }
+    },
+    [user, debouncedSearch]
+  );
+
+  // Reset on search or tab change
+  useEffect(() => {
+    if (!user) return;
+
+    pageRef.current = 1;
+    hasMoreRef.current = true;
+    setWyraList([]);
+    fetchWyras(true);
+  }, [debouncedSearch, activeFeatureTab, user, fetchWyras]);
+
+  // =============================
+  // Fetch circle wyras
+  // =============================
+  const fetchCircleWyras = useCallback(async () => {
+    if (!user) return;
+    const data = await getWyrasWithCircles(user.id, debouncedSearch);
+    setCircleList(data || []);
+  }, [user, debouncedSearch]);
+
+   const fetchFollowingUsersWyras = useCallback(async () => {
+    if (!user) return;
+    const data = await getFollowingUsersWyras(user.id);
+    setFollowingWyraList(data || []);
+  }, [user, debouncedSearch]);
 
   useEffect(() => {
     fetchCircleWyras();
-  }, [debouncedSearch]);
+    fetchFollowingUsersWyras()
+  }, [fetchCircleWyras]);
 
   useEffect(() => {
-    if (!user) return;
-    async function fetchFollowStatusForAll() {
-      const uniqueProfileUserIds = Array.from(
-        new Set(
-          wyraList.map((w) => w.created_by).filter((id) => id !== user?.id)
-        )
-      );
+    if (!loaderRef.current) return;
 
-      // Query user_followers table for all following relations
-      const { data, error } = await supabase
-        .from("user_followers")
-        .select("following_id")
-        .eq("follower_id", user?.id)
-        .in("following_id", uniqueProfileUserIds);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && !isFetchingRef.current && hasMoreRef.current) {
+          fetchWyras(false);
+        }
+      },
+      { threshold: 1.0 }
+    );
 
-      if (error) {
-        console.error("Failed to fetch follow statuses", error);
-        return;
-      }
-
-      // Create map of profileUserId -> true if following
-      const followMap: Record<string, boolean> = {};
-      uniqueProfileUserIds.forEach((id) => {
-        followMap[id] = false;
-      });
-      if (data) {
-        data.forEach((row) => {
-          followMap[row.following_id] = true;
-        });
-      }
-
-      setFollowStatus(followMap);
-    }
-
-    fetchFollowStatusForAll();
-  }, [user, wyraList, supabase]);
-
-  useEffect(() => {
-    if (postId) {
-      const element = document.getElementById(postId);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }
-  }, [postId, wyraList]);
+    observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [fetchWyras]);
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
-  // if (!wyraList.length)
-  //   return <div className="text-center py-10">No Wyras yet.</div>;
 
   const tabs = [
     { id: "recent", icon: Clock, label: "Recent", isImage: false },
@@ -230,152 +149,57 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab, setSele
 
   return (
     <>
-      <Tooltip
-        className="bg-black text-white dark:text-black"
-        color="success"
-        content="Create Wyra"
+      {/* Floating plus button */}
+      <Button
+        onClick={() => {}}
+        className="rounded-full h-12 w-12 fixed bottom-[5%] right-[5%] z-50 hidden md:flex items-center justify-center"
       >
-        <Button
-          onClick={() => setShowCreateWyraModal(true)}
-          className="rounded-full h-12 w-12 fixed bottom-[5%] right-[5%] z-50 hidden md:flex items-center justify-center"
-        >
-          <Plus className="h-8 w-8 text-white dark:text-black" />
-        </Button>
-      </Tooltip>
+        <Plus className="h-8 w-8 text-white dark:text-black" />
+      </Button>
 
+      {/* Tabs */}
       <div className="max-w-3xl flex items-center justify-around gap-4 py-2 px-2">
-        {tabs.map((tab: any) => {
+        {tabs.map((tab) => {
           const isActive = activeFeatureTab === tab.id;
           const Icon = tab.icon;
-
           return (
             <button
               key={tab.id}
               onClick={() => setActiveFeatureTab(tab.id)}
-              className={`flex flex-col items-center justify-center p-3 min-w-0 flex-1 rounded-2xl transition-all duration-300 transform ${isActive
-                ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white dark:text-black shadow-lg scale-110"
-                : "text-gray-500 dark:text-gray-200 hover:text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800/50"
-                }`}
+              className={`flex flex-col items-center justify-center p-3 w-full rounded-2xl transition-all ${
+                isActive
+                  ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white scale-110"
+                  : "text-gray-500"
+              }`}
             >
-              {
-                tab.isImage
-                  ?
-                  <FaUsers
-                    className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
-                  />
-                  :
-                  <Icon
-                    className={`w-6 h-6 ${isActive ? "animate-bounce-slow" : ""}`}
-                  />
-              }
-
-              <span
-                className={`text-xs mt-1 font-semibold ${isActive ? "text-white dark:text-black" : ""
-                  }`}
-              >
-                {tab.label}
-              </span>
+              {tab.isImage ? <FaUsers className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
+              <span className="text-xs mt-1 font-semibold">{tab.label}</span>
             </button>
           );
         })}
       </div>
 
+      {/* Content */}
       <div className="max-w-3xl">
-        {
-          !wyraLoading
-            ?
-            <>
-              {activeFeatureTab === "trending" ? (
-                <PullToRefresh onRefresh={fetchWyras}>
-                  <WyraSection
-                    wyras={wyraList.filter((wyra: any) => wyra.likeCount > 10)}
-                    fetchWyras={fetchWyras}
-                    searchTerm={searchTerm}
-                    postId={postId}
-                    setActiveTab={setActiveTab}
-                    setSelectedUserId={setSelectedUserId}
-                  />
-                </PullToRefresh>
-              ) : activeFeatureTab === "recent" ? (
-                <PullToRefresh onRefresh={fetchWyras}>
-                  <WyraSection
-                    wyras={wyraList}
-                    fetchWyras={fetchWyras}
-                    searchTerm={searchTerm}
-                    postId={postId}
-                    setActiveTab={setActiveTab}
-                    setSelectedUserId={setSelectedUserId}
-                  />
-                </PullToRefresh>
-              ) : activeFeatureTab === "circles" ? (
-                <PullToRefresh onRefresh={fetchWyras}>
-                  <CirclesWyras
-                    wyras={wyrasWithCircles}
-                    fetchWyras={fetchCircleWyras}
-                    searchTerm={searchTerm}
-                    postId={postId}
-                    setActiveTab={setActiveTab}
-                    setSelectedUserId={setSelectedUserId}
-                  />
-                </PullToRefresh>
-              ) : (
-                <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
-                  <CardHeader className="text-center pb-6">
-                    <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                      Following
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p>Feeds from people you follow will be shown here.</p>
-                  </CardContent>
-                </Card>
-              )}
-            </>
-            :
-            <div className="flex justify-center mt-10">
-              <Loader
-                height={16}
-                width={16}
-              />
-            </div>
-        }
+        {activeFeatureTab === "circles" ? (
+          <CirclesWyras wyras={circleList} fetchWyras={fetchCircleWyras} />
+        ) : activeFeatureTab === "trending" ? (
+          <WyraSection wyras={wyraList.filter((w) => w.likeCount > 10)} />
+        ) : activeFeatureTab === "recent" ? (
+          <>
+            <WyraSection wyras={wyraList} />
+
+            {/* Loader */}
+            {hasMoreRef.current && (
+              <div ref={loaderRef} className="flex justify-center py-6">
+                <Loader height={16} width={16} />
+              </div>
+            )}
+          </>
+        ) : (
+            <WyraSection wyras={followingWyraList} />
+        )}
       </div>
-      <Modal isOpen={showCreateWyraModal} hideCloseButton={true}>
-        <ModalContent>
-          <ModalHeader className="flex flex-col justify-center items-center gap-1">
-            Create Wyra
-            <button
-              onClick={() => setShowCreateWyraModal(false)}
-              className="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 focus:outline-none"
-              aria-label="Close comment modal"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </ModalHeader>
-
-          <ModalBody>
-            <CreateWyra />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      <Modal isOpen={showEditWyraModal.isShow} hideCloseButton={true}>
-        <ModalContent>
-          <ModalHeader className="flex flex-col justify-center items-center gap-1">
-            Edit Wyra
-            <button
-              onClick={() => { setShowEditWyraModal({ isShow: false, id: "" }) }}
-              className="absolute top-4 right-4 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100 focus:outline-none"
-              aria-label="Close comment modal"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </ModalHeader>
-
-          <ModalBody>
-            <EditWyra wyraId={showEditWyraModal.id} fetchWyras={fetchWyras} setShowEditWyraModal={setShowEditWyraModal} />
-          </ModalBody>
-        </ModalContent>
-      </Modal>
     </>
   );
 }
