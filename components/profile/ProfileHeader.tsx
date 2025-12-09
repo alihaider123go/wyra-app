@@ -27,8 +27,8 @@ interface UserProfileHeaderProps {
   };
   onEditProfile: () => void;
   onShareProfile: () => void;
-  onFollowersClick: () => void;
-  onFollowingClick: () => void;
+  onFollowersClick?: () => void;
+  onFollowingClick?: () => void;
   showEditButton?: any
 }
 
@@ -37,7 +37,7 @@ export default function UserProfileHeader({
   onEditProfile,
   onShareProfile,
   onFollowersClick,
-onFollowingClick,
+   onFollowingClick,
   showEditButton,
 }: UserProfileHeaderProps) {
   return (

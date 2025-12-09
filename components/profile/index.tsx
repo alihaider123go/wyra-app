@@ -117,7 +117,6 @@ export default function Profile({ userId, setActiveTab, setSelectedUserId }: Pro
           .eq("following_id", userId);
 
         if (followersError) throw followersError;
-
         setFollowersCount(followersData?.length || 0);
         setFollowersList(followersData?.map((f: any) => f.follower) || []);
 
@@ -136,7 +135,6 @@ export default function Profile({ userId, setActiveTab, setSelectedUserId }: Pro
           .eq("follower_id", userId);
 
         if (followingError) throw followingError;
-
         setFollowingCount(followingData?.length || 0);
         setFollowingList(followingData?.map((f: any) => f.following) || []);
 

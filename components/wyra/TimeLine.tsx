@@ -17,7 +17,7 @@ import { FaUsers } from "react-icons/fa";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, TrendingUp, Clock, Sparkles } from "lucide-react";
 
-export default function WyraTimeline({ searchTerm, postId, setActiveTab }: any) {
+export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelectedUserId }: any) {
   const supabase = createClient();
 
   const [wyraList, setWyraList] = useState<any[]>([]);
@@ -182,12 +182,12 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab }: any) 
       {/* Content */}
       <div className="max-w-3xl">
         {activeFeatureTab === "circles" ? (
-          <CirclesWyras wyras={circleList} fetchWyras={fetchCircleWyras} />
+          <CirclesWyras wyras={circleList} fetchWyras={fetchCircleWyras} setSelectedUserId={setSelectedUserId} setActiveTab={setActiveTab}/>
         ) : activeFeatureTab === "trending" ? (
-          <WyraSection wyras={wyraList.filter((w) => w.likeCount > 10)} />
+          <WyraSection wyras={wyraList.filter((w) => w.likeCount > 10)} setSelectedUserId={setSelectedUserId} setActiveTab={setActiveTab}/>
         ) : activeFeatureTab === "recent" ? (
           <>
-            <WyraSection wyras={wyraList} />
+            <WyraSection wyras={wyraList} setSelectedUserId={setSelectedUserId} setActiveTab={setActiveTab}/>
 
             {/* Loader */}
             {hasMoreRef.current && (
@@ -197,7 +197,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab }: any) 
             )}
           </>
         ) : (
-            <WyraSection wyras={followingWyraList} />
+            <WyraSection wyras={followingWyraList} setSelectedUserId={setSelectedUserId} setActiveTab={setActiveTab}/>
         )}
       </div>
     </>
