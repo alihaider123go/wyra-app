@@ -7,10 +7,16 @@ import { createClient } from "@/utils/supabase/client";
 interface FavouriteButtonProps {
   wyraId: string;
   userId: string | undefined;
-  isFloatAllow?: any
+  isFloatAllow?: any;
+  isDisabled?: any;
 }
 
-const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId, isFloatAllow }) => {
+const FavouriteButton: React.FC<FavouriteButtonProps> = ({
+  wyraId,
+  userId,
+  isFloatAllow,
+  isDisabled,
+}) => {
   const [favourited, setFavourited] = useState(false);
   const [showFavourite, setShowFavourite] = useState(false); // ✅ for floating text
   const [showUnFavourite, setShowUnFavourite] = useState(false); // ✅ for floating text
@@ -38,6 +44,7 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId, isFlo
 
   // ✅ Toggle Favorite / Unfavorite
   const toggleFavourite = async () => {
+    if (isDisabled) return;
     if (!userId) {
       alert("Please login to mark as favourite");
       return;
@@ -57,7 +64,6 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId, isFlo
         setFavourited(false);
         setShowUnFavourite(true); // ✅ show floating text
         setTimeout(() => setShowUnFavourite(false), 1000);
-
       } else {
         // ✅ Favorite (Insert)
         setShowFavourite(true); // ✅ show floating text
@@ -101,17 +107,20 @@ const FavouriteButton: React.FC<FavouriteButtonProps> = ({ wyraId, userId, isFlo
       <button
         onClick={toggleFavourite}
         disabled={loading}
-        className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer ${favourited ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white dark:text-black" : "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
-          }`}
+        className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer ${
+          favourited
+            ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white dark:text-black"
+            : "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+        }`}
       >
         <Heart
-          className={`w-4 h-4 mr-1 transition ${favourited ? "fill-current text-white dark:text-black" : ""
-            }`}
+          className={`w-4 h-4 mr-1 transition ${
+            favourited ? "fill-current text-white dark:text-black" : ""
+          }`}
         />
         <span className="md:block hidden">
           {favourited ? "Favourited" : "Favourite"}
         </span>
-
       </button>
       {isFloatAllow && showFavourite && (
         <span className="absolute left-1/2 -translate-x-1/2 -top-6 animate-float text-red-600 font-bold">

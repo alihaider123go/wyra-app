@@ -30,8 +30,9 @@ import NotificationsList from "@/components/notifications/notificationList";
 import { NotificationsProvider } from "@/components/notifications/useNotifications";
 import { isNotificationAllowed, isSettingAllowed } from "@/utils/helper";
 import { checkUserOnlineStatus, updateLastSeen } from "@/actions/common";
-import '@ant-design/v5-patch-for-react-19';
+import "@ant-design/v5-patch-for-react-19";
 import UserProfile from "@/components/profile/userProfile";
+import SelectedWyra from "@/components/wyra/SelectedWyra";
 
 declare global {
   interface Window {
@@ -43,10 +44,14 @@ declare global {
 
 export default function Home() {
   const supabase = createClient();
-  const { user: sessionUser, loading, isVerified, isProfileCompleted, refetch } = useSessionUser();
+  const {
+    user: sessionUser,
+    loading,
+    isVerified,
+    isProfileCompleted,
+    refetch,
+  } = useSessionUser();
   const [themeLoaded, setThemeLoaded] = useState(false);
-
-
 
   useEffect(() => {
     const checkDarkMode = async () => {
@@ -80,7 +85,6 @@ export default function Home() {
     }
   }, [loading, isProfileCompleted]);
 
-
   const [activeTab, setActiveTab] = useState("home");
   const [postId, setPostId] = useState("");
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -92,7 +96,9 @@ export default function Home() {
 
         if (data.type === "BACK_BUTTON") {
           if (activeTab === "home") {
-            window?.ReactNativeWebView?.postMessage(JSON.stringify({ type: "EXIT_APP" }));
+            window?.ReactNativeWebView?.postMessage(
+              JSON.stringify({ type: "EXIT_APP" })
+            );
           } else {
             if (window.history.state?.tab) {
               window.history.back();
@@ -128,7 +134,6 @@ export default function Home() {
       setSearchTerm("");
 
       if (tab === "home") {
-        // Clear history and push home as the only entry
         window.history.replaceState({ tab: "home" }, "", "#home");
       } else {
         window.history.pushState({ tab }, "", `#${tab}`);
@@ -154,31 +159,68 @@ export default function Home() {
     };
   }, []);
 
-
   const renderCurrentTab = () => {
     switch (activeTab) {
       case "home":
-        return <WyraTimeLine searchTerm={searchTerm} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} setPostId={setPostId} postId={postId} />;
+        return (
+          <WyraTimeLine
+            searchTerm={searchTerm}
+            setActiveTab={setActiveTab}
+            setSelectedUserId={setSelectedUserId}
+            setPostId={setPostId}
+            postId={postId}
+          />
+        );
       case "create":
         return <CreateWyra onTabChange={handleTabClick} />;
       case "chat":
         return <Chat userId={sessionUser?.id} />;
       case "profile":
-        return <Profile userId={sessionUser?.id} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
+        return (
+          <Profile
+            userId={sessionUser?.id}
+            setActiveTab={setActiveTab}
+            setSelectedUserId={setSelectedUserId}
+          />
+        );
       case "user-profile":
-        return <UserProfile userId={selectedUserId} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
+        return (
+          <UserProfile
+            userId={selectedUserId}
+            setActiveTab={setActiveTab}
+            setSelectedUserId={setSelectedUserId}
+          />
+        );
       case "profile-settings":
-        return <Settings user={sessionUser} isVerified={isVerified} refetch={refetch} />;
+        return (
+          <Settings
+            user={sessionUser}
+            isVerified={isVerified}
+            refetch={refetch}
+          />
+        );
       case "account-settings":
         return <AccountPrivacySettings userId={sessionUser?.id} />;
       case "notification-settings":
         return <NotificationsSettings userId={sessionUser?.id} />;
       case "notifications":
-        return <NotificationsList userId={sessionUser?.id} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} setPostId={setPostId} />;
+        return (
+          <NotificationsList
+            userId={sessionUser?.id}
+            setActiveTab={setActiveTab}
+            setSelectedUserId={setSelectedUserId}
+            setPostId={setPostId}
+          />
+        );
       case "invite":
         return <InviteFriends />;
       case "block-unblock":
-        return <BlockUserInfo setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
+        return (
+          <BlockUserInfo
+            setActiveTab={setActiveTab}
+            setSelectedUserId={setSelectedUserId}
+          />
+        );
       case "help-faqs":
         return <HelpCenter />;
       case "about-us":
@@ -195,8 +237,16 @@ export default function Home() {
         return <CommunityGuidelines />;
       case "csae":
         return <CSAEPolicy />;
+      case "wyra":
+        return <SelectedWyra postId={postId} />;
       case "favorites":
-        return <FavoritesWyra searchTerm={searchTerm} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />;
+        return (
+          <FavoritesWyra
+            searchTerm={searchTerm}
+            setActiveTab={setActiveTab}
+            setSelectedUserId={setSelectedUserId}
+          />
+        );
       default:
         return null;
     }
@@ -205,10 +255,10 @@ export default function Home() {
   useEffect(() => {
     if (postId) {
       setTimeout(() => {
-        setPostId("")
+        setPostId("");
       }, 10000);
     }
-  }, [postId])
+  }, [postId]);
 
   if (!themeLoaded) {
     return (
@@ -241,7 +291,9 @@ export default function Home() {
         />
 
         <main className="pb-20 md:pb-4">
-          <div className="md:max-w-4xl max-w-2xl mx-auto p-4">{renderCurrentTab()}</div>
+          <div className="md:max-w-4xl max-w-2xl mx-auto p-4">
+            {renderCurrentTab()}
+          </div>
         </main>
 
         <BottomNavigation
@@ -250,7 +302,6 @@ export default function Home() {
           onTabChange={handleTabClick}
           user={sessionUser}
           isProfileCompleted={isProfileCompleted}
-
         />
       </div>
     </NotificationsProvider>

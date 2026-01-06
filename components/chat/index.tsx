@@ -14,14 +14,13 @@ export default function ChatPage({ userId }: ChatProps) {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [showMessages, setShowMessages] = useState(false); // For mobile view
 
-
   const fetchChats = async () => {
     if (!userId) return;
 
     const { data, error } = await supabase.rpc("get_user_chats", {
       user_uuid: userId,
     });
-    
+
     if (error) {
       console.error("get_user_chats RPC error", error);
       return;
@@ -30,23 +29,23 @@ export default function ChatPage({ userId }: ChatProps) {
       (item: {
         chat_id: string;
         is_group: boolean;
-        sender_id:string;
+        sender_id: string;
         chat_name: string | null;
         avatar: string | null;
         username: string | null;
         last_message: string | null;
         last_message_at: string | null;
-        unread_count: any
+        unread_count: any;
       }) => ({
         id: item.chat_id,
         is_group: item.is_group,
-        sender_id:item.sender_id,
+        sender_id: item.sender_id,
         name: item.chat_name,
         avatar: item.avatar,
         username: item.username,
         lastMessage: item.last_message,
         lastMessageAt: item.last_message_at,
-        unreadCount: item.unread_count
+        unreadCount: item.unread_count,
       })
     );
 
@@ -62,9 +61,8 @@ export default function ChatPage({ userId }: ChatProps) {
   const handleSelectChat = (chat: any) => {
     setSelectedChat(chat);
     setShowMessages(true); // Show messages on mobile
-    fetchChats()
+    fetchChats();
   };
-
 
   useEffect(() => {
     fetchChats();
@@ -140,7 +138,6 @@ export default function ChatPage({ userId }: ChatProps) {
               }
               return prev; // No change if already exists
             });
-
             handleSelectChat(chat);
           }}
         />
@@ -164,7 +161,9 @@ export default function ChatPage({ userId }: ChatProps) {
           />
         ) : (
           <div className="hidden md:flex items-center justify-center w-full">
-            <p className="text-gray-500 dark:text-gray-200">Select a chat to start messaging</p>
+            <p className="text-gray-500 dark:text-gray-200">
+              Select a chat to start messaging
+            </p>
           </div>
         )}
       </div>

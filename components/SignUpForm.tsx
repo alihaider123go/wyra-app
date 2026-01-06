@@ -20,7 +20,7 @@ import TermsOfService from "./tos";
 import { X } from "lucide-react";
 import PrivacyPolicy from "./policies/privacy";
 import Cookies from "./policies/cookies";
-import { message } from "antd";
+
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -91,15 +91,15 @@ const SignUpForm = () => {
     const confirmPassword = formData.get("confirm-password")?.toString();
 
     if (password !== confirmPassword) {
-      // setError("Passwords do not match");
-      message.error("Passwords do not match");
+      setError("Passwords do not match");
+      // message.error("Passwords do not match");
       setLoading(false);
       return;
     }
 
     if (usernameAvailable === false) {
-      // setError("Username is already taken");
-      message.error("Username is already taken")
+      setError("Username is already taken");
+      // message.error("Username is already taken")
       setLoading(false);
       return;
     }
@@ -110,8 +110,8 @@ const SignUpForm = () => {
     if (result.status === "success") {
       router.push("/");
     } else {
-      // setError(result.status);
-      message.error(result.status);
+      setError(result.status);
+      // message.error(result.status);
 
     }
 

@@ -17,58 +17,68 @@ export default function MessageInput({
   onNewMessage: (msg: Message) => void;
 }) {
   const [text, setText] = useState("");
-  const [isUserAllowToSendMessage, setIsUserAllowToSendMessage] = useState(false)
+  const [isUserAllowToSendMessage, setIsUserAllowToSendMessage] =
+    useState(false);
 
-  async function isUserFollowing(followerId:any, followingId:any) {
-  const { data, error } = await supabase
-    .from('user_followers')
-    .select('id') // or use 'count' if you just need a yes/no
-    .eq('follower_id', followerId)
-    .eq('following_id', followingId)
-    .maybeSingle(); // or `.single()` if you expect exactly one
+  async function isUserFollowing(followerId: any, followingId: any) {
+    const { data, error } = await supabase
+      .from("user_followers")
+      .select("id") // or use 'count' if you just need a yes/no
+      .eq("follower_id", followerId)
+      .eq("following_id", followingId)
+      .maybeSingle(); // or `.single()` if you expect exactly one
 
-  if (error) {
-    // console.error(error)
-    return false
+    if (error) {
+      // console.error(error)
+      return false;
+    }
+
+    return !!data; // returns true if a record exists, false otherwise
   }
-
-  return !!data // returns true if a record exists, false otherwise
-}
 
   const checkUserSettings = async () => {
-    const isAllowedEveryone = await isSettingAllowed(senderId, "allow_dm_everyone")
-    const isAllowedFollower = await isSettingAllowed(senderId, "allow_dm_followers")
-    const isNotAllowed = await isSettingAllowed(senderId, "no_dm")
-    const isFollowing = await isUserFollowing(currentUserId, senderId)
+    const isAllowedEveryone = await isSettingAllowed(
+      senderId,
+      "allow_dm_everyone"
+    );
+    const isAllowedFollower = await isSettingAllowed(
+      senderId,
+      "allow_dm_followers"
+    );
+    const isNotAllowed = await isSettingAllowed(senderId, "no_dm");
+    const isFollowing = await isUserFollowing(currentUserId, senderId);
 
-    console.log("he;;p",senderId,isAllowedEveryone,isAllowedFollower,isNotAllowed,isFollowing)
     if (isNotAllowed) {
-      setIsUserAllowToSendMessage(false)
+      setIsUserAllowToSendMessage(false);
     }
     if (isAllowedEveryone) {
-      setIsUserAllowToSendMessage(true)
-    }else{
-      setIsUserAllowToSendMessage(false)
+      setIsUserAllowToSendMessage(true);
+    } else {
+      setIsUserAllowToSendMessage(false);
     }
     if (isAllowedFollower && isFollowing) {
-      setIsUserAllowToSendMessage(true)
+      setIsUserAllowToSendMessage(true);
     }
-  }
+  };
 
   useEffect(() => {
-    if(senderId){
-      checkUserSettings()
+    if (senderId) {
+      checkUserSettings();
     }
-  }, [senderId])
+  }, [senderId]);
 
   const sendMessage = async () => {
     if (!chatId || !text.trim()) return;
 
-    const { data, error } = await supabase.from("messages").insert({
-      chat_id: chatId,
-      sender_id: currentUserId,
-      content: text.trim(),
-    }).select().single();
+    const { data, error } = await supabase
+      .from("messages")
+      .insert({
+        chat_id: chatId,
+        sender_id: currentUserId,
+        content: text.trim(),
+      })
+      .select()
+      .single();
 
     if (error) {
       console.error("Error sending message:", error);
@@ -81,15 +91,13 @@ export default function MessageInput({
 
   return (
     <div>
-      {!isUserAllowToSendMessage
-        ?
+      {!isUserAllowToSendMessage ? (
         <h3 className="text-black dark:text-white text-sm p-2">
           You are not allowed to send a message to this user.
         </h3>
-        : null}
+      ) : null}
 
       <div className="p-4 border-t flex">
-
         <input
           type="text"
           value={text}
@@ -101,7 +109,11 @@ export default function MessageInput({
             if (e.key === "Enter") sendMessage();
           }}
         />
-        <button disabled={!isUserAllowToSendMessage} onClick={sendMessage} className="ml-2 bg-blue-600 text-white dark:text-black px-4 py-2 rounded">
+        <button
+          disabled={!isUserAllowToSendMessage}
+          onClick={sendMessage}
+          className="ml-2 bg-blue-600 text-white dark:text-black px-4 py-2 rounded"
+        >
           Send
         </button>
       </div>

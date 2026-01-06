@@ -9,11 +9,18 @@ import { isNotificationAllowed } from "@/utils/helper";
 interface DislikeButtonProps {
   wyraId: string;
   userId: string | undefined;
-  isFloatAllow?: any
-  count?: any
+  isFloatAllow?: any;
+  count?: any;
+  isDisabled?: any;
 }
 
-const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAllow, count }) => {
+const DislikeButton: React.FC<DislikeButtonProps> = ({
+  wyraId,
+  userId,
+  isFloatAllow,
+  count,
+  isDisabled,
+}) => {
   const [disliked, setDisliked] = useState(false);
   const [dislikesCount, setDislikesCount] = useState(0);
 
@@ -37,13 +44,9 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAl
       .eq("type", "dislike");
 
     setDislikesCount(count || 0);
-
   };
 
-
   useEffect(() => {
-
-
     if (userId) fetchReaction();
   }, [wyraId, userId]);
 
@@ -52,7 +55,7 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAl
       const detail = (e as CustomEvent).detail;
       if (detail?.wyraId === wyraId && detail.type === "like") {
         setDisliked(false); // someone clicked like, clear dislike
-        fetchReaction()
+        fetchReaction();
       }
     };
 
@@ -63,6 +66,7 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAl
   }, [wyraId]);
 
   const toggleDislike = async () => {
+    if (isDisabled) return;
     const newDisliked = !disliked;
     setDisliked(newDisliked);
 
@@ -94,8 +98,10 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAl
         .single();
 
       if (wyra?.created_by && wyra.created_by !== userId) {
-
-        const isAllowed = await isNotificationAllowed(wyra.created_by, "likes_dislikes_my_wyra")
+        const isAllowed = await isNotificationAllowed(
+          wyra.created_by,
+          "likes_dislikes_my_wyra"
+        );
         if (isAllowed) {
           await supabase.from("notifications").insert([
             {
@@ -115,7 +121,7 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAl
         .eq("wyra_id", wyraId)
         .eq("user_id", userId);
     }
-    fetchReaction()
+    fetchReaction();
   };
 
   return (
@@ -123,13 +129,22 @@ const DislikeButton: React.FC<DislikeButtonProps> = ({ wyraId, userId, isFloatAl
       <button
         onClick={toggleDislike}
         className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition cursor-pointer 
-        ${disliked ? "bg-red-600 text-white dark:text-black" : "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200"}`}
+        ${
+          disliked
+            ? "bg-red-600 text-white dark:text-black"
+            : "bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+        }`}
       >
         <ThumbsDown className="w-4 h-4 mr-1" />
         <span>{dislikesCount}</span>
         <span className="hidden md:inline ml-1">
-          {dislikesCount > 0 ? dislikesCount > 1 ? "Dislikes" : "Dislike" : "Dislike"}
-        </span>      </button>
+          {dislikesCount > 0
+            ? dislikesCount > 1
+              ? "Dislikes"
+              : "Dislike"
+            : "Dislike"}
+        </span>{" "}
+      </button>
 
       {/* ✅ Floating "Disagree" Text */}
       {isFloatAllow && showDisagree && (

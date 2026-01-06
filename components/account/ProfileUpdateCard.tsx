@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Heart, Sparkles, Zap, Users } from "lucide-react";
 import { getAvatarInitials } from "@/utils/helper";
-import { message } from "antd";
+// import { message } from "antd";
 
 interface ProfileInformationProps {
   userId: string;
@@ -90,9 +90,8 @@ export default function ProfileInformation({
 
         setOriginalUsername(data.username || "");
       } catch (error: any) {
-        // setErrorMsg(error.message || "Failed to load profile");
-        message.error(error.message || "Failed to load profile")
-
+        setErrorMsg(error.message || "Failed to load profile");
+        // message.error(error.message || "Failed to load profile")
       } finally {
         setLoading(false);
       }
@@ -185,8 +184,8 @@ export default function ProfileInformation({
 
       if (error) throw error;
 
-      // setSuccessMsg("Profile updated successfully!");
-      message.success("Profile updated successfully!")
+      setSuccessMsg("Profile updated successfully!");
+      // message.success("Profile updated successfully!")
       refetch();
       setOriginalUsername(profile.username); // reset original
     } catch (error: any) {
@@ -202,19 +201,19 @@ export default function ProfileInformation({
     }
   };
 
- const handleSetProfilePicture = (e: any) => {
-  const file = e.target.files?.[0];
+  const handleSetProfilePicture = (e: any) => {
+    const file = e.target.files?.[0];
 
-  if (file) {
-    const previewUrl = URL.createObjectURL(file);
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
 
-    setAvatarFile(file);
-    setProfile((prev) => ({
-      ...prev,
-      avatar: previewUrl, // store preview URL instead of file object
-    }));
-  }
-};
+      setAvatarFile(file);
+      setProfile((prev) => ({
+        ...prev,
+        avatar: previewUrl, // store preview URL instead of file object
+      }));
+    }
+  };
 
   if (loading) return <div>Loading profile...</div>;
 
@@ -245,17 +244,16 @@ export default function ProfileInformation({
               alt="avatar preview"
               className="shadow-2xl p-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 border-gray-700 w-24 h-24 rounded-full mb-2 object-cover"
             />
-          )
-          :
-          <div
-          className="flex items-center justify-center shadow-2xl p-1 bg-gradient-to-r 
+          ) : (
+            <div
+              className="flex items-center justify-center shadow-2xl p-1 bg-gradient-to-r 
                      from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
                      border-gray-700 w-24 h-24 rounded-full mb-2 
                      text-white dark:text-black text-3xl font-bold uppercase"
-        >
-          {getAvatarInitials(profile?.firstname + " " + profile?.lastname)}
-        </div>
-          }
+            >
+              {getAvatarInitials(profile?.firstname + " " + profile?.lastname)}
+            </div>
+          )}
           <input
             type="file"
             accept="image/*"
@@ -360,7 +358,10 @@ export default function ProfileInformation({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="dob" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          <Label
+            htmlFor="dob"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+          >
             {" "}
             Date of Birth{" "}
           </Label>
@@ -448,7 +449,10 @@ export default function ProfileInformation({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="bio" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <Label
+          htmlFor="bio"
+          className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+        >
           {" "}
           Bio{" "}
         </Label>

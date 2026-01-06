@@ -3,25 +3,25 @@
 import { formatDistanceToNow } from "date-fns";
 import { useNotifications } from "./useNotifications";
 
-export default function NotificationsList({ userId,setActiveTab,setSelectedUserId,setPostId }: any) {
-  const {
-    notifications,
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
-  } = useNotifications();
+export default function NotificationsList({
+  userId,
+  setActiveTab,
+  setSelectedUserId,
+  setPostId,
+}: any) {
+  const { notifications, unreadCount, markAsRead, markAllAsRead } =
+    useNotifications();
 
-  const handleNotificationClick = (n:any) => {
-    markAsRead(n.id)
-    setActiveTab("home")
-    setPostId(n.post_id)
-  }
+  const handleNotificationClick = (n: any) => {
+    markAsRead(n.id);
+    setActiveTab("wyra");
+    setPostId(n.post_id);
+  };
 
-  const handleUserNameClick = (n:any)=>{
-    
-    setActiveTab("user-profile")
-    setSelectedUserId(n.sender?.id)
-  }
+  const handleUserNameClick = (n: any) => {
+    setActiveTab("user-profile");
+    setSelectedUserId(n.sender?.id);
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -45,11 +45,12 @@ export default function NotificationsList({ userId,setActiveTab,setSelectedUserI
             <li
               key={n.id}
               className={`p-4 rounded-lg border shadow-sm cursor-pointer transition ${
-                n.is_read ? "bg-gray-200 dark:bg-gray-800" : "bg-white dark:bg-black"
+                n.is_read
+                  ? "bg-gray-200 dark:bg-gray-800"
+                  : "bg-white dark:bg-black"
               }`}
               onClick={() => handleNotificationClick(n)}
             >
-
               <div className="flex items-center space-x-3">
                 {n.sender?.avatar ? (
                   <img
@@ -65,7 +66,13 @@ export default function NotificationsList({ userId,setActiveTab,setSelectedUserI
 
                 <div>
                   <p className="text-sm">
-                    <span onClick={(e) => { e.stopPropagation();handleUserNameClick(n)}} className="font-medium">
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleUserNameClick(n);
+                      }}
+                      className="font-medium"
+                    >
                       {n.sender
                         ? `${n.sender.firstname} ${n.sender.lastname}`
                         : "Someone"}

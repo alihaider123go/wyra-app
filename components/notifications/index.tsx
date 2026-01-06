@@ -14,18 +14,20 @@ const settings: Setting[] = [
   {
     id: "showRealName",
     label: "Show my real name on posts",
-    description: "Your name is your badge of honor… unless you prefer staying low-key with just your username.",
+    description:
+      "Your name is your badge of honor… unless you prefer staying low-key with just your username.",
     category: "Account & Privacy",
   },
   {
     id: "findByEmail",
     label: "Allow people to find me by email",
-    description: "For those who love surprise connections. Otherwise? Cloak of invisibility it is.",
+    description:
+      "For those who love surprise connections. Otherwise? Cloak of invisibility it is.",
     category: "Account & Privacy",
   },
   {
     id: "findByUsername",
-    label: "Allow people to find me by user name",
+    label: "Allow people to find me by username",
     description: "Only for the bold. Or the social butterflies.",
     category: "Account & Privacy",
   },
@@ -157,17 +159,22 @@ export default function AccountPrivacySettings() {
   };
 
   // Group settings by category
-  const groupedSettings = settings.reduce<Record<string, Setting[]>>((acc, setting) => {
-    if (!acc[setting.category]) acc[setting.category] = [];
-    acc[setting.category].push(setting);
-    return acc;
-  }, {});
+  const groupedSettings = settings.reduce<Record<string, Setting[]>>(
+    (acc, setting) => {
+      if (!acc[setting.category]) acc[setting.category] = [];
+      acc[setting.category].push(setting);
+      return acc;
+    },
+    {}
+  );
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-black rounded-lg shadow-md space-y-8 text-gray-800 dark:text-gray-200">
       {Object.entries(groupedSettings).map(([category, settings]) => (
         <section key={category}>
-          <h2 className="text-xl font-semibold mb-4 border-b border-gray-300 pb-2">{category}</h2>
+          <h2 className="text-xl font-semibold mb-4 border-b border-gray-300 pb-2">
+            {category}
+          </h2>
           <div className="space-y-4">
             {settings.map(({ id, label, description }) => (
               <div key={id} className="flex items-center justify-between">
@@ -175,7 +182,9 @@ export default function AccountPrivacySettings() {
                   <label htmlFor={id} className="font-medium cursor-pointer">
                     {label}
                   </label>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {description}
+                  </p>
                 </div>
                 <div>
                   <input

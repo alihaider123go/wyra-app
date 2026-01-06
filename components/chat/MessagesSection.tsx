@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Chat, Message,UserProfile } from "@/actions/types";
+import { Chat, Message, UserProfile } from "@/actions/types";
 import MessageItem from "./MessageItem";
 import MessageInput from "./MessageInput";
 import { IoMdArrowRoundBack } from "react-icons/io";
@@ -10,7 +10,7 @@ interface MessagesSectionProps {
   chat: Chat | null;
   currentUserId: string | undefined;
   onSendMessage: (msg: Message) => void;
-  onBack:any
+  onBack: any;
 }
 
 export default function MessagesSection({
@@ -23,14 +23,14 @@ export default function MessagesSection({
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagePage, setMessagePage] = useState(1);
   const messagesPerPage = 20;
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const {markChatMessagesAsRead} = useNotifications()
+  const [user, setUser] = useState<any | null>(null);
+  const { markChatMessagesAsRead } = useNotifications();
 
-  useEffect(()=>{
-    if(chat?.id){
-      markChatMessagesAsRead(chat?.id)
+  useEffect(() => {
+    if (chat?.id) {
+      markChatMessagesAsRead(chat?.id);
     }
-  },[chat?.id,messages?.length])
+  }, [chat?.id, messages?.length]);
 
   const fetchMessages = async () => {
     if (!chat) {
@@ -38,38 +38,37 @@ export default function MessagesSection({
       return;
     }
 
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("chat_id", chat.id)
-        .order("created_at", { ascending: false })
-        .limit(messagesPerPage * messagePage);
+    const { data, error } = await supabase
+      .from("messages")
+      .select("*")
+      .eq("chat_id", chat.id)
+      .order("created_at", { ascending: false })
+      .limit(messagesPerPage * messagePage);
 
-      if (error) {
-        console.error("Error fetching messages:", error);
-        return;
-      }
-      if (data) {
-        setMessages(data.reverse()); // oldest message on top
-      }
-    };
-
-    const currentUserData = async () => {
- const { data: profile, error: profileError } = await supabase
-        .from("user_profiles")
-        .select("id,firstname, lastname, username, avatar")
-        .eq("id", currentUserId)
-        .single();
-
-      if (!profileError) {
-        setUser(profile);
-      }
+    if (error) {
+      console.error("Error fetching messages:", error);
+      return;
     }
-   
+    if (data) {
+      setMessages(data.reverse()); // oldest message on top
+    }
+  };
+
+  const currentUserData = async () => {
+    const { data: profile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("id,firstname, lastname, username, avatar")
+      .eq("id", currentUserId)
+      .single();
+
+    if (!profileError) {
+      setUser(profile);
+    }
+  };
 
   useEffect(() => {
     fetchMessages();
-    currentUserData()
+    currentUserData();
   }, [chat, messagePage, supabase]);
 
   useEffect(() => {
@@ -87,7 +86,7 @@ export default function MessagesSection({
         },
         (payload) => {
           const newMessage = payload.new as Message;
-          markChatMessagesAsRead(chat?.id)
+          markChatMessagesAsRead(chat?.id);
 
           // Prevent duplicates if message already exists
           setMessages((prev) => {
@@ -96,7 +95,7 @@ export default function MessagesSection({
           });
 
           onSendMessage(newMessage);
-          fetchMessages()
+          fetchMessages();
         }
       )
       .subscribe();
@@ -116,48 +115,54 @@ export default function MessagesSection({
     return (
       <div className="w-3/4 flex flex-col items-center justify-center border-l">
         <h3 className="text-xl font-semibold mb-2">Select a chat</h3>
-        <p className="text-gray-500 dark:text-gray-200">Choose a conversation to start messaging</p>
+        <p className="text-gray-500 dark:text-gray-200">
+          Choose a conversation to start messaging
+        </p>
       </div>
     );
   }
 
   return (
-<div className=" flex flex-col md:h-[88vh] h-[80vh]">
-  {/* Chat Header */}
-   <div className="md:hidden flex items-center p-3 border-b bg-white dark:bg-black">
-        <button onClick={onBack} className="text-blue-600 text-2xl font-semibold">
+    <div className=" flex flex-col md:h-[88vh] h-[80vh]">
+      {/* Chat Header */}
+      <div className="md:hidden flex items-center p-3 border-b bg-white dark:bg-black">
+        <button
+          onClick={onBack}
+          className="text-blue-600 text-2xl font-semibold"
+        >
           <IoMdArrowRoundBack />
         </button>
-        <h2 className="ml-3 font-bold text-center w-full">{chat?.name || "Chat"}</h2>
+        <h2 className="ml-3 font-bold text-center w-full">
+          {chat?.name || "Chat"}
+        </h2>
       </div>
 
-  {/* Scrollable Messages */}
-  <div className="flex-1 overflow-y-auto p-4">
-    {messages.map((msg) => (
-      <MessageItem
-        key={msg.id}
-        message={msg}
-        avatar={chat?.avatar}
-        currenctUserAvatar={user?.avatar}
-        currentUserId={currentUserId}
-      />
-    ))}
-  </div>
+      {/* Scrollable Messages */}
+      <div className="flex-1 overflow-y-auto p-4">
+        {messages.map((msg) => (
+          <MessageItem
+            key={msg.id}
+            message={msg}
+            avatar={chat?.avatar}
+            currenctUserAvatar={user?.avatar}
+            currentUserId={currentUserId}
+            userName={user?.firstname[0] + user?.lastname[0]}
+          />
+        ))}
+      </div>
 
-  {/* Fixed Input at Bottom */}
-  <div className="flex-shrink-0">
-    <MessageInput
-      supabase={supabase}
-      chatId={chat.id}
-      senderId={chat.sender_id}
-      currentUserId={currentUserId}
-      onNewMessage={(msg) => {
-        onSendMessage(msg);
-      }}
-    />
-  </div>
-</div>
-
-
+      {/* Fixed Input at Bottom */}
+      <div className="flex-shrink-0">
+        <MessageInput
+          supabase={supabase}
+          chatId={chat.id}
+          senderId={chat.sender_id}
+          currentUserId={currentUserId}
+          onNewMessage={(msg) => {
+            onSendMessage(msg);
+          }}
+        />
+      </div>
+    </div>
   );
 }

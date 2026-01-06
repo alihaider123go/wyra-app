@@ -17,7 +17,13 @@ import { FaUsers } from "react-icons/fa";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, TrendingUp, Clock, Sparkles } from "lucide-react";
 
-export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelectedUserId }: any) {
+export default function WyraTimeline({
+  searchTerm,
+  postId,
+  setActiveTab,
+  setSelectedUserId,
+  setPostId,
+}: any) {
   const supabase = createClient();
 
   const [wyraList, setWyraList] = useState<any[]>([]);
@@ -47,9 +53,6 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelec
     });
   }, []);
 
-  // =============================
-  // Fetch paginated wyras
-  // =============================
   const fetchWyras = useCallback(
     async (reset = false) => {
       if (!user || isFetchingRef.current) return;
@@ -58,29 +61,25 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelec
       isFetchingRef.current = true;
 
       const limit = 20;
-      try {
-        let data: any[] = [];
 
-        if (postId) {
-          const res = await getWyraById(postId, user.id);
-          data = [res];
-        } else {
-          data = await getUnifiedHomeWyras(
-            user.id,
-            debouncedSearch,
-            reset ? 1 : pageRef.current,
-            limit
-          );
-        }
+      try {
+        const data = await getUnifiedHomeWyras(
+          user.id,
+          debouncedSearch,
+          reset ? 1 : pageRef.current,
+          limit
+        );
 
         setWyraList((prev) => {
-          const combined = reset ? data : [...prev, ...data];
-          return Array.from(new Map(combined.map((w) => [w.id, w])).values());
+          if (reset) return data;
+
+          const existingIds = new Set(prev.map((w) => w.id));
+          const filtered = data.filter((w) => !existingIds.has(w.id));
+
+          return [...prev, ...filtered];
         });
 
-        if (reset) pageRef.current = 2;
-        else pageRef.current += 1;
-
+        pageRef.current = reset ? 2 : pageRef.current + 1;
         hasMoreRef.current = data.length === limit;
       } catch (err) {
         console.error("Error fetching wyras:", err);
@@ -91,7 +90,6 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelec
     [user, debouncedSearch]
   );
 
-  // Reset on search or tab change
   useEffect(() => {
     if (!user) return;
 
@@ -110,7 +108,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelec
     setCircleList(data || []);
   }, [user, debouncedSearch]);
 
-   const fetchFollowingUsersWyras = useCallback(async () => {
+  const fetchFollowingUsersWyras = useCallback(async () => {
     if (!user) return;
     const data = await getFollowingUsersWyras(user.id);
     setFollowingWyraList(data || []);
@@ -118,7 +116,7 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelec
 
   useEffect(() => {
     fetchCircleWyras();
-    fetchFollowingUsersWyras()
+    fetchFollowingUsersWyras();
   }, [fetchCircleWyras]);
 
   useEffect(() => {
@@ -127,7 +125,11 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelec
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && !isFetchingRef.current && hasMoreRef.current) {
+        if (
+          entry.isIntersecting &&
+          !isFetchingRef.current &&
+          hasMoreRef.current
+        ) {
           fetchWyras(false);
         }
       },
@@ -172,7 +174,11 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelec
                   : "text-gray-500"
               }`}
             >
-              {tab.isImage ? <FaUsers className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
+              {tab.isImage ? (
+                <FaUsers className="w-6 h-6" />
+              ) : (
+                <Icon className="w-6 h-6" />
+              )}
               <span className="text-xs mt-1 font-semibold">{tab.label}</span>
             </button>
           );
@@ -182,12 +188,27 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelec
       {/* Content */}
       <div className="max-w-3xl">
         {activeFeatureTab === "circles" ? (
-          <CirclesWyras wyras={circleList} fetchWyras={fetchCircleWyras} setSelectedUserId={setSelectedUserId} setActiveTab={setActiveTab}/>
+          <CirclesWyras
+            wyras={circleList}
+            fetchWyras={fetchCircleWyras}
+            setSelectedUserId={setSelectedUserId}
+            setActiveTab={setActiveTab}
+          />
         ) : activeFeatureTab === "trending" ? (
-          <WyraSection wyras={wyraList.filter((w) => w.likeCount > 10)} setSelectedUserId={setSelectedUserId} setActiveTab={setActiveTab}/>
+          <WyraSection
+            wyras={wyraList.filter((w) => w.likeCount > 10)}
+            setSelectedUserId={setSelectedUserId}
+            setActiveTab={setActiveTab}
+            fetchWyras={fetchWyras}
+          />
         ) : activeFeatureTab === "recent" ? (
           <>
-            <WyraSection wyras={wyraList} setSelectedUserId={setSelectedUserId} setActiveTab={setActiveTab}/>
+            <WyraSection
+              wyras={wyraList}
+              setSelectedUserId={setSelectedUserId}
+              setActiveTab={setActiveTab}
+              fetchWyras={fetchWyras}
+            />
 
             {/* Loader */}
             {hasMoreRef.current && (
@@ -197,7 +218,12 @@ export default function WyraTimeline({ searchTerm, postId, setActiveTab,setSelec
             )}
           </>
         ) : (
-            <WyraSection wyras={followingWyraList} setSelectedUserId={setSelectedUserId} setActiveTab={setActiveTab}/>
+          <WyraSection
+            wyras={followingWyraList}
+            setSelectedUserId={setSelectedUserId}
+            setActiveTab={setActiveTab}
+            fetchWyras={fetchWyras}
+          />
         )}
       </div>
     </>

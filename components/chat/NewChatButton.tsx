@@ -26,9 +26,11 @@ export default function NewChatButton({
 
       const { data, error } = await supabase
         .from("user_profiles")
-        .select(`id, firstname, lastname, username, email, account_settings (
+        .select(
+          `id, firstname, lastname, username, email, account_settings (
       find_by_email
-    )`)
+    )`
+        )
         .or(
           `firstname.ilike.%${search}%,lastname.ilike.%${search}%,username.ilike.%${search}%,email.ilike.%${search}%`
         )
@@ -76,7 +78,12 @@ export default function NewChatButton({
     // Create new chat
     const { data: newChat, error } = await supabase
       .from("chats")
-      .insert([{ is_group: false }])
+      .insert([
+        {
+          is_group: false,
+          sender_id: otherUserId, // 👈 add sender_id here
+        },
+      ])
       .select()
       .single();
 
@@ -102,7 +109,6 @@ export default function NewChatButton({
         className="bg-blue-500 px-3 py-1 rounded text-white dark:text-black"
       >
         <Plus className="inline mr-1" />
-
       </button>
       {open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
@@ -118,7 +124,9 @@ export default function NewChatButton({
             />
             <div className="max-h-48 overflow-y-auto">
               {results.length === 0 && (
-                <p className="text-gray-500 dark:text-gray-200 px-2 py-1">No users found</p>
+                <p className="text-gray-500 dark:text-gray-200 px-2 py-1">
+                  No users found
+                </p>
               )}
 
               {results.map((user) => (
@@ -130,7 +138,9 @@ export default function NewChatButton({
                   <div className="font-medium">
                     {user.firstname} {user.lastname}
                   </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-200">@{user.username}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-200">
+                    @{user.username}
+                  </div>
                   <div className="text-xs text-gray-400">{user.email}</div>
                 </div>
               ))}

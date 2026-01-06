@@ -5,12 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 import UserProfileHeader from "./ProfileHeader";
 import CircleList from "../circle/CircleList";
 import MyWyras from "../wyra/MyWyras";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loader from "@/components/common/loader";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -24,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
 } from "@/components/ui/dialog";
 
 import { Input } from "@/components/ui/input";
@@ -45,7 +40,11 @@ interface UserProfile {
   account_settings?: any;
 }
 
-export default function Profile({ userId, setActiveTab, setSelectedUserId }: ProfileProps) {
+export default function Profile({
+  userId,
+  setActiveTab,
+  setSelectedUserId,
+}: ProfileProps) {
   const supabase = createClient();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -54,14 +53,18 @@ export default function Profile({ userId, setActiveTab, setSelectedUserId }: Pro
   const [followingCount, setFollowingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeCircleTab, setActiveCircleTab] = useState<"myCircles" | "addedCircles">("myCircles");
+  const [activeCircleTab, setActiveCircleTab] = useState<
+    "myCircles" | "addedCircles"
+  >("myCircles");
 
   const [followersList, setFollowersList] = useState<any[]>([]);
   const [followingList, setFollowingList] = useState<any[]>([]);
 
   // Modal State
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState<"followers" | "following" | null>(null);
+  const [modalType, setModalType] = useState<"followers" | "following" | null>(
+    null
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter users inside modal
@@ -137,7 +140,6 @@ export default function Profile({ userId, setActiveTab, setSelectedUserId }: Pro
         if (followingError) throw followingError;
         setFollowingCount(followingData?.length || 0);
         setFollowingList(followingData?.map((f: any) => f.following) || []);
-
       } catch (err: any) {
         console.log(err, "err");
         setError("Failed to load profile.");
@@ -192,17 +194,33 @@ export default function Profile({ userId, setActiveTab, setSelectedUserId }: Pro
                   key={user.id}
                   className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                 >
-                  <img
-                    src={user.avatar || "/default.png"}
-                    className="w-10 h-10 rounded-full object-cover"
-                    alt=""
-                  />
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar || "/default.png"}
+                      className="w-10 h-10 rounded-full object-cover"
+                      alt=""
+                    />
+                  ) : (
+                    <div
+                      className="relative w-10 h-10 rounded-full p-[2px]
+                 bg-gradient-to-r from-blue-500 to-purple-600"
+                    >
+                      <div
+                        className="w-full h-full rounded-full flex items-center justify-center
+                   bg-white dark:bg-black text-gray-700 dark:text-gray-300 font-bold text-lg"
+                      >
+                        {user?.firstname[0] + user?.lastname[0]}
+                      </div>
+                    </div>
+                  )}
 
                   <div>
                     <div className="font-medium">
                       {user.firstname} {user.lastname}
                     </div>
-                    <div className="text-sm text-gray-500">@{user.username}</div>
+                    <div className="text-sm text-gray-500">
+                      @{user.username}
+                    </div>
                   </div>
                 </div>
               ))
@@ -216,20 +234,24 @@ export default function Profile({ userId, setActiveTab, setSelectedUserId }: Pro
       {/* ===== Profile Card ===== */}
       <Card className="shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
         <CardHeader className="text-center pb-6">
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">Profile</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+            Profile
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <UserProfileHeader
             user={{
               avatar: profile.avatar || "",
-              fullName: `${profile.firstname ?? ""} ${profile.lastname ?? ""}`.trim(),
+              fullName: `${profile.firstname ?? ""} ${
+                profile.lastname ?? ""
+              }`.trim(),
               username: profile.username,
               bio: profile.bio ?? "",
               stats: {
                 wyras: wyrasCount,
                 followers: followersCount,
-                following: followingCount
-              }
+                following: followingCount,
+              },
             }}
             onFollowersClick={() => openModal("followers")}
             onFollowingClick={() => openModal("following")}
@@ -246,7 +268,9 @@ export default function Profile({ userId, setActiveTab, setSelectedUserId }: Pro
       {/* ===== Circles ===== */}
       <Card className="mt-[50px] shadow-2xl border-0 bg-white dark:bg-black/80 backdrop-blur-lg animate-slide-in-right">
         <CardHeader className="text-center pb-6">
-          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">Circles</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+            Circles
+          </CardTitle>
         </CardHeader>
 
         {profile?.account_settings?.show_circles_on_profile && (
@@ -269,7 +293,9 @@ export default function Profile({ userId, setActiveTab, setSelectedUserId }: Pro
         <CardContent className="pt-6">
           {activeCircleTab === "myCircles" && <CircleList userId={userId} />}
           {profile?.account_settings?.show_circles_on_profile &&
-            activeCircleTab === "addedCircles" && <AddedCircles userId={userId} />}
+            activeCircleTab === "addedCircles" && (
+              <AddedCircles userId={userId} />
+            )}
         </CardContent>
       </Card>
 
@@ -286,7 +312,11 @@ export default function Profile({ userId, setActiveTab, setSelectedUserId }: Pro
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <MyWyras userId={userId} setActiveTab={setActiveTab} setSelectedUserId={setSelectedUserId} />
+          <MyWyras
+            userId={userId}
+            setActiveTab={setActiveTab}
+            setSelectedUserId={setSelectedUserId}
+          />
         </CardContent>
       </Card>
     </>
